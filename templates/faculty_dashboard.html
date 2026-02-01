@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Faculty Dashboard - C Faculty Manager</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="page-wrapper">
+        <!-- Navbar -->
+        <nav class="navbar">
+            <div class="container">
+                <a href="/" class="navbar-brand">
+                    💻 C Faculty Manager
+                </a>
+                <ul class="navbar-nav">
+                    <li><span id="welcomeText" style="color: white;"></span></li>
+                    <li><a href="#" onclick="logout()" class="nav-btn">Logout</a></li>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- Dashboard -->
+        <div class="dashboard">
+            <div class="container">
+                <div class="dashboard-header">
+                    <div>
+                        <h1 class="dashboard-title">📅 Today's Schedule</h1>
+                        <p id="dateDisplay" style="color: var(--text-secondary);"></p>
+                    </div>
+                </div>
+
+                <!-- Schedule Cards -->
+                <div id="scheduleContainer">
+                    <div class="card">
+                        <p class="text-center">Loading schedule...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="container">
+                <p>&copy; 2026 C Programming Faculty Management System</p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Modal for filling entry -->
+    <div class="modal-overlay" id="entryModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">📝 Fill Daily Entry</h3>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="entryForm">
+                    <input type="hidden" id="modalDeptId">
+                    <input type="hidden" id="modalPeriod">
+                    
+                    <div class="form-group">
+                        <label class="form-label">Department</label>
+                        <input type="text" class="form-control" id="modalDeptName" readonly>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Period</label>
+                        <input type="text" class="form-control" id="modalPeriodDisplay" readonly>
+                    </div>
+                    
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="isAbsent" onchange="toggleAbsent()">
+                        <label for="isAbsent">Mark as Absent</label>
+                    </div>
+                    
+                    <div id="classDetails">
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="isSwapped" onchange="toggleSwapped()">
+                            <label for="isSwapped">Class Swapped/Changed</label>
+                        </div>
+                        
+                        <div class="form-group hidden" id="swappedWithGroup">
+                            <label class="form-label">Swapped With (Faculty Name)</label>
+                            <input type="text" class="form-control" id="swappedWith" placeholder="Enter faculty name">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Select Topic (Syllabus)</label>
+                            <select class="form-control" id="syllabusSelect">
+                                <option value="">-- Select Topic --</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Class Summary</label>
+                            <textarea class="form-control" id="summary" placeholder="Brief summary of what was taught..."></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Session Plan</label>
+                            <textarea class="form-control" id="sessionPlan" placeholder="What do you plan to cover in this session?"></textarea>
+                        </div>
+                    </div>
+                    
+                    <div class="modal-footer" style="padding: 0; border: none; margin-top: 20px;">
+                        <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Submit Entry</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/app.js"></script>
+    <script>
+        let syllabusData = [];
+        
+        // Check auth
+        if (!isLoggedIn() || getUserType() !== 'faculty') {
+            window.location.href = '/faculty/login';
+        }
+        
+        // Set welcome text
+        document.getElementById('welcomeText').textContent = `Welcome, ${getUserName()}`;
+        
+        // Load data on page load
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadSyllabus();
+            await loadSchedule();
+        });
+        
+        async function loadSyllabus() {
+            try {
+                syllabusData = await apiRequest('/api/syllabus');
+                const select = document.getElementById('syllabusSelect');
+                
+                let currentUnit = 0;
+                syllabusData.forEach(topic => {
+                    if (topic.unit !== currentUnit) {
+                        const optgroup = document.createElement('optgroup');
+                        optgroup.label = `Unit ${topic.unit}`;
+                        select.appendChild(optgroup);
+                        currentUnit = topic.unit;
+                    }
+                    const option = document.createElement('option');
+                    option.value = topic.id;
+                    option.textContent = topic.topic_name;
+                    select.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Error loading syllabus:', error);
+            }
+        }
+        
+        async function loadSchedule() {
+            try {
+                const data = await apiRequest('/api/faculty/today-schedule', 'GET', null, true);
+                
+                document.getElementById('dateDisplay').textContent = `${data.day}, ${formatDate(data.date)}`;
+                
+                const container = document.getElementById('scheduleContainer');
+                
+                if (data.schedule.length === 0) {
+                    container.innerHTML = `
+                        <div class="card text-center">
+                            <h3>🎉 No classes scheduled for today!</h3>
+                            <p style="color: var(--text-secondary); margin-top: 10px;">Enjoy your day!</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                let html = '<div class="card"><table class="schedule-table"><thead><tr>' +
+                    '<th>Period</th><th>Time</th><th>Department</th><th>Status</th><th>Action</th>' +
+                    '</tr></thead><tbody>';
+                
+                data.schedule.forEach(item => {
+                    let status = '';
+                    let statusClass = 'pending';
+                    let btnText = 'Fill Entry';
+                    
+                    if (item.is_filled) {
+                        if (item.daily_entry.is_absent) {
+                            status = 'Absent';
+                            statusClass = 'absent';
+                        } else if (item.daily_entry.is_swapped) {
+                            status = 'Swapped';
+                            statusClass = 'swapped';
+                        } else {
+                            status = 'Filled';
+                            statusClass = 'filled';
+                        }
+                        btnText = 'Edit Entry';
+                    } else {
+                        status = 'Pending';
+                    }
+                    
+                    html += `
+                        <tr>
+                            <td><span class="period-badge">${getOrdinal(item.period)}</span></td>
+                            <td>${getPeriodTime(item.period)}</td>
+                            <td><strong>${item.department_name}</strong><br><small>${item.subject_code} - ${item.subject_name}</small></td>
+                            <td><span class="status-badge ${statusClass}">${status}</span></td>
+                            <td>
+                                <button class="btn btn-sm ${item.is_filled ? 'btn-secondary' : 'btn-primary'}" 
+                                    onclick="openModal(${item.department_id}, ${item.period}, '${item.department_name}', ${JSON.stringify(item.daily_entry).replace(/"/g, '&quot;')})">
+                                    ${btnText}
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                });
+                
+                html += '</tbody></table></div>';
+                container.innerHTML = html;
+                
+            } catch (error) {
+                console.error('Error loading schedule:', error);
+                document.getElementById('scheduleContainer').innerHTML = `
+                    <div class="card">
+                        <div class="alert alert-error">Failed to load schedule. Please try again.</div>
+                    </div>
+                `;
+            }
+        }
+        
+        function openModal(deptId, period, deptName, existingData) {
+            document.getElementById('modalDeptId').value = deptId;
+            document.getElementById('modalPeriod').value = period;
+            document.getElementById('modalDeptName').value = deptName;
+            document.getElementById('modalPeriodDisplay').value = `${getOrdinal(period)} Period (${getPeriodTime(period)})`;
+            
+            // Reset form
+            document.getElementById('isAbsent').checked = false;
+            document.getElementById('isSwapped').checked = false;
+            document.getElementById('swappedWith').value = '';
+            document.getElementById('syllabusSelect').value = '';
+            document.getElementById('summary').value = '';
+            document.getElementById('sessionPlan').value = '';
+            document.getElementById('classDetails').classList.remove('hidden');
+            document.getElementById('swappedWithGroup').classList.add('hidden');
+            
+            // Fill existing data if available
+            if (existingData) {
+                document.getElementById('isAbsent').checked = existingData.is_absent;
+                document.getElementById('isSwapped').checked = existingData.is_swapped;
+                document.getElementById('swappedWith').value = existingData.swapped_with || '';
+                document.getElementById('syllabusSelect').value = existingData.syllabus_id || '';
+                document.getElementById('summary').value = existingData.summary || '';
+                document.getElementById('sessionPlan').value = existingData.session_plan || '';
+                
+                if (existingData.is_absent) {
+                    document.getElementById('classDetails').classList.add('hidden');
+                }
+                if (existingData.is_swapped) {
+                    document.getElementById('swappedWithGroup').classList.remove('hidden');
+                }
+            }
+            
+            document.getElementById('entryModal').classList.add('active');
+        }
+        
+        function closeModal() {
+            document.getElementById('entryModal').classList.remove('active');
+        }
+        
+        function toggleAbsent() {
+            const isAbsent = document.getElementById('isAbsent').checked;
+            if (isAbsent) {
+                document.getElementById('classDetails').classList.add('hidden');
+            } else {
+                document.getElementById('classDetails').classList.remove('hidden');
+            }
+        }
+        
+        function toggleSwapped() {
+            const isSwapped = document.getElementById('isSwapped').checked;
+            if (isSwapped) {
+                document.getElementById('swappedWithGroup').classList.remove('hidden');
+            } else {
+                document.getElementById('swappedWithGroup').classList.add('hidden');
+            }
+        }
+        
+        document.getElementById('entryForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const data = {
+                department_id: parseInt(document.getElementById('modalDeptId').value),
+                period: parseInt(document.getElementById('modalPeriod').value),
+                is_absent: document.getElementById('isAbsent').checked,
+                is_swapped: document.getElementById('isSwapped').checked,
+                swapped_with: document.getElementById('swappedWith').value || null,
+                syllabus_id: document.getElementById('syllabusSelect').value ? parseInt(document.getElementById('syllabusSelect').value) : null,
+                summary: document.getElementById('summary').value || null,
+                session_plan: document.getElementById('sessionPlan').value || null
+            };
+            
+            try {
+                showLoading();
+                await apiRequest('/api/faculty/daily-entry', 'POST', data, true);
+                hideLoading();
+                closeModal();
+                await loadSchedule();
+                alert('Entry saved successfully!');
+            } catch (error) {
+                hideLoading();
+                alert('Error: ' + error.message);
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Faculty Login - C Faculty Manager</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <h1>👨‍🏫 Faculty Login</h1>
+                <p>Sign in to manage your daily schedule</p>
+            </div>
+            
+            <form id="loginForm">
+                <div class="form-group">
+                    <label class="form-label">Email Address</label>
+                    <input type="email" class="form-control" id="email" placeholder="Enter your email" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" class="form-control" id="password" placeholder="Enter your password" required>
+                </div>
+                
+                <button type="submit" class="btn btn-primary btn-block btn-lg">Login</button>
+            </form>
+            
+            <div class="auth-footer">
+                <p style="margin-top: 10px;"><a href="/">← Back to Home</a></p>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/app.js?v=2"></script>
+    <script>
+        // Clear any stale login state when on login page
+        localStorage.removeItem('token');
+        localStorage.removeItem('userType');
+        localStorage.removeItem('userName');
+        
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            try {
+                showLoading();
+                const result = await apiRequest('/api/faculty/login', 'POST', { email, password });
+                
+                localStorage.setItem('token', result.access_token);
+                localStorage.setItem('userType', 'faculty');
+                localStorage.setItem('userName', result.faculty_name);
+                
+                window.location.href = '/faculty/dashboard';
+            } catch (error) {
+                hideLoading();
+                showAlert(error.message);
+            }
+        });
+    </script>
+</body>
+</html>
+    </script>
+</body>
+</html>

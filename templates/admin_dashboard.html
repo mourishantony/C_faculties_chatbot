@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - C Faculty Manager</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="page-wrapper">
+        <!-- Navbar -->
+        <nav class="navbar">
+            <div class="container">
+                <a href="/" class="navbar-brand">
+                    💻 C Faculty Manager
+                </a>
+                <ul class="navbar-nav">
+                    <li><span style="color: white;">👤 Admin</span></li>
+                    <li><a href="#" onclick="logout()" class="nav-btn">Logout</a></li>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- Dashboard -->
+        <div class="dashboard">
+            <div class="container">
+                <div class="dashboard-header">
+                    <h1 class="dashboard-title">📊 Admin Dashboard</h1>
+                </div>
+
+                <!-- Stats -->
+                <div class="stats-grid" id="statsGrid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalScheduled">-</div>
+                        <div class="stat-label">Total Classes Today</div>
+                    </div>
+                    <div class="stat-card success">
+                        <div class="stat-value" id="filledCount">-</div>
+                        <div class="stat-label">Entries Filled</div>
+                    </div>
+                    <div class="stat-card warning">
+                        <div class="stat-value" id="pendingCount">-</div>
+                        <div class="stat-label">Pending</div>
+                    </div>
+                    <div class="stat-card danger">
+                        <div class="stat-value" id="absentCount">-</div>
+                        <div class="stat-label">Absent</div>
+                    </div>
+                </div>
+
+                <!-- Report Section -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">📋 Daily Reports</h3>
+                    </div>
+                    
+                    <div class="report-filters">
+                        <div class="filter-group">
+                            <label>Start Date</label>
+                            <input type="date" id="startDate" class="form-control">
+                        </div>
+                        <div class="filter-group">
+                            <label>End Date</label>
+                            <input type="date" id="endDate" class="form-control">
+                        </div>
+                        <button class="btn btn-primary" onclick="loadReport()">Load Report</button>
+                    </div>
+                    
+                    <div id="reportContainer">
+                        <p class="text-center" style="padding: 20px;">Select date range and click "Load Report"</p>
+                    </div>
+                </div>
+
+                <!-- Faculties List -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">👨‍🏫 Registered Faculties</h3>
+                    </div>
+                    <div id="facultiesContainer">
+                        <p>Loading...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="container">
+                <p>&copy; 2026 C Programming Faculty Management System</p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Floating Chatbot -->
+    <div class="chatbot-floating" id="chatbotWidget">
+        <!-- Chat Button -->
+        <button class="chatbot-toggle-btn" id="chatToggleBtn" onclick="toggleChatbot()">
+            <span class="chat-icon">💬</span>
+            <span class="close-icon">✕</span>
+        </button>
+        
+        <!-- Chat Window -->
+        <div class="chatbot-window" id="chatWindow">
+            <div class="chatbot-header">
+                <div class="chatbot-header-info">
+                    <div class="chatbot-avatar">🤖</div>
+                    <div>
+                        <h4>C Programming Assistant</h4>
+                        <span class="chatbot-status">● Online</span>
+                    </div>
+                </div>
+                <button class="chatbot-close" onclick="toggleChatbot()">✕</button>
+            </div>
+            
+            <!-- Welcome Screen (shown initially) -->
+            <div class="chatbot-welcome" id="chatWelcome">
+                <div class="welcome-avatar">
+                    <div class="avatar-circle">
+                        <span>🤖</span>
+                    </div>
+                    <div class="avatar-wave">👋</div>
+                </div>
+                <h3>C Programming Assistant</h3>
+                <p>Ask your query related to classes, schedules, topics, faculties etc.</p>
+                
+                <!-- Category Tabs -->
+                <div class="faq-categories">
+                    <button class="faq-cat-btn active" onclick="showFaqCategory('all')">All</button>
+                    <button class="faq-cat-btn" onclick="showFaqCategory('schedule')">Schedule</button>
+                    <button class="faq-cat-btn" onclick="showFaqCategory('faculty')">Faculty</button>
+                    <button class="faq-cat-btn" onclick="showFaqCategory('topics')">Topics</button>
+                </div>
+                
+                <!-- FAQ Questions -->
+                <div class="faq-list" id="faqList">
+                    <div class="faq-item" data-category="schedule" onclick="askFaq('What are the C programming classes today?')">
+                        <span>What are the C programming classes today?</span>
+                        <span class="faq-arrow">›</span>
+                    </div>
+                    <div class="faq-item" data-category="schedule" onclick="askFaq('What class is in the 4th period?')">
+                        <span>What class is in the 4th period?</span>
+                        <span class="faq-arrow">›</span>
+                    </div>
+                    <div class="faq-item" data-category="faculty" onclick="askFaq('List all C programming faculties')">
+                        <span>List all C programming faculties</span>
+                        <span class="faq-arrow">›</span>
+                    </div>
+                    <div class="faq-item" data-category="faculty" onclick="askFaq('Who is absent today?')">
+                        <span>Who is absent today?</span>
+                        <span class="faq-arrow">›</span>
+                    </div>
+                    <div class="faq-item" data-category="topics" onclick="askFaq('What topics are being taught today?')">
+                        <span>What topics are being taught today?</span>
+                        <span class="faq-arrow">›</span>
+                    </div>
+                    <div class="faq-item" data-category="schedule" onclick="askFaq('When is the C class for AIDS-A?')">
+                        <span>When is the C class for AIDS-A?</span>
+                        <span class="faq-arrow">›</span>
+                    </div>
+                    <div class="faq-item" data-category="faculty" onclick="askFaq('What is Dr. Ramesh Kumar\\'s schedule today?')">
+                        <span>What is Dr. Ramesh Kumar's schedule today?</span>
+                        <span class="faq-arrow">›</span>
+                    </div>
+                    <div class="faq-item" data-category="topics" onclick="askFaq('What topic will Dr. Ramesh Kumar teach today?')">
+                        <span>What topic will Dr. Ramesh Kumar teach today?</span>
+                        <span class="faq-arrow">›</span>
+                    </div>
+                </div>
+                
+                <div class="welcome-footer">
+                    <p>You might be interested in:</p>
+                    <div class="quick-tags">
+                        <button onclick="askFaq('Today\\'s summary')">📊 Today's Summary</button>
+                        <button onclick="askFaq('Help')">❓ Help</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Chat Messages (hidden initially) -->
+            <div class="chatbot-messages hidden" id="floatingChatMessages">
+            </div>
+            
+            <!-- Quick Actions (shown during chat) -->
+            <div class="chatbot-quick-actions hidden" id="quickActions">
+                <button onclick="quickAsk('Today\\'s classes')">Today's Classes</button>
+                <button onclick="quickAsk('Topics today')">Topics Today</button>
+                <button onclick="quickAsk('Absent today')">Absent Today</button>
+                <button onclick="showWelcome()">📋 FAQs</button>
+            </div>
+            
+            <div class="chatbot-input-area">
+                <input type="text" id="floatingChatInput" placeholder="Write your query here..." onkeypress="handleChatKeypress(event)">
+                <button onclick="sendFloatingMessage()">➤</button>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        /* Floating Chatbot Styles */
+        .chatbot-floating {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 9999;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .chatbot-toggle-btn {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #2563eb, #7c3aed);
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .chatbot-toggle-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.5);
+        }
+        
+        .chatbot-toggle-btn .chat-icon,
+        .chatbot-toggle-btn .close-icon {
+            font-size: 24px;
+            position: absolute;
+            transition: all 0.3s ease;
+        }
+        
+        .chatbot-toggle-btn .close-icon {
+            opacity: 0;
+            transform: rotate(-90deg);
+            color: white;
+        }
+        
+        .chatbot-floating.open .chatbot-toggle-btn .chat-icon {
+            opacity: 0;
+            transform: rotate(90deg);
+        }
+        
+        .chatbot-floating.open .chatbot-toggle-btn .close-icon {
+            opacity: 1;
+            transform: rotate(0);
+        }
+        
+        .chatbot-window {
+            position: absolute;
+            bottom: 75px;
+            right: 0;
+            width: 400px;
+            height: 580px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(20px) scale(0.95);
+            transition: all 0.3s ease;
+        }
+        
+        .chatbot-floating.open .chatbot-window {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0) scale(1);
+        }
+        
+        .chatbot-header {
+            background: linear-gradient(135deg, #2563eb, #7c3aed);
+            color: white;
+            padding: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .chatbot-header-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .chatbot-avatar {
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+        
+        .chatbot-header h4 {
+            margin: 0;
+            font-size: 15px;
+            font-weight: 600;
+        }
+        
+        .chatbot-status {
+            font-size: 12px;
+            opacity: 0.9;
+            color: #86efac;
+        }
+        
+        .chatbot-close {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+        
+        .chatbot-close:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        
+        /* Welcome Screen */
+        .chatbot-welcome {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background: #f8fafc;
+            text-align: center;
+        }
+        
+        .welcome-avatar {
+            position: relative;
+            display: inline-block;
+            margin-bottom: 15px;
+        }
+        
+        .avatar-circle {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #dbeafe, #c7d2fe);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            margin: 0 auto;
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.2);
+        }
+        
+        .avatar-wave {
+            position: absolute;
+            top: -5px;
+            right: -10px;
+            font-size: 24px;
+            animation: wave 1.5s infinite;
+        }
+        
+        @keyframes wave {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(20deg); }
+            75% { transform: rotate(-15deg); }
+        }
+        
+        .chatbot-welcome h3 {
+            margin: 0 0 8px 0;
+            color: #1e293b;
+            font-size: 18px;
+        }
+        
+        .chatbot-welcome > p {
+            margin: 0 0 20px 0;
+            color: #64748b;
+            font-size: 13px;
+        }
+        
+        /* FAQ Categories */
+        .faq-categories {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .faq-cat-btn {
+            padding: 6px 14px;
+            border: 1px solid #e2e8f0;
+            background: white;
+            border-radius: 20px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #475569;
+        }
+        
+        .faq-cat-btn:hover, .faq-cat-btn.active {
+            background: #2563eb;
+            color: white;
+            border-color: #2563eb;
+        }
+        
+        /* FAQ List */
+        .faq-list {
+            text-align: left;
+            max-height: 250px;
+            overflow-y: auto;
+        }
+        
+        .faq-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 14px;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 13px;
+            color: #334155;
+        }
+        
+        .faq-item:hover {
+            background: #f1f5f9;
+            border-color: #2563eb;
+            transform: translateX(4px);
+        }
+        
+        .faq-arrow {
+            color: #2563eb;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        
+        .faq-item.hidden {
+            display: none;
+        }
+        
+        /* Welcome Footer */
+        .welcome-footer {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #e2e8f0;
+        }
+        
+        .welcome-footer p {
+            font-size: 12px;
+            color: #64748b;
+            margin-bottom: 10px;
+        }
+        
+        .quick-tags {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .quick-tags button {
+            padding: 8px 14px;
+            background: #dbeafe;
+            border: none;
+            border-radius: 20px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #1e40af;
+        }
+        
+        .quick-tags button:hover {
+            background: #bfdbfe;
+        }
+        
+        /* Chat Messages */
+        .chatbot-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            background: #f8fafc;
+        }
+        
+        .chatbot-messages.hidden {
+            display: none;
+        }
+        
+        .chat-message {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 16px;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .chat-message.user {
+            flex-direction: row-reverse;
+        }
+        
+        .chat-msg-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+        
+        .chat-message.bot .chat-msg-avatar {
+            background: #dbeafe;
+        }
+        
+        .chat-message.user .chat-msg-avatar {
+            background: #2563eb;
+            color: white;
+        }
+        
+        .chat-msg-content {
+            max-width: 75%;
+            padding: 10px 14px;
+            border-radius: 16px;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+        
+        .chat-message.bot .chat-msg-content {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px 16px 16px 4px;
+        }
+        
+        .chat-message.user .chat-msg-content {
+            background: #2563eb;
+            color: white;
+            border-radius: 16px 16px 4px 16px;
+        }
+        
+        .chat-msg-content p {
+            margin: 0 0 8px 0;
+        }
+        
+        .chat-msg-content p:last-child {
+            margin-bottom: 0;
+        }
+        
+        /* Quick Actions */
+        .chatbot-quick-actions {
+            padding: 8px 12px;
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            border-top: 1px solid #e2e8f0;
+            background: white;
+        }
+        
+        .chatbot-quick-actions.hidden {
+            display: none;
+        }
+        
+        .chatbot-quick-actions button {
+            padding: 6px 12px;
+            background: #f1f5f9;
+            border: 1px solid #e2e8f0;
+            border-radius: 20px;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #475569;
+        }
+        
+        .chatbot-quick-actions button:hover {
+            background: #e2e8f0;
+            border-color: #cbd5e1;
+        }
+        
+        /* Input Area */
+        .chatbot-input-area {
+            padding: 12px 16px;
+            display: flex;
+            gap: 10px;
+            background: white;
+            border-top: 1px solid #e2e8f0;
+        }
+        
+        .chatbot-input-area input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 24px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        
+        .chatbot-input-area input:focus {
+            border-color: #2563eb;
+        }
+        
+        .chatbot-input-area button {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: #2563eb;
+            border: none;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            transition: background 0.2s;
+        }
+        
+        .chatbot-input-area button:hover {
+            background: #1d4ed8;
+        }
+        
+        /* Typing Indicator */
+        .typing-dots {
+            display: flex;
+            gap: 4px;
+            padding: 8px 0;
+        }
+        
+        .typing-dots span {
+            width: 8px;
+            height: 8px;
+            background: #94a3b8;
+            border-radius: 50%;
+            animation: typingBounce 1.4s infinite;
+        }
+        
+        .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+        
+        @keyframes typingBounce {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-4px); }
+        }
+        
+        /* Utility */
+        .hidden {
+            display: none !important;
+        }
+        
+        /* Mobile responsiveness */
+        @media (max-width: 480px) {
+            .chatbot-window {
+                width: calc(100vw - 32px);
+                height: calc(100vh - 120px);
+                right: -8px;
+            }
+        }
+    </style>
+
+    <script src="/static/js/app.js"></script>
+    <script>
+        // Check auth
+        if (!isLoggedIn() || getUserType() !== 'admin') {
+            window.location.href = '/admin/login';
+        }
+        
+        // Set default dates
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('startDate').value = today;
+        document.getElementById('endDate').value = today;
+        
+        // Load data on page load
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadSummary();
+            await loadFaculties();
+            await loadReport();
+        });
+        
+        async function loadSummary() {
+            try {
+                const data = await apiRequest('/api/admin/today-summary');
+                
+                document.getElementById('totalScheduled').textContent = data.total_scheduled;
+                document.getElementById('filledCount').textContent = data.filled;
+                document.getElementById('pendingCount').textContent = data.pending;
+                document.getElementById('absentCount').textContent = data.absent;
+            } catch (error) {
+                console.error('Error loading summary:', error);
+            }
+        }
+        
+        async function loadFaculties() {
+            try {
+                const faculties = await apiRequest('/api/admin/faculties');
+                const container = document.getElementById('facultiesContainer');
+                
+                if (faculties.length === 0) {
+                    container.innerHTML = '<p>No faculties registered yet.</p>';
+                    return;
+                }
+                
+                let html = '<table class="schedule-table"><thead><tr>' +
+                    '<th>#</th><th>Name</th><th>Email</th><th>Phone</th><th>Status</th>' +
+                    '</tr></thead><tbody>';
+                
+                faculties.forEach((f, index) => {
+                    html += `
+                        <tr>
+                            <td>${index + 1}</td>
+                            <td><strong>${f.name}</strong></td>
+                            <td>${f.email}</td>
+                            <td>${f.phone || '-'}</td>
+                            <td><span class="status-badge ${f.is_active ? 'filled' : 'absent'}">${f.is_active ? 'Active' : 'Inactive'}</span></td>
+                        </tr>
+                    `;
+                });
+                
+                html += '</tbody></table>';
+                container.innerHTML = html;
+                
+            } catch (error) {
+                console.error('Error loading faculties:', error);
+            }
+        }
+        
+        async function loadReport() {
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            
+            if (!startDate || !endDate) {
+                alert('Please select date range');
+                return;
+            }
+            
+            try {
+                showLoading();
+                const data = await apiRequest(`/api/admin/report?start_date=${startDate}&end_date=${endDate}`);
+                hideLoading();
+                
+                const container = document.getElementById('reportContainer');
+                
+                if (data.entries.length === 0) {
+                    container.innerHTML = '<p class="text-center" style="padding: 20px;">No entries found for the selected date range.</p>';
+                    return;
+                }
+                
+                let html = `<p style="margin-bottom: 15px;"><strong>Total Entries: ${data.total}</strong></p>`;
+                html += '<table class="schedule-table"><thead><tr>' +
+                    '<th>Date</th><th>Period</th><th>Faculty</th><th>Department</th><th>Topic</th><th>Status</th><th>Summary</th>' +
+                    '</tr></thead><tbody>';
+                
+                data.entries.forEach(entry => {
+                    let status = 'Present';
+                    let statusClass = 'filled';
+                    
+                    if (entry.is_absent) {
+                        status = 'Absent';
+                        statusClass = 'absent';
+                    } else if (entry.is_swapped) {
+                        status = `Swapped (${entry.swapped_with || 'N/A'})`;
+                        statusClass = 'swapped';
+                    }
+                    
+                    html += `
+                        <tr>
+                            <td>${formatDate(entry.date)}</td>
+                            <td><span class="period-badge">${getOrdinal(entry.period)}</span></td>
+                            <td><strong>${entry.faculty_name}</strong></td>
+                            <td>${entry.department_name}</td>
+                            <td>${entry.topic}</td>
+                            <td><span class="status-badge ${statusClass}">${status}</span></td>
+                            <td>${entry.summary || '-'}</td>
+                        </tr>
+                    `;
+                });
+                
+                html += '</tbody></table>';
+                container.innerHTML = html;
+                
+            } catch (error) {
+                hideLoading();
+                console.error('Error loading report:', error);
+                document.getElementById('reportContainer').innerHTML = '<div class="alert alert-error">Failed to load report</div>';
+            }
+        }
+        
+        // ========== Floating Chatbot Functions ==========
+        let chatStarted = false;
+        
+        function toggleChatbot() {
+            const widget = document.getElementById('chatbotWidget');
+            widget.classList.toggle('open');
+            
+            if (widget.classList.contains('open')) {
+                document.getElementById('floatingChatInput').focus();
+            }
+        }
+        
+        function showWelcome() {
+            document.getElementById('chatWelcome').classList.remove('hidden');
+            document.getElementById('floatingChatMessages').classList.add('hidden');
+            document.getElementById('quickActions').classList.add('hidden');
+        }
+        
+        function showChat() {
+            document.getElementById('chatWelcome').classList.add('hidden');
+            document.getElementById('floatingChatMessages').classList.remove('hidden');
+            document.getElementById('quickActions').classList.remove('hidden');
+            chatStarted = true;
+        }
+        
+        function showFaqCategory(category) {
+            // Update active button
+            document.querySelectorAll('.faq-cat-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Filter FAQ items
+            document.querySelectorAll('.faq-item').forEach(item => {
+                if (category === 'all' || item.dataset.category === category) {
+                    item.classList.remove('hidden');
+                } else {
+                    item.classList.add('hidden');
+                }
+            });
+        }
+        
+        function askFaq(question) {
+            showChat();
+            document.getElementById('floatingChatInput').value = question;
+            sendFloatingMessage();
+        }
+        
+        function handleChatKeypress(event) {
+            if (event.key === 'Enter') {
+                sendFloatingMessage();
+            }
+        }
+        
+        function quickAsk(question) {
+            document.getElementById('floatingChatInput').value = question;
+            sendFloatingMessage();
+        }
+        
+        async function sendFloatingMessage() {
+            const input = document.getElementById('floatingChatInput');
+            const message = input.value.trim();
+            if (!message) return;
+            
+            // Switch to chat view if on welcome screen
+            if (!chatStarted) {
+                showChat();
+            }
+            
+            const messagesContainer = document.getElementById('floatingChatMessages');
+            
+            // Add user message
+            messagesContainer.innerHTML += `
+                <div class="chat-message user">
+                    <div class="chat-msg-avatar">👤</div>
+                    <div class="chat-msg-content">
+                        <p>${escapeHtml(message)}</p>
+                    </div>
+                </div>
+            `;
+            
+            input.value = '';
+            scrollChatToBottom();
+            
+            // Show typing indicator
+            const typingId = 'typing-' + Date.now();
+            messagesContainer.innerHTML += `
+                <div class="chat-message bot" id="${typingId}">
+                    <div class="chat-msg-avatar">🤖</div>
+                    <div class="chat-msg-content">
+                        <div class="typing-dots">
+                            <span></span><span></span><span></span>
+                        </div>
+                    </div>
+                </div>
+            `;
+            scrollChatToBottom();
+            
+            try {
+                const response = await apiRequest('/api/chatbot', 'POST', { query: message });
+                
+                // Remove typing indicator
+                document.getElementById(typingId).remove();
+                
+                // Add bot response
+                const formattedResponse = formatBotResponse(response.response);
+                messagesContainer.innerHTML += `
+                    <div class="chat-message bot">
+                        <div class="chat-msg-avatar">🤖</div>
+                        <div class="chat-msg-content">
+                            ${formattedResponse}
+                        </div>
+                    </div>
+                `;
+                
+                scrollChatToBottom();
+                
+            } catch (error) {
+                document.getElementById(typingId).remove();
+                messagesContainer.innerHTML += `
+                    <div class="chat-message bot">
+                        <div class="chat-msg-avatar">🤖</div>
+                        <div class="chat-msg-content">
+                            <p>Sorry, something went wrong. Please try again.</p>
+                        </div>
+                    </div>
+                `;
+                scrollChatToBottom();
+            }
+        }
+        
+        function scrollChatToBottom() {
+            const container = document.getElementById('floatingChatMessages');
+            container.scrollTop = container.scrollHeight;
+        }
+        
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        function formatBotResponse(text) {
+            // Convert markdown-style formatting to HTML
+            let html = text
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\n\n/g, '</p><p>')
+                .replace(/\n/g, '<br>');
+            
+            return '<p>' + html + '</p>';
+        }
+    </script>
+</body>
+</html>
