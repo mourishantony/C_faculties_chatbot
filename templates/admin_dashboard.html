@@ -78,16 +78,34 @@
                         <h3 class="card-title"><i class="material-icons" style="vertical-align: middle; margin-right: 6px; font-size: 20px;">menu_book</i>Classes by Type</h3>
                     </div>
                     <div style="padding: 20px;">
-                        <div class="filter-group" style="max-width: 400px;">
-                            <label for="classTypeFilter" style="display: block; margin-bottom: 8px; font-weight: 600; color: #334155;">
-                                Select Class Type:
-                            </label>
-                            <select id="classTypeFilter" class="form-control" onchange="loadClassesByType()" style="padding: 10px; font-size: 14px;">
-                                <option value="">-- Select Type --</option>
-                                <option value="theory">Theory Classes</option>
-                                <option value="lab">Lab Classes</option>
-                                <option value="mini_project">Mini Project Classes</option>
-                            </select>
+                        <div class="filter-group" style="display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 20px;">
+                            <div style="flex: 1; min-width: 200px;">
+                                <label for="classTypeFilter" style="display: block; margin-bottom: 8px; font-weight: 600; color: #334155;">
+                                    Select Class Type:
+                                </label>
+                                <select id="classTypeFilter" class="form-control" onchange="loadClassesByType()" style="padding: 10px; font-size: 14px;">
+                                    <option value="">-- Select Type --</option>
+                                    <option value="theory">Theory Classes</option>
+                                    <option value="lab">Lab Classes</option>
+                                    <option value="mini_project">Mini Project Classes</option>
+                                </select>
+                            </div>
+                            
+                            <div id="dayFilterContainer" style="flex: 1; min-width: 200px; display: none;">
+                                <label for="dayFilter" style="display: block; margin-bottom: 8px; font-weight: 600; color: #334155;">
+                                    Select Day:
+                                </label>
+                                <select id="dayFilter" class="form-control" onchange="filterByDay()" style="padding: 10px; font-size: 14px;">
+                                    <option value="">-- All Days --</option>
+                                    <option value="Monday">Monday</option>
+                                    <option value="Tuesday">Tuesday</option>
+                                    <option value="Wednesday">Wednesday</option>
+                                    <option value="Thursday">Thursday</option>
+                                    <option value="Friday">Friday</option>
+                                    <option value="Saturday">Saturday</option>
+                                    <option value="Sunday">Sunday</option>
+                                </select>
+                            </div>
                         </div>
                         
                         <div id="classesByTypeContainer" style="margin-top: 20px;">
@@ -188,7 +206,7 @@
                         <span>Who has class today?</span>
                         <span class="faq-arrow">›</span>
                     </div>
-                    <div class="faq-item" data-category="topics" onclick="askFaq('Today\\'s summary')">
+                    <div class="faq-item" data-category="topics" onclick="askFaq('Today\\s summary')">
                         <span>Today's summary</span>
                         <span class="faq-arrow">›</span>
                     </div>
@@ -203,7 +221,7 @@
                 <div class="welcome-footer">
                     <p>You might be interested in:</p>
                     <div class="quick-tags">
-                        <button onclick="askFaq('Today\\'s summary')"><i class="material-icons" style="font-size: 14px; vertical-align: middle; margin-right: 4px;">bar_chart</i>Today's Summary</button>
+                        <button onclick="askFaq('Today\\s summary')"><i class="material-icons" style="font-size: 14px; vertical-align: middle; margin-right: 4px;">bar_chart</i>Today's Summary</button>
                         <button onclick="askFaq('Help')"><i class="material-icons" style="font-size: 14px; vertical-align: middle; margin-right: 4px;">help</i>Help</button>
                     </div>
                 </div>
@@ -1435,12 +1453,22 @@
             }
         }
         
+        // Store loaded classes data globally for day filtering
+        let currentClassesData = null;
+        
         async function loadClassesByType() {
             const classType = document.getElementById('classTypeFilter').value;
             const container = document.getElementById('classesByTypeContainer');
+            const dayFilterContainer = document.getElementById('dayFilterContainer');
+            const dayFilter = document.getElementById('dayFilter');
+            
+            // Reset day filter
+            dayFilter.value = '';
             
             if (!classType) {
                 container.innerHTML = '<p class="text-center" style="padding: 20px; color: #64748b;">Select a class type from the dropdown above to view scheduled classes</p>';
+                dayFilterContainer.style.display = 'none';
+                currentClassesData = null;
                 return;
             }
             
@@ -1456,67 +1484,116 @@
                         'mini_project': 'Mini Project'
                     };
                     container.innerHTML = `<p class="text-center" style="padding: 20px; color: #64748b;">No ${typeNames[classType]} classes found in the timetable.</p>`;
+                    dayFilterContainer.style.display = 'none';
+                    currentClassesData = null;
                     return;
                 }
                 
-                // Group classes by day
-                const dayOrder = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-                const groupedByDay = {};
-                
-                data.classes.forEach(cls => {
-                    if (!groupedByDay[cls.day]) {
-                        groupedByDay[cls.day] = [];
-                    }
-                    groupedByDay[cls.day].push(cls);
-                });
-                
-                // Sort each day's classes by period
-                Object.keys(groupedByDay).forEach(day => {
-                    groupedByDay[day].sort((a, b) => a.period - b.period);
-                });
-                
-                // Build HTML
-                const typeIcons = {
-                    'theory': '<i class="material-icons" style="font-size: 24px; vertical-align: middle;">book</i>',
-                    'lab': '<i class="material-icons" style="font-size: 24px; vertical-align: middle;">science</i>',
-                    'mini_project': '<i class="material-icons" style="font-size: 24px; vertical-align: middle;">lightbulb</i>'
+                // Store data globally for day filtering
+                currentClassesData = {
+                    classType: classType,
+                    classes: data.classes,
+                    totalClasses: data.total_classes
                 };
                 
-                const typeNames = {
-                    'theory': 'Theory Classes',
-                    'lab': 'Lab Classes',
-                    'mini_project': 'Mini Project Classes'
-                };
+                // Show day filter
+                dayFilterContainer.style.display = 'block';
                 
-                let html = `
-                    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
-                        <h3 style="margin: 0 0 5px 0; display: flex; align-items: center; gap: 10px;">
-                            <span style="font-size: 28px;">${typeIcons[classType]}</span>
-                            <span>${typeNames[classType]}</span>
-                        </h3>
-                        <p style="margin: 0; opacity: 0.9; font-size: 14px;">Total: ${data.total_classes} class${data.total_classes !== 1 ? 'es' : ''} scheduled</p>
-                    </div>
+                // Render all classes (no day filter applied)
+                renderClasses();
+                
+            } catch (error) {
+                console.error('Error loading classes by type:', error);
+                container.innerHTML = '<div class="alert alert-error">Failed to load classes. Please try again.</div>';
+                dayFilterContainer.style.display = 'none';
+                currentClassesData = null;
+            }
+        }
+        
+        function filterByDay() {
+            if (!currentClassesData) return;
+            renderClasses();
+        }
+        
+        function renderClasses() {
+            if (!currentClassesData) return;
+            
+            const container = document.getElementById('classesByTypeContainer');
+            const selectedDay = document.getElementById('dayFilter').value;
+            const { classType, classes, totalClasses } = currentClassesData;
+            
+            // Filter by day if selected
+            let filteredClasses = classes;
+            if (selectedDay) {
+                filteredClasses = classes.filter(cls => cls.day === selectedDay);
+                
+                if (filteredClasses.length === 0) {
+                    container.innerHTML = `<p class="text-center" style="padding: 20px; color: #64748b;">No classes scheduled for ${selectedDay}.</p>`;
+                    return;
+                }
+            }
+            
+            // Group classes by day
+            const dayOrder = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+            const groupedByDay = {};
+            
+            filteredClasses.forEach(cls => {
+                if (!groupedByDay[cls.day]) {
+                    groupedByDay[cls.day] = [];
+                }
+                groupedByDay[cls.day].push(cls);
+            });
+            
+            // Sort each day's classes by period
+            Object.keys(groupedByDay).forEach(day => {
+                groupedByDay[day].sort((a, b) => a.period - b.period);
+            });
+            
+            // Build HTML
+            const typeIcons = {
+                'theory': '<i class="material-icons" style="font-size: 24px; vertical-align: middle;">book</i>',
+                'lab': '<i class="material-icons" style="font-size: 24px; vertical-align: middle;">science</i>',
+                'mini_project': '<i class="material-icons" style="font-size: 24px; vertical-align: middle;">lightbulb</i>'
+            };
+            
+            const typeNames = {
+                'theory': 'Theory Classes',
+                'lab': 'Lab Classes',
+                'mini_project': 'Mini Project Classes'
+            };
+            
+            let html = `
+                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+                    <h3 style="margin: 0 0 5px 0; display: flex; align-items: center; gap: 10px;">
+                        <span style="font-size: 28px;">${typeIcons[classType]}</span>
+                        <span>${typeNames[classType]}</span>
+                    </h3>
+                    <p style="margin: 0; opacity: 0.9; font-size: 14px;">
+                        ${selectedDay ? `${selectedDay}: ` : ''}${filteredClasses.length} class${filteredClasses.length !== 1 ? 'es' : ''} 
+                        ${selectedDay ? `(Total: ${totalClasses})` : 'scheduled'}
+                    </p>
+                </div>
+            `;
+            
+            // Sort days according to day order
+            const sortedDays = dayOrder.filter(day => groupedByDay[day]);
+            
+            sortedDays.forEach(day => {
+                const classes = groupedByDay[day];
+                
+                html += `
+                    <div style="margin-bottom: 25px;">
+                        <h4 style="background: #f1f5f9; padding: 10px 15px; border-radius: 8px; color: #1e293b; margin: 0 0 12px 0; display: flex; align-items: center; gap: 8px;">
+                            <i class="material-icons" style="font-size: 20px;">event</i>
+                            <span>${day}</span>
+                            <span style="margin-left: auto; background: #2563eb; color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: normal;">
+                                ${classes.length} class${classes.length !== 1 ? 'es' : ''}
+                            </span>
+                        </h4>
+                        <div class="classes-grid">
                 `;
                 
-                // Sort days according to day order
-                const sortedDays = dayOrder.filter(day => groupedByDay[day]);
-                
-                sortedDays.forEach(day => {
-                    const classes = groupedByDay[day];
-                    
-                    html += `
-                        <div style="margin-bottom: 25px;">
-                            <h4 style="background: #f1f5f9; padding: 10px 15px; border-radius: 8px; color: #1e293b; margin: 0 0 12px 0; display: flex; align-items: center; gap: 8px;">
-                                <i class="material-icons" style="font-size: 20px;">event</i>
-                                <span>${day}</span>
-                                <span style="margin-left: auto; background: #2563eb; color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: normal;">
-                                    ${classes.length} class${classes.length !== 1 ? 'es' : ''}
-                                </span>
-                            </h4>
-                            <div class="classes-grid">
-                    `;
-                    
-                    classes.forEach(cls => {
+                classes.forEach(cls => {
                         html += `
                             <div class="class-card">
                                 <div class="class-card-header">
@@ -1554,24 +1631,16 @@
                                 </div>
                             </div>
                         `;
-                    });
-                    
-                    html += `
-                            </div>
-                        </div>
-                    `;
                 });
                 
-                container.innerHTML = html;
-                
-            } catch (error) {
-                console.error('Error loading classes by type:', error);
-                container.innerHTML = '<div class="alert alert-error">Failed to load classes. Please try again.</div>';
-            }
+                html += `
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
         }
-        
-        // ========== Floating Chatbot Functions ==========
-        let chatStarted = false;
         
         function toggleChatbot() {
             const widget = document.getElementById('chatbotWidget');
