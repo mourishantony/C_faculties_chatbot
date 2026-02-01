@@ -115,7 +115,44 @@ function formatDate(dateStr) {
     });
 }
 
+// Period timings cache (loaded from API)
+let periodTimingsCache = null;
+
+// Load period timings from API
+async function loadPeriodTimings() {
+    if (periodTimingsCache) return periodTimingsCache;
+    
+    try {
+        const response = await fetch('/api/period-timings');
+        periodTimingsCache = await response.json();
+        return periodTimingsCache;
+    } catch (error) {
+        console.error('Error loading period timings:', error);
+        // Fallback to default timings
+        return {
+            1: '08:00 AM - 08:45 AM',
+            2: '08:45 AM - 09:30 AM',
+            3: '09:45 AM - 10:30 AM',
+            4: '10:30 AM - 11:15 AM',
+            5: '11:15 AM - 12:00 PM',
+            6: '01:00 PM - 01:45 PM',
+            7: '01:45 PM - 02:30 PM',
+            8: '02:30 PM - 03:15 PM',
+            9: '03:30 PM - 04:15 PM'
+        };
+    }
+}
+
+// Initialize period timings on page load
+loadPeriodTimings();
+
 function getPeriodTime(period) {
+    // Use cached timings if available
+    if (periodTimingsCache && periodTimingsCache[period]) {
+        return periodTimingsCache[period];
+    }
+    
+    // Fallback to default timings
     const times = {
         1: '08:00 AM - 08:45 AM',
         2: '08:45 AM - 09:30 AM',

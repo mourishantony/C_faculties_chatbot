@@ -1,6 +1,6 @@
 from datetime import date, datetime
 from sqlalchemy.orm import Session
-from models import Faculty, Department, TimetableEntry, DailyEntry, Syllabus
+from models import Faculty, Department, TimetableEntry, DailyEntry, Syllabus, PeriodTiming, LabProgram
 import re
 
 def get_day_name(d: date = None):
@@ -9,7 +9,14 @@ def get_day_name(d: date = None):
     days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
     return days[d.weekday()]
 
-def get_period_time(period: int) -> str:
+def get_period_time(period: int, db: Session = None) -> str:
+    # Try to get from database first
+    if db:
+        timing = db.query(PeriodTiming).filter(PeriodTiming.period == period).first()
+        if timing:
+            return timing.display_time
+    
+    # Fallback to hardcoded values
     period_times = {
         1: "08:00 AM - 08:45 AM",
         2: "08:45 AM - 09:30 AM",
@@ -131,12 +138,49 @@ def process_chatbot_query(query: str, db: Session) -> str:
 - "When is the C class for AIDS-A?"
 - "Who teaches CSE-B?"
 
-📖 **Topics:**
+📖 **Syllabus & Sessions:**
 - "What topics are being taught today?"
-- "Today's summary"
+- "Show session 5" or "What is session 10 about?"
+- "List all sessions" or "Show syllabus"
+- "Get PPT for session 3"
+
+🔬 **Lab Programs:**
+- "List lab programs" or "Show all labs"
+- "What is lab 5 about?"
+- "Lab programs for arrays"
 
 💡 **Tip:** Just type any faculty name to check their schedule!
 """
+
+    # Session queries
+    session_match = re.search(r'session\s*(\d+)', query_lower)
+    if session_match:
+        session_num = int(session_match.group(1))
+        return get_session_info_response(db, session_num)
+    
+    # PPT/Deck queries
+    if "ppt" in query_lower or "deck" in query_lower or "slides" in query_lower or "presentation" in query_lower:
+        ppt_session_match = re.search(r'(?:ppt|deck|slides|presentation).*?(?:session|for)?\s*(\d+)', query_lower)
+        if ppt_session_match:
+            session_num = int(ppt_session_match.group(1))
+            return get_session_ppt_response(db, session_num)
+        return get_all_ppts_response(db)
+    
+    # List all sessions / syllabus
+    if ("session" in query_lower and ("all" in query_lower or "list" in query_lower or "show" in query_lower)) or \
+       "syllabus" in query_lower:
+        return get_all_sessions_response(db)
+    
+    # Lab program queries
+    lab_match = re.search(r'lab\s*(?:program)?\s*(\d+)', query_lower)
+    if lab_match:
+        lab_num = int(lab_match.group(1))
+        return get_lab_program_response(db, lab_num)
+    
+    # List all lab programs
+    if ("lab" in query_lower and ("all" in query_lower or "list" in query_lower or "show" in query_lower)) or \
+       "lab programs" in query_lower:
+        return get_all_lab_programs_response(db)
     
     # Default response
     return f"""I'm sorry, I didn't understand your question. 
@@ -178,16 +222,19 @@ def get_today_classes_response(db: Session, day_name: str, today: date) -> str:
         
         status = ""
         topic = ""
+        ppt_url = ""
         if daily:
             if daily.is_absent:
                 status = " ❌ (Faculty Absent)"
             elif daily.is_swapped:
                 status = f" 🔄 (Swapped with {daily.swapped_with})"
             if daily.syllabus:
-                topic = f"\n   📖 Topic: {daily.syllabus.topic_name}"
+                topic = f"\n   📖 Session {daily.syllabus.session_number}: {daily.syllabus.session_title}"
+                if daily.syllabus.ppt_url:
+                    ppt_url = f"\n   📊 PPT: {daily.syllabus.ppt_url}"
         
         response += f"**{get_period_ordinal(entry.period)} Period** ({get_period_time(entry.period)})\n"
-        response += f"   👨‍🏫 {faculty.name} → {dept.name}{status}{topic}\n\n"
+        response += f"   👨‍🏫 {faculty.name} → {dept.name}{status}{topic}{ppt_url}\n\n"
     
     return response
 
@@ -215,6 +262,7 @@ def get_faculty_schedule_response(db: Session, faculty: Faculty, day_name: str, 
         
         status = "✅ Scheduled"
         topic = "Not yet updated"
+        ppt_url = None
         if daily:
             if daily.is_absent:
                 status = "❌ Absent"
@@ -223,12 +271,16 @@ def get_faculty_schedule_response(db: Session, faculty: Faculty, day_name: str, 
             else:
                 status = "✅ Confirmed"
             if daily.syllabus:
-                topic = daily.syllabus.topic_name
+                topic = f"Session {daily.syllabus.session_number}: {daily.syllabus.session_title}"
+                ppt_url = daily.syllabus.ppt_url
         
         response += f"**{get_period_ordinal(entry.period)} Period** ({get_period_time(entry.period)})\n"
         response += f"   🏫 Department: {dept.name}\n"
         response += f"   📊 Status: {status}\n"
-        response += f"   📖 Topic: {topic}\n\n"
+        response += f"   📖 Topic: {topic}\n"
+        if ppt_url:
+            response += f"   📊 PPT: {ppt_url}\n"
+        response += "\n"
     
     return response
 
@@ -260,11 +312,11 @@ def get_faculty_topic_response(db: Session, faculty: Faculty, today: date) -> st
         if daily and daily.syllabus and not daily.is_absent:
             has_topic = True
             response += f"**{get_period_ordinal(entry.period)} Period** - {dept.name}\n"
-            response += f"   📖 Topic: **{daily.syllabus.topic_name}**\n"
+            response += f"   📖 **Session {daily.syllabus.session_number}: {daily.syllabus.session_title}**\n"
+            if daily.syllabus.ppt_url:
+                response += f"   📊 PPT: {daily.syllabus.ppt_url}\n"
             if daily.summary:
                 response += f"   📝 Summary: {daily.summary}\n"
-            if daily.session_plan:
-                response += f"   📋 Plan: {daily.session_plan}\n"
             response += "\n"
     
     if not has_topic:
@@ -300,16 +352,19 @@ def get_department_schedule_response(db: Session, dept: Department, day_name: st
         
         status = ""
         topic = ""
+        ppt_url = ""
         if daily:
             if daily.is_absent:
                 status = " ❌ (Faculty Absent)"
             elif daily.is_swapped:
                 status = f" 🔄 (Swapped with {daily.swapped_with})"
             if daily.syllabus:
-                topic = f"\n   📖 Topic: {daily.syllabus.topic_name}"
+                topic = f"\n   📖 Session {daily.syllabus.session_number}: {daily.syllabus.session_title}"
+                if daily.syllabus.ppt_url:
+                    ppt_url = f"\n   📊 PPT: {daily.syllabus.ppt_url}"
         
         response += f"**{get_period_ordinal(entry.period)} Period** ({get_period_time(entry.period)})\n"
-        response += f"   👨‍🏫 Faculty: {faculty.name}{status}{topic}\n\n"
+        response += f"   👨‍🏫 Faculty: {faculty.name}{status}{topic}{ppt_url}\n\n"
     
     return response
 
@@ -341,15 +396,18 @@ def get_period_class_response(db: Session, period: int, day_name: str, today: da
         
         status = ""
         topic = ""
+        ppt_info = ""
         if daily:
             if daily.is_absent:
                 status = " ❌ (Absent)"
             elif daily.is_swapped:
                 status = f" 🔄 (Swapped)"
             if daily.syllabus:
-                topic = f" - Topic: {daily.syllabus.topic_name}"
+                topic = f" - Session {daily.syllabus.session_number}: {daily.syllabus.session_title}"
+                if daily.syllabus.ppt_url:
+                    ppt_info = f"\n   📊 PPT: {daily.syllabus.ppt_url}"
         
-        response += f"👨‍🏫 {faculty.name} → {dept.name}{status}{topic}\n"
+        response += f"👨‍🏫 {faculty.name} → {dept.name}{status}{topic}{ppt_info}\n"
     
     return response
 
@@ -377,7 +435,9 @@ def get_all_topics_today_response(db: Session, today: date) -> str:
             
             response += f"**{get_period_ordinal(entry.period)} Period**\n"
             response += f"   👨‍🏫 {faculty.name} → {dept.name}\n"
-            response += f"   📖 **{entry.syllabus.topic_name}**\n"
+            response += f"   📖 **Session {entry.syllabus.session_number}: {entry.syllabus.session_title}**\n"
+            if entry.syllabus.ppt_url:
+                response += f"   📊 PPT: {entry.syllabus.ppt_url}\n"
             if entry.summary:
                 response += f"   📝 {entry.summary}\n"
             response += "\n"
@@ -468,5 +528,142 @@ def get_today_summary_response(db: Session, day_name: str, today: date) -> str:
         response += f"⚠️ {pending} class(es) still pending to be updated."
     else:
         response += "✅ All schedules have been filled for today!"
+    
+    return response
+
+
+# ===== Session & Syllabus Functions =====
+
+def get_session_info_response(db: Session, session_num: int) -> str:
+    session = db.query(Syllabus).filter(Syllabus.session_number == session_num).first()
+    
+    if not session:
+        total = db.query(Syllabus).count()
+        return f"❌ Session {session_num} not found. The syllabus has sessions 1 to {total}."
+    
+    response = f"📚 **Session {session.session_number}: {session.session_title}**\n\n"
+    response += f"📗 **Unit:** {session.unit}\n\n"
+    
+    if session.topics:
+        response += f"📖 **Topics Covered:**\n{session.topics}\n\n"
+    
+    if session.ppt_url:
+        response += f"📊 **PPT/Deck:** {session.ppt_url}\n"
+    else:
+        response += "📊 **PPT/Deck:** Not available yet\n"
+    
+    return response
+
+
+def get_session_ppt_response(db: Session, session_num: int) -> str:
+    session = db.query(Syllabus).filter(Syllabus.session_number == session_num).first()
+    
+    if not session:
+        total = db.query(Syllabus).count()
+        return f"❌ Session {session_num} not found. The syllabus has sessions 1 to {total}."
+    
+    if session.ppt_url:
+        response = f"📊 **PPT for Session {session.session_number}**\n\n"
+        response += f"📚 Topic: {session.session_title}\n"
+        response += f"🔗 Link: {session.ppt_url}\n"
+        return response
+    else:
+        return f"📊 The PPT for Session {session_num} ({session.session_title}) is not available yet."
+
+
+def get_all_ppts_response(db: Session) -> str:
+    sessions_with_ppt = db.query(Syllabus).filter(Syllabus.ppt_url != None).order_by(Syllabus.session_number).all()
+    
+    if not sessions_with_ppt:
+        return "📊 No PPTs are currently available in the system."
+    
+    response = f"📊 **Available PPTs/Decks ({len(sessions_with_ppt)} sessions):**\n\n"
+    
+    current_unit = 0
+    for session in sessions_with_ppt:
+        if session.unit != current_unit:
+            current_unit = session.unit
+            response += f"\n**Unit {current_unit}:**\n"
+        response += f"  Session {session.session_number}: {session.session_title}\n"
+        response += f"  🔗 {session.ppt_url}\n\n"
+    
+    return response
+
+
+def get_all_sessions_response(db: Session) -> str:
+    sessions = db.query(Syllabus).order_by(Syllabus.unit, Syllabus.session_number).all()
+    
+    if not sessions:
+        return "📚 No syllabus sessions found in the system."
+    
+    response = "📚 **C Programming Syllabus - All Sessions:**\n\n"
+    
+    current_unit = 0
+    for session in sessions:
+        if session.unit != current_unit:
+            current_unit = session.unit
+            unit_names = {
+                1: "BASICS OF C PROGRAMMING",
+                2: "ARRAYS AND STRINGS",
+                3: "FUNCTIONS AND POINTERS",
+                4: "STRUCTURES AND UNIONS",
+                5: "FILE PROCESSING"
+            }
+            response += f"\n**📗 UNIT {current_unit}: {unit_names.get(current_unit, '')}**\n"
+        
+        ppt_indicator = "📊" if session.ppt_url else "📄"
+        response += f"  {ppt_indicator} Session {session.session_number}: {session.session_title}\n"
+    
+    response += "\n💡 *Ask about any session for details (e.g., 'Show session 5')*"
+    response += "\n💡 *📊 = PPT available, 📄 = No PPT yet*"
+    
+    return response
+
+
+# ===== Lab Program Functions =====
+
+def get_lab_program_response(db: Session, program_num: int) -> str:
+    program = db.query(LabProgram).filter(LabProgram.program_number == program_num).first()
+    
+    if not program:
+        total = db.query(LabProgram).count()
+        return f"❌ Lab program {program_num} not found. There are {total} lab programs available."
+    
+    response = f"🔬 **Lab Program {program.program_number}: {program.program_title}**\n\n"
+    
+    if program.description:
+        response += f"📝 **Description:**\n{program.description}\n"
+    
+    return response
+
+
+def get_all_lab_programs_response(db: Session) -> str:
+    programs = db.query(LabProgram).order_by(LabProgram.program_number).all()
+    
+    if not programs:
+        return "🔬 No lab programs found in the system."
+    
+    response = f"🔬 **C Programming Lab Programs ({len(programs)} total):**\n\n"
+    
+    # Group by categories based on program number ranges
+    categories = [
+        (1, 5, "Basic I/O & Arithmetic"),
+        (6, 14, "Control Structures & Patterns"),
+        (15, 20, "Arrays & Matrices"),
+        (21, 24, "Strings"),
+        (25, 30, "Functions, Recursion & Pointers"),
+        (31, 35, "Structures & Linked Lists"),
+        (36, 40, "File Handling & Mini Project")
+    ]
+    
+    for start, end, category_name in categories:
+        cat_programs = [p for p in programs if start <= p.program_number <= end]
+        if cat_programs:
+            response += f"**{category_name}:**\n"
+            for prog in cat_programs:
+                response += f"  {prog.program_number}. {prog.program_title}\n"
+            response += "\n"
+    
+    response += "💡 *Ask about any lab program for details (e.g., 'Lab 5')*"
     
     return response

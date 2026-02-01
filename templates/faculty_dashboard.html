@@ -5,6 +5,44 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Faculty Dashboard - C Faculty Manager</title>
     <link rel="stylesheet" href="/static/css/style.css">
+    <style>
+        .class-type-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .class-type-theory { background: #e3f2fd; color: #1565c0; }
+        .class-type-lab { background: #fce4ec; color: #c62828; }
+        .class-type-mini_project { background: #e8f5e9; color: #2e7d32; }
+        
+        .form-section {
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            background: var(--bg-secondary);
+        }
+        .form-section-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--text-primary);
+        }
+        
+        .ppt-link {
+            display: inline-block;
+            margin-top: 5px;
+            padding: 5px 10px;
+            background: #e3f2fd;
+            color: #1565c0;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 0.85rem;
+        }
+        .ppt-link:hover { background: #bbdefb; }
+    </style>
 </head>
 <body>
     <div class="page-wrapper">
@@ -50,15 +88,16 @@
 
     <!-- Modal for filling entry -->
     <div class="modal-overlay" id="entryModal">
-        <div class="modal">
+        <div class="modal" style="max-width: 600px;">
             <div class="modal-header">
-                <h3 class="modal-title">📝 Fill Daily Entry</h3>
+                <h3 class="modal-title" id="modalTitle">📝 Fill Daily Entry</h3>
                 <button class="modal-close" onclick="closeModal()">&times;</button>
             </div>
             <div class="modal-body">
                 <form id="entryForm">
                     <input type="hidden" id="modalDeptId">
                     <input type="hidden" id="modalPeriod">
+                    <input type="hidden" id="modalClassType">
                     
                     <div class="form-group">
                         <label class="form-label">Department</label>
@@ -66,7 +105,7 @@
                     </div>
                     
                     <div class="form-group">
-                        <label class="form-label">Period</label>
+                        <label class="form-label">Period & Class Type</label>
                         <input type="text" class="form-control" id="modalPeriodDisplay" readonly>
                     </div>
                     
@@ -86,21 +125,78 @@
                             <input type="text" class="form-control" id="swappedWith" placeholder="Enter faculty name">
                         </div>
                         
-                        <div class="form-group">
-                            <label class="form-label">Select Topic (Syllabus)</label>
-                            <select class="form-control" id="syllabusSelect">
-                                <option value="">-- Select Topic --</option>
-                            </select>
+                        <!-- Theory Class Form -->
+                        <div id="theoryForm" class="form-section hidden">
+                            <div class="form-section-title">📚 Theory Class</div>
+                            
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="isOwnContent" onchange="toggleOwnContent()">
+                                <label for="isOwnContent">Teaching Own Content (not from syllabus)</label>
+                            </div>
+                            
+                            <div id="syllabusSection">
+                                <div class="form-group">
+                                    <label class="form-label">Select Session</label>
+                                    <select class="form-control" id="syllabusSelect" onchange="showSessionDetails()">
+                                        <option value="">-- Select Session --</option>
+                                    </select>
+                                </div>
+                                <div id="sessionDetails" class="hidden" style="margin-top: 10px; padding: 10px; background: #f5f5f5; border-radius: 5px;">
+                                    <p><strong>Topics:</strong> <span id="sessionTopics"></span></p>
+                                    <p id="pptLinkContainer"></p>
+                                </div>
+                            </div>
+                            
+                            <div id="ownContentSection" class="hidden">
+                                <div class="form-group">
+                                    <label class="form-label">Content Title</label>
+                                    <input type="text" class="form-control" id="ownContentTitle" placeholder="What topic are you teaching?">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Content Summary</label>
+                                    <textarea class="form-control" id="ownContentSummary" placeholder="Brief description of the content..."></textarea>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Class Summary</label>
+                                <textarea class="form-control" id="theorySummary" placeholder="What was covered in this class?"></textarea>
+                            </div>
                         </div>
                         
-                        <div class="form-group">
-                            <label class="form-label">Class Summary</label>
-                            <textarea class="form-control" id="summary" placeholder="Brief summary of what was taught..."></textarea>
+                        <!-- Lab Class Form -->
+                        <div id="labForm" class="form-section hidden">
+                            <div class="form-section-title">🔬 Lab Class</div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Select Lab Program</label>
+                                <select class="form-control" id="labProgramSelect" onchange="showLabDetails()">
+                                    <option value="">-- Select Lab Program --</option>
+                                </select>
+                            </div>
+                            <div id="labProgramDetails" class="hidden" style="margin-top: 10px; padding: 10px; background: #f5f5f5; border-radius: 5px;">
+                                <p><strong>Description:</strong> <span id="labDescription"></span></p>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">What was done in this lab period?</label>
+                                <textarea class="form-control" id="labWorkDone" placeholder="Explain, demo, practice, completion status..."></textarea>
+                            </div>
                         </div>
                         
-                        <div class="form-group">
-                            <label class="form-label">Session Plan</label>
-                            <textarea class="form-control" id="sessionPlan" placeholder="What do you plan to cover in this session?"></textarea>
+                        <!-- Mini Project Form -->
+                        <div id="miniProjectForm" class="form-section hidden">
+                            <div class="form-section-title">🚀 Mini Project</div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Project Progress & Activities</label>
+                                <textarea class="form-control" id="miniProjectProgress" placeholder="What progress was made? What activities were done?"></textarea>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Summary</label>
+                                <textarea class="form-control" id="miniProjectSummary" placeholder="Brief summary of today's mini project session..."></textarea>
+                            </div>
                         </div>
                     </div>
                     
@@ -116,6 +212,7 @@
     <script src="/static/js/app.js"></script>
     <script>
         let syllabusData = [];
+        let labProgramsData = [];
         
         // Check auth
         if (!isLoggedIn() || getUserType() !== 'faculty') {
@@ -127,7 +224,7 @@
         
         // Load data on page load
         document.addEventListener('DOMContentLoaded', async () => {
-            await loadSyllabus();
+            await Promise.all([loadSyllabus(), loadLabPrograms()]);
             await loadSchedule();
         });
         
@@ -137,20 +234,81 @@
                 const select = document.getElementById('syllabusSelect');
                 
                 let currentUnit = 0;
-                syllabusData.forEach(topic => {
-                    if (topic.unit !== currentUnit) {
-                        const optgroup = document.createElement('optgroup');
-                        optgroup.label = `Unit ${topic.unit}`;
+                let optgroup = null;
+                syllabusData.forEach(session => {
+                    if (session.unit !== currentUnit) {
+                        optgroup = document.createElement('optgroup');
+                        optgroup.label = `Unit ${session.unit}`;
                         select.appendChild(optgroup);
-                        currentUnit = topic.unit;
+                        currentUnit = session.unit;
                     }
                     const option = document.createElement('option');
-                    option.value = topic.id;
-                    option.textContent = topic.topic_name;
-                    select.appendChild(option);
+                    option.value = session.id;
+                    option.textContent = `Session ${session.session_number}: ${session.session_title}`;
+                    if (optgroup) {
+                        optgroup.appendChild(option);
+                    } else {
+                        select.appendChild(option);
+                    }
                 });
             } catch (error) {
                 console.error('Error loading syllabus:', error);
+            }
+        }
+        
+        async function loadLabPrograms() {
+            try {
+                labProgramsData = await apiRequest('/api/lab-programs');
+                const select = document.getElementById('labProgramSelect');
+                
+                labProgramsData.forEach(program => {
+                    const option = document.createElement('option');
+                    option.value = program.id;
+                    option.textContent = `${program.program_number}. ${program.program_title}`;
+                    select.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Error loading lab programs:', error);
+            }
+        }
+        
+        function showSessionDetails() {
+            const sessionId = document.getElementById('syllabusSelect').value;
+            const detailsDiv = document.getElementById('sessionDetails');
+            
+            if (!sessionId) {
+                detailsDiv.classList.add('hidden');
+                return;
+            }
+            
+            const session = syllabusData.find(s => s.id == sessionId);
+            if (session) {
+                document.getElementById('sessionTopics').textContent = session.topics || 'No topics listed';
+                
+                const pptContainer = document.getElementById('pptLinkContainer');
+                if (session.ppt_url) {
+                    pptContainer.innerHTML = `<a href="${session.ppt_url}" target="_blank" class="ppt-link">📊 Open PPT/Deck</a>`;
+                } else {
+                    pptContainer.innerHTML = '<span style="color: #999;">No PPT available</span>';
+                }
+                
+                detailsDiv.classList.remove('hidden');
+            }
+        }
+        
+        function showLabDetails() {
+            const programId = document.getElementById('labProgramSelect').value;
+            const detailsDiv = document.getElementById('labProgramDetails');
+            
+            if (!programId) {
+                detailsDiv.classList.add('hidden');
+                return;
+            }
+            
+            const program = labProgramsData.find(p => p.id == programId);
+            if (program) {
+                document.getElementById('labDescription').textContent = program.description || 'No description';
+                detailsDiv.classList.remove('hidden');
             }
         }
         
@@ -173,7 +331,7 @@
                 }
                 
                 let html = '<div class="card"><table class="schedule-table"><thead><tr>' +
-                    '<th>Period</th><th>Time</th><th>Department</th><th>Status</th><th>Action</th>' +
+                    '<th>Period</th><th>Time</th><th>Department</th><th>Class Type</th><th>Status</th><th>Action</th>' +
                     '</tr></thead><tbody>';
                 
                 data.schedule.forEach(item => {
@@ -197,15 +355,22 @@
                         status = 'Pending';
                     }
                     
+                    const classTypeLabel = {
+                        'theory': '📚 Theory',
+                        'lab': '🔬 Lab',
+                        'mini_project': '🚀 Mini Project'
+                    };
+                    
                     html += `
                         <tr>
                             <td><span class="period-badge">${getOrdinal(item.period)}</span></td>
                             <td>${getPeriodTime(item.period)}</td>
                             <td><strong>${item.department_name}</strong><br><small>${item.subject_code} - ${item.subject_name}</small></td>
+                            <td><span class="class-type-badge class-type-${item.class_type}">${classTypeLabel[item.class_type] || item.class_type}</span></td>
                             <td><span class="status-badge ${statusClass}">${status}</span></td>
                             <td>
                                 <button class="btn btn-sm ${item.is_filled ? 'btn-secondary' : 'btn-primary'}" 
-                                    onclick="openModal(${item.department_id}, ${item.period}, '${item.department_name}', ${JSON.stringify(item.daily_entry).replace(/"/g, '&quot;')})">
+                                    onclick='openModal(${item.department_id}, ${item.period}, "${item.department_name}", "${item.class_type}", ${JSON.stringify(item.daily_entry)})'>
                                     ${btnText}
                                 </button>
                             </td>
@@ -226,36 +391,91 @@
             }
         }
         
-        function openModal(deptId, period, deptName, existingData) {
+        function openModal(deptId, period, deptName, classType, existingData) {
             document.getElementById('modalDeptId').value = deptId;
             document.getElementById('modalPeriod').value = period;
+            document.getElementById('modalClassType').value = classType;
             document.getElementById('modalDeptName').value = deptName;
-            document.getElementById('modalPeriodDisplay').value = `${getOrdinal(period)} Period (${getPeriodTime(period)})`;
             
-            // Reset form
+            const classTypeLabel = {
+                'theory': '📚 Theory',
+                'lab': '🔬 Lab',
+                'mini_project': '🚀 Mini Project'
+            };
+            document.getElementById('modalPeriodDisplay').value = `${getOrdinal(period)} Period (${getPeriodTime(period)}) - ${classTypeLabel[classType] || classType}`;
+            
+            // Set modal title based on class type
+            document.getElementById('modalTitle').textContent = `📝 Fill ${classTypeLabel[classType] || classType} Entry`;
+            
+            // Reset all forms
             document.getElementById('isAbsent').checked = false;
             document.getElementById('isSwapped').checked = false;
             document.getElementById('swappedWith').value = '';
+            document.getElementById('isOwnContent').checked = false;
             document.getElementById('syllabusSelect').value = '';
-            document.getElementById('summary').value = '';
-            document.getElementById('sessionPlan').value = '';
+            document.getElementById('labProgramSelect').value = '';
+            document.getElementById('theorySummary').value = '';
+            document.getElementById('labWorkDone').value = '';
+            document.getElementById('miniProjectProgress').value = '';
+            document.getElementById('miniProjectSummary').value = '';
+            document.getElementById('ownContentTitle').value = '';
+            document.getElementById('ownContentSummary').value = '';
+            
+            // Hide all details
+            document.getElementById('sessionDetails').classList.add('hidden');
+            document.getElementById('labProgramDetails').classList.add('hidden');
             document.getElementById('classDetails').classList.remove('hidden');
             document.getElementById('swappedWithGroup').classList.add('hidden');
+            document.getElementById('syllabusSection').classList.remove('hidden');
+            document.getElementById('ownContentSection').classList.add('hidden');
+            
+            // Hide all form types first
+            document.getElementById('theoryForm').classList.add('hidden');
+            document.getElementById('labForm').classList.add('hidden');
+            document.getElementById('miniProjectForm').classList.add('hidden');
+            
+            // Show the relevant form based on class type
+            if (classType === 'theory') {
+                document.getElementById('theoryForm').classList.remove('hidden');
+            } else if (classType === 'lab') {
+                document.getElementById('labForm').classList.remove('hidden');
+            } else if (classType === 'mini_project') {
+                document.getElementById('miniProjectForm').classList.remove('hidden');
+            }
             
             // Fill existing data if available
             if (existingData) {
                 document.getElementById('isAbsent').checked = existingData.is_absent;
                 document.getElementById('isSwapped').checked = existingData.is_swapped;
                 document.getElementById('swappedWith').value = existingData.swapped_with || '';
-                document.getElementById('syllabusSelect').value = existingData.syllabus_id || '';
-                document.getElementById('summary').value = existingData.summary || '';
-                document.getElementById('sessionPlan').value = existingData.session_plan || '';
                 
                 if (existingData.is_absent) {
                     document.getElementById('classDetails').classList.add('hidden');
                 }
                 if (existingData.is_swapped) {
                     document.getElementById('swappedWithGroup').classList.remove('hidden');
+                }
+                
+                // Fill class-type specific data
+                if (classType === 'theory') {
+                    document.getElementById('isOwnContent').checked = existingData.is_own_content;
+                    if (existingData.is_own_content) {
+                        document.getElementById('syllabusSection').classList.add('hidden');
+                        document.getElementById('ownContentSection').classList.remove('hidden');
+                        document.getElementById('ownContentTitle').value = existingData.own_content_title || '';
+                        document.getElementById('ownContentSummary').value = existingData.own_content_summary || '';
+                    } else {
+                        document.getElementById('syllabusSelect').value = existingData.syllabus_id || '';
+                        showSessionDetails();
+                    }
+                    document.getElementById('theorySummary').value = existingData.summary || '';
+                } else if (classType === 'lab') {
+                    document.getElementById('labProgramSelect').value = existingData.lab_program_id || '';
+                    showLabDetails();
+                    document.getElementById('labWorkDone').value = existingData.lab_work_done || '';
+                } else if (classType === 'mini_project') {
+                    document.getElementById('miniProjectProgress').value = existingData.mini_project_progress || '';
+                    document.getElementById('miniProjectSummary').value = existingData.summary || '';
                 }
             }
             
@@ -284,19 +504,48 @@
             }
         }
         
+        function toggleOwnContent() {
+            const isOwnContent = document.getElementById('isOwnContent').checked;
+            if (isOwnContent) {
+                document.getElementById('syllabusSection').classList.add('hidden');
+                document.getElementById('ownContentSection').classList.remove('hidden');
+            } else {
+                document.getElementById('syllabusSection').classList.remove('hidden');
+                document.getElementById('ownContentSection').classList.add('hidden');
+            }
+        }
+        
         document.getElementById('entryForm').addEventListener('submit', async (e) => {
             e.preventDefault();
+            
+            const classType = document.getElementById('modalClassType').value;
             
             const data = {
                 department_id: parseInt(document.getElementById('modalDeptId').value),
                 period: parseInt(document.getElementById('modalPeriod').value),
+                class_type: classType,
                 is_absent: document.getElementById('isAbsent').checked,
                 is_swapped: document.getElementById('isSwapped').checked,
-                swapped_with: document.getElementById('swappedWith').value || null,
-                syllabus_id: document.getElementById('syllabusSelect').value ? parseInt(document.getElementById('syllabusSelect').value) : null,
-                summary: document.getElementById('summary').value || null,
-                session_plan: document.getElementById('sessionPlan').value || null
+                swapped_with: document.getElementById('swappedWith').value || null
             };
+            
+            // Add class-type specific data
+            if (classType === 'theory') {
+                data.is_own_content = document.getElementById('isOwnContent').checked;
+                if (data.is_own_content) {
+                    data.own_content_title = document.getElementById('ownContentTitle').value || null;
+                    data.own_content_summary = document.getElementById('ownContentSummary').value || null;
+                } else {
+                    data.syllabus_id = document.getElementById('syllabusSelect').value ? parseInt(document.getElementById('syllabusSelect').value) : null;
+                }
+                data.summary = document.getElementById('theorySummary').value || null;
+            } else if (classType === 'lab') {
+                data.lab_program_id = document.getElementById('labProgramSelect').value ? parseInt(document.getElementById('labProgramSelect').value) : null;
+                data.lab_work_done = document.getElementById('labWorkDone').value || null;
+            } else if (classType === 'mini_project') {
+                data.mini_project_progress = document.getElementById('miniProjectProgress').value || null;
+                data.summary = document.getElementById('miniProjectSummary').value || null;
+            }
             
             try {
                 showLoading();

@@ -74,7 +74,7 @@
                 <!-- Faculties List -->
                 <div class="card">
                     <div class="card-header">
-                        <h3 class="card-title">👨‍🏫 Our Faculty Team</h3>
+                        <h3 class="card-title">👨‍🏫 C Faculties</h3>
                     </div>
                     <div class="faculty-grid" id="facultiesContainer">
                         <p>Loading...</p>
@@ -1171,7 +1171,7 @@
                 
                 let html = `<p style="margin-bottom: 15px;"><strong>Total Entries: ${data.total}</strong></p>`;
                 html += '<table class="schedule-table"><thead><tr>' +
-                    '<th>Date</th><th>Period</th><th>Faculty</th><th>Department</th><th>Topic</th><th>Status</th><th>Summary</th>' +
+                    '<th>Date</th><th>Period</th><th>Faculty</th><th>Department</th><th>Topic</th><th>PPT</th><th>Status</th><th>Summary</th>' +
                     '</tr></thead><tbody>';
                 
                 data.entries.forEach(entry => {
@@ -1186,6 +1186,10 @@
                         statusClass = 'swapped';
                     }
                     
+                    const pptLink = entry.ppt_url 
+                        ? `<a href="${entry.ppt_url}" target="_blank" class="ppt-link" title="Open PPT">📊 View</a>` 
+                        : '-';
+                    
                     html += `
                         <tr>
                             <td>${formatDate(entry.date)}</td>
@@ -1193,6 +1197,7 @@
                             <td><strong>${entry.faculty_name}</strong></td>
                             <td>${entry.department_name}</td>
                             <td>${entry.topic}</td>
+                            <td>${pptLink}</td>
                             <td><span class="status-badge ${statusClass}">${status}</span></td>
                             <td>${entry.summary || '-'}</td>
                         </tr>
