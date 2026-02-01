@@ -153,7 +153,7 @@ def init_database():
     # Each faculty handles 1-2 departments
     mock_timetable = [
         # Faculty 1 - Dr. Ramesh Kumar handles AIDS-A
-        {"faculty_id": 1, "dept_code": "AIDS-A", "day": "Tuesday", "period": 7},
+        {"faculty_id": 1, "dept_code": "AIDS-A", "day": "Sunday", "period": 7},
         {"faculty_id": 1, "dept_code": "AIDS-A", "day": "Wednesday", "period": 5},
         {"faculty_id": 1, "dept_code": "AIDS-A", "day": "Wednesday", "period": 7},
         {"faculty_id": 1, "dept_code": "AIDS-A", "day": "Thursday", "period": 7},

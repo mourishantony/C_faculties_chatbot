@@ -66,16 +66,29 @@ def process_chatbot_query(query: str, db: Session) -> str:
     if faculty_match:
         if "topic" in query_lower or "teach" in query_lower or "going to take" in query_lower or "syllabus" in query_lower:
             return get_faculty_topic_response(db, faculty_match, today)
-        elif "class" in query_lower or "schedule" in query_lower:
+        elif "class" in query_lower or "schedule" in query_lower or "have" in query_lower:
+            return get_faculty_schedule_response(db, faculty_match, day_name, today)
+        else:
+            # Default to schedule if faculty is mentioned
             return get_faculty_schedule_response(db, faculty_match, day_name, today)
     
-    # Ask about specific department
+    # List all faculties - CHECK BEFORE department matching to avoid false matches
+    if ("faculty" in query_lower or "faculties" in query_lower or "staff" in query_lower) and \
+       ("list" in query_lower or "all" in query_lower or "show" in query_lower):
+        return get_all_faculties_response(db)
+    
+    # Ask about specific department - be more specific in matching
     departments = db.query(Department).all()
     dept_match = None
     for dept in departments:
-        dept_name_lower = dept.name.lower()
         dept_code_lower = dept.code.lower()
-        if dept_code_lower in query_lower or any(part in query_lower for part in dept_name_lower.split() if len(part) > 2):
+        # Only match exact code or explicit department name mentions
+        # Avoid matching "RA" in "programming" etc.
+        if dept_code_lower in query_lower.split() or \
+           dept.name.lower() in query_lower or \
+           dept_code_lower + " " in query_lower or \
+           " " + dept_code_lower in query_lower or \
+           dept_code_lower + "?" in query_lower:
             dept_match = dept
             break
     
@@ -91,11 +104,6 @@ def process_chatbot_query(query: str, db: Session) -> str:
     if period_match:
         period = int(period_match.group(1))
         return get_period_class_response(db, period, day_name, today)
-    
-    # List all faculties
-    if "faculty" in query_lower or "faculties" in query_lower or "staff" in query_lower:
-        if "list" in query_lower or "all" in query_lower or "who" in query_lower:
-            return get_all_faculties_response(db)
     
     # Who is absent today
     if "absent" in query_lower:
@@ -115,8 +123,8 @@ def process_chatbot_query(query: str, db: Session) -> str:
 - "What classes are in the 4th period?"
 
 👨‍🏫 **Faculty Information:**
-- "What is Dr. Ramesh Kumar's schedule today?"
-- "What topic will Ms. Priya Sharma teach?"
+- "Does [faculty name] have class today?"
+- "What topic will [faculty name] teach?"
 - "List all faculties"
 
 🏫 **Department Classes:**
@@ -125,7 +133,9 @@ def process_chatbot_query(query: str, db: Session) -> str:
 
 📖 **Topics:**
 - "What topics are being taught today?"
-- "What will be covered in today's classes?"
+- "Today's summary"
+
+💡 **Tip:** Just type any faculty name to check their schedule!
 """
     
     # Default response
@@ -143,9 +153,6 @@ Try asking: "What are the C programming classes today?" """
 
 
 def get_today_classes_response(db: Session, day_name: str, today: date) -> str:
-    if day_name == "Sunday":
-        return "📅 Today is Sunday. There are no classes scheduled."
-    
     # Get all timetable entries for today
     entries = db.query(TimetableEntry).filter(TimetableEntry.day == day_name).all()
     
@@ -186,9 +193,6 @@ def get_today_classes_response(db: Session, day_name: str, today: date) -> str:
 
 
 def get_faculty_schedule_response(db: Session, faculty: Faculty, day_name: str, today: date) -> str:
-    if day_name == "Sunday":
-        return f"📅 Today is Sunday. {faculty.name} has no classes."
-    
     entries = db.query(TimetableEntry).filter(
         TimetableEntry.faculty_id == faculty.id,
         TimetableEntry.day == day_name
@@ -232,9 +236,6 @@ def get_faculty_schedule_response(db: Session, faculty: Faculty, day_name: str, 
 def get_faculty_topic_response(db: Session, faculty: Faculty, today: date) -> str:
     day_name = get_day_name(today)
     
-    if day_name == "Sunday":
-        return f"📅 Today is Sunday. {faculty.name} has no classes."
-    
     entries = db.query(TimetableEntry).filter(
         TimetableEntry.faculty_id == faculty.id,
         TimetableEntry.day == day_name
@@ -277,9 +278,6 @@ def get_faculty_topic_response(db: Session, faculty: Faculty, today: date) -> st
 
 
 def get_department_schedule_response(db: Session, dept: Department, day_name: str, today: date) -> str:
-    if day_name == "Sunday":
-        return f"📅 Today is Sunday. No classes for {dept.name}."
-    
     entries = db.query(TimetableEntry).filter(
         TimetableEntry.department_id == dept.id,
         TimetableEntry.day == day_name
@@ -317,9 +315,6 @@ def get_department_schedule_response(db: Session, dept: Department, day_name: st
 
 
 def get_period_class_response(db: Session, period: int, day_name: str, today: date) -> str:
-    if day_name == "Sunday":
-        return f"📅 Today is Sunday. No classes."
-    
     if period < 1 or period > 9:
         return "❌ Invalid period. Please specify a period between 1 and 9."
     
@@ -361,9 +356,6 @@ def get_period_class_response(db: Session, period: int, day_name: str, today: da
 
 def get_all_topics_today_response(db: Session, today: date) -> str:
     day_name = get_day_name(today)
-    
-    if day_name == "Sunday":
-        return "📅 Today is Sunday. No classes."
     
     daily_entries = db.query(DailyEntry).filter(
         DailyEntry.date == today,
@@ -409,9 +401,6 @@ def get_all_faculties_response(db: Session) -> str:
 def get_absent_today_response(db: Session, today: date) -> str:
     day_name = get_day_name(today)
     
-    if day_name == "Sunday":
-        return "📅 Today is Sunday. No classes scheduled."
-    
     absent_entries = db.query(DailyEntry).filter(
         DailyEntry.date == today,
         DailyEntry.is_absent == True
@@ -446,9 +435,6 @@ def get_absent_today_response(db: Session, today: date) -> str:
 
 
 def get_today_summary_response(db: Session, day_name: str, today: date) -> str:
-    if day_name == "Sunday":
-        return "📅 Today is Sunday. No classes scheduled."
-    
     # Get all timetable entries for today
     timetable_entries = db.query(TimetableEntry).filter(
         TimetableEntry.day == day_name
