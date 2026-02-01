@@ -116,21 +116,22 @@ def init_database():
     db.add(admin)
     
     # Add mock faculties (14 faculties)
+    # Images should be stored in static/images/ folder with filenames like: faculty1.jpg, faculty2.jpg, etc.
     mock_faculties = [
-        {"name": "Dr. Ramesh Kumar", "email": "ramesh@college.edu", "phone": "9876543210"},
-        {"name": "Ms. Priya Sharma", "email": "priya@college.edu", "phone": "9876543211"},
-        {"name": "Mr. Arun Prakash", "email": "arun@college.edu", "phone": "9876543212"},
-        {"name": "Dr. Lakshmi Narayanan", "email": "lakshmi@college.edu", "phone": "9876543213"},
-        {"name": "Ms. N. Backiyalakshmi", "email": "backiya@college.edu", "phone": "9876543214"},
-        {"name": "Mr. Senthil Kumar", "email": "senthil@college.edu", "phone": "9876543215"},
-        {"name": "Dr. Vijay Anand", "email": "vijay@college.edu", "phone": "9876543216"},
-        {"name": "Ms. Deepa Krishnan", "email": "deepa@college.edu", "phone": "9876543217"},
-        {"name": "Mr. Karthik Raja", "email": "karthik@college.edu", "phone": "9876543218"},
-        {"name": "Dr. Meena Sundaram", "email": "meena@college.edu", "phone": "9876543219"},
-        {"name": "Mr. Rajesh Babu", "email": "rajesh@college.edu", "phone": "9876543220"},
-        {"name": "Ms. Anjali Devi", "email": "anjali@college.edu", "phone": "9876543221"},
-        {"name": "Dr. Suresh Rajan", "email": "suresh@college.edu", "phone": "9876543222"},
-        {"name": "Mr. Gopal Krishnan", "email": "gopal@college.edu", "phone": "9876543223"},
+        {"name": "Dr. Ramesh Kumar", "email": "ramesh@college.edu", "phone": "9876543210", "dept": "AIDS-A", "image": "faculty1.jpg", "linkedin": "https://linkedin.com/in/ramesh-kumar", "github": "https://github.com/rameshkumar"},
+        {"name": "Ms. Priya Sharma", "email": "priya@college.edu", "phone": "9876543211", "dept": "AIDS-B", "image": "faculty2.jpg", "linkedin": "https://linkedin.com/in/priya-sharma", "github": "https://github.com/priyasharma"},
+        {"name": "Mr. Arun Prakash", "email": "arun@college.edu", "phone": "9876543212", "dept": "AIML-A", "image": "faculty3.jpg", "linkedin": "https://linkedin.com/in/arun-prakash", "github": "https://github.com/arunprakash"},
+        {"name": "Dr. Lakshmi Narayanan", "email": "lakshmi@college.edu", "phone": "9876543213", "dept": "AIML-B", "image": "faculty4.jpg", "linkedin": "https://linkedin.com/in/lakshmi-narayanan", "github": "https://github.com/lakshminarayanan"},
+        {"name": "Ms. N. Backiyalakshmi", "email": "backiya@college.edu", "phone": "9876543214", "dept": "CSBS", "image": "faculty5.jpg", "linkedin": "https://linkedin.com/in/backiyalakshmi", "github": "https://github.com/backiyalakshmi"},
+        {"name": "Mr. Senthil Kumar", "email": "senthil@college.edu", "phone": "9876543215", "dept": "CSE-A", "image": "faculty6.jpg", "linkedin": "https://linkedin.com/in/senthil-kumar", "github": "https://github.com/senthilkumar"},
+        {"name": "Dr. Vijay Anand", "email": "vijay@college.edu", "phone": "9876543216", "dept": "CSE-B", "image": "faculty7.jpg", "linkedin": "https://linkedin.com/in/vijay-anand", "github": "https://github.com/vijayanand"},
+        {"name": "Ms. Deepa Krishnan", "email": "deepa@college.edu", "phone": "9876543217", "dept": "CYS", "image": "faculty8.jpg", "linkedin": "https://linkedin.com/in/deepa-krishnan", "github": "https://github.com/deepakrishnan"},
+        {"name": "Mr. Karthik Raja", "email": "karthik@college.edu", "phone": "9876543218", "dept": "ECE-A", "image": "faculty9.jpg", "linkedin": "https://linkedin.com/in/karthik-raja", "github": "https://github.com/karthikraja"},
+        {"name": "Dr. Meena Sundaram", "email": "meena@college.edu", "phone": "9876543219", "dept": "ECE-B", "image": "faculty10.jpg", "linkedin": "https://linkedin.com/in/meena-sundaram", "github": "https://github.com/meenasundaram"},
+        {"name": "Mr. Rajesh Babu", "email": "rajesh@college.edu", "phone": "9876543220", "dept": "IT-A", "image": "faculty11.jpg", "linkedin": "https://linkedin.com/in/rajesh-babu", "github": "https://github.com/rajeshbabu"},
+        {"name": "Ms. Anjali Devi", "email": "anjali@college.edu", "phone": "9876543221", "dept": "IT-B", "image": "faculty12.jpg", "linkedin": "https://linkedin.com/in/anjali-devi", "github": "https://github.com/anjalidevi"},
+        {"name": "Dr. Suresh Rajan", "email": "suresh@college.edu", "phone": "9876543222", "dept": "MECH", "image": "faculty13.jpg", "linkedin": "https://linkedin.com/in/suresh-rajan", "github": "https://github.com/sureshrajan"},
+        {"name": "Mr. Gopal Krishnan", "email": "gopal@college.edu", "phone": "9876543223", "dept": "RA", "image": "faculty14.jpg", "linkedin": "https://linkedin.com/in/gopal-krishnan", "github": "https://github.com/gopalkrishnan"},
     ]
     
     for faculty_data in mock_faculties:
@@ -138,7 +139,11 @@ def init_database():
             name=faculty_data["name"],
             email=faculty_data["email"],
             password=pwd_context.hash("password123"),  # Default password
-            phone=faculty_data["phone"]
+            phone=faculty_data["phone"],
+            image_url=f"/static/images/{faculty_data['image']}",
+            linkedin_url=faculty_data["linkedin"],
+            github_url=faculty_data["github"],
+            department=faculty_data["dept"]
         )
         db.add(faculty)
     

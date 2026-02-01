@@ -11,6 +11,10 @@ class Faculty(Base):
     email = Column(String(100), unique=True, index=True, nullable=False)
     password = Column(String(255), nullable=False)
     phone = Column(String(15))
+    image_url = Column(String(255), nullable=True)
+    linkedin_url = Column(String(255), nullable=True)
+    github_url = Column(String(255), nullable=True)
+    department = Column(String(100), nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     is_active = Column(Boolean, default=True)
     

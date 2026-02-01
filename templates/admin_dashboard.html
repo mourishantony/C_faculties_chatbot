@@ -74,9 +74,9 @@
                 <!-- Faculties List -->
                 <div class="card">
                     <div class="card-header">
-                        <h3 class="card-title">👨‍🏫 Registered Faculties</h3>
+                        <h3 class="card-title">👨‍🏫 Our Faculty Team</h3>
                     </div>
-                    <div id="facultiesContainer">
+                    <div class="faculty-grid" id="facultiesContainer">
                         <p>Loading...</p>
                     </div>
                 </div>
@@ -201,7 +201,307 @@
     </div>
 
     <style>
-        /* Floating Chatbot Styles */
+        /* ========== Faculty Flip Cards ========== */
+        .faculty-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 24px;
+            padding: 20px;
+        }
+        
+        .flip-card {
+            background-color: transparent;
+            width: 100%;
+            height: 350px;
+            perspective: 1000px;
+        }
+        
+        .flip-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.8s;
+            transform-style: preserve-3d;
+            cursor: pointer;
+        }
+        
+        .flip-card:hover .flip-card-inner,
+        .flip-card.flipped .flip-card-inner {
+            transform: rotateY(180deg);
+        }
+        
+        .flip-card-front, .flip-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            border-radius: 16px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+        }
+        
+        .flip-card-front {
+            background: linear-gradient(145deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .faculty-image {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            margin-bottom: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .faculty-image-placeholder {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 60px;
+            margin-bottom: 15px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .flip-card-front h3 {
+            margin: 0 0 8px 0;
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+        
+        .flip-card-front .faculty-dept {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 4px 12px;
+            border-radius: 20px;
+        }
+        
+        .flip-card-front .flip-hint {
+            position: absolute;
+            bottom: 15px;
+            font-size: 0.75rem;
+            opacity: 0.7;
+        }
+        
+        .flip-card-back {
+            background: white;
+            transform: rotateY(180deg);
+            display: flex;
+            flex-direction: column;
+            padding: 25px;
+        }
+        
+        .flip-card-back h3 {
+            margin: 0 0 5px 0;
+            font-size: 1.2rem;
+            color: #1e293b;
+        }
+        
+        .flip-card-back .faculty-dept-back {
+            font-size: 0.85rem;
+            color: #64748b;
+            margin-bottom: 15px;
+        }
+        
+        .faculty-info-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 0.9rem;
+            color: #475569;
+        }
+        
+        .faculty-info-item:last-child {
+            border-bottom: none;
+        }
+        
+        .faculty-info-item span:first-child {
+            font-size: 1.1rem;
+        }
+        
+        .social-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: auto;
+            padding-top: 15px;
+        }
+        
+        .social-btn {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        
+        .social-btn.email {
+            background: linear-gradient(135deg, #ea4335, #fbbc05);
+            color: white;
+        }
+        
+        .social-btn.phone {
+            background: linear-gradient(135deg, #25d366, #128c7e);
+            color: white;
+        }
+        
+        .social-btn.linkedin {
+            background: linear-gradient(135deg, #0077b5, #00a0dc);
+            color: white;
+        }
+        
+        .social-btn.github {
+            background: linear-gradient(135deg, #333, #6e5494);
+            color: white;
+        }
+        
+        .social-btn:hover {
+            transform: scale(1.15);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .status-indicator {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #22c55e;
+            box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.3);
+        }
+        
+        .status-indicator.inactive {
+            background: #ef4444;
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.3);
+        }
+        
+        /* ========== Mobile Responsiveness ========== */
+        @media (max-width: 768px) {
+            .dashboard {
+                padding: 10px;
+            }
+            
+            .dashboard-title {
+                font-size: 1.5rem;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+            
+            .stat-card {
+                padding: 15px;
+            }
+            
+            .stat-value {
+                font-size: 1.8rem;
+            }
+            
+            .faculty-grid {
+                grid-template-columns: 1fr;
+                padding: 10px;
+                gap: 16px;
+            }
+            
+            .flip-card {
+                height: 320px;
+            }
+            
+            .faculty-image, .faculty-image-placeholder {
+                width: 120px;
+                height: 120px;
+                font-size: 50px;
+            }
+            
+            .report-filters {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .filter-group {
+                width: 100%;
+            }
+            
+            .schedule-table {
+                font-size: 0.8rem;
+            }
+            
+            .schedule-table th,
+            .schedule-table td {
+                padding: 8px 5px;
+            }
+            
+            .navbar {
+                padding: 10px;
+            }
+            
+            .navbar-brand {
+                font-size: 1rem;
+            }
+            
+            .navbar-nav {
+                gap: 10px;
+            }
+            
+            .card {
+                margin-bottom: 15px;
+            }
+            
+            .card-header {
+                padding: 15px;
+            }
+            
+            .card-title {
+                font-size: 1.1rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .flip-card {
+                height: 300px;
+            }
+            
+            .social-btn {
+                width: 40px;
+                height: 40px;
+                font-size: 16px;
+            }
+            
+            .chatbot-window {
+                width: calc(100vw - 20px);
+                height: calc(100vh - 100px);
+                right: -12px;
+            }
+        }
+        
+        /* ========== Floating Chatbot Styles ========== */
         .chatbot-floating {
             position: fixed;
             bottom: 24px;
@@ -706,7 +1006,29 @@
             await loadSummary();
             await loadFaculties();
             await loadReport();
+            
+            // Add touch support for flip cards on mobile
+            setupFlipCardTouch();
         });
+        
+        // Touch support for flip cards
+        function setupFlipCardTouch() {
+            document.addEventListener('click', (e) => {
+                const flipCard = e.target.closest('.flip-card');
+                if (flipCard) {
+                    // Don't toggle if clicking a link
+                    if (e.target.closest('.social-btn')) return;
+                    
+                    // Remove flipped class from all other cards
+                    document.querySelectorAll('.flip-card.flipped').forEach(card => {
+                        if (card !== flipCard) card.classList.remove('flipped');
+                    });
+                    
+                    // Toggle current card
+                    flipCard.classList.toggle('flipped');
+                }
+            });
+        }
         
         async function loadSummary() {
             try {
@@ -731,23 +1053,53 @@
                     return;
                 }
                 
-                let html = '<table class="schedule-table"><thead><tr>' +
-                    '<th>#</th><th>Name</th><th>Email</th><th>Phone</th><th>Status</th>' +
-                    '</tr></thead><tbody>';
+                let html = '';
                 
                 faculties.forEach((f, index) => {
+                    const initials = f.name.split(' ').map(n => n[0]).join('').substring(0, 2);
+                    const imageHtml = f.image_url 
+                        ? `<img src="${f.image_url}" alt="${f.name}" class="faculty-image" onerror="this.outerHTML='<div class=\\'faculty-image-placeholder\\'>${initials}</div>'">`
+                        : `<div class="faculty-image-placeholder">${initials}</div>`;
+                    
                     html += `
-                        <tr>
-                            <td>${index + 1}</td>
-                            <td><strong>${f.name}</strong></td>
-                            <td>${f.email}</td>
-                            <td>${f.phone || '-'}</td>
-                            <td><span class="status-badge ${f.is_active ? 'filled' : 'absent'}">${f.is_active ? 'Active' : 'Inactive'}</span></td>
-                        </tr>
+                        <div class="flip-card">
+                            <div class="flip-card-inner">
+                                <div class="flip-card-front">
+                                    <div class="status-indicator ${f.is_active ? '' : 'inactive'}"></div>
+                                    ${imageHtml}
+                                    <h3>${f.name}</h3>
+                                    <span class="faculty-dept">${f.department || 'C Programming'}</span>
+                                    <span class="flip-hint">Hover to see more →</span>
+                                </div>
+                                <div class="flip-card-back">
+                                    <h3>${f.name}</h3>
+                                    <p class="faculty-dept-back">📚 Handles: ${f.department || 'C Programming'}</p>
+                                    
+                                    <div class="faculty-info-item">
+                                        <span>📧</span>
+                                        <span>${f.email}</span>
+                                    </div>
+                                    <div class="faculty-info-item">
+                                        <span>📱</span>
+                                        <span>${f.phone || 'N/A'}</span>
+                                    </div>
+                                    <div class="faculty-info-item">
+                                        <span>🟢</span>
+                                        <span>Status: ${f.is_active ? 'Active' : 'Inactive'}</span>
+                                    </div>
+                                    
+                                    <div class="social-buttons">
+                                        <a href="mailto:${f.email}" class="social-btn email" title="Send Email">✉️</a>
+                                        <a href="tel:${f.phone}" class="social-btn phone" title="Call">📞</a>
+                                        <a href="${f.linkedin_url || '#'}" target="_blank" class="social-btn linkedin" title="LinkedIn">in</a>
+                                        <a href="${f.github_url || '#'}" target="_blank" class="social-btn github" title="GitHub">⌨️</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     `;
                 });
                 
-                html += '</tbody></table>';
                 container.innerHTML = html;
                 
             } catch (error) {

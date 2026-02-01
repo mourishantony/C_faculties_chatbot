@@ -242,7 +242,11 @@ def get_all_faculties(db: Session = Depends(get_db)):
         "name": f.name,
         "email": f.email,
         "phone": f.phone,
-        "is_active": f.is_active
+        "is_active": f.is_active,
+        "image_url": f.image_url,
+        "linkedin_url": f.linkedin_url,
+        "github_url": f.github_url,
+        "department": f.department
     } for f in faculties]
 
 @app.get("/api/admin/today-summary")

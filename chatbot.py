@@ -426,9 +426,8 @@ def get_absent_today_response(db: Session, today: date) -> str:
             response += f"👨‍🏫 **{faculty.name}**\n"
             response += f"   📍 Department: {dept.name}\n"
             response += f"   ⏰ Period: {get_period_ordinal(entry.period)} ({get_period_time(entry.period)})\n"
-            if entry.swap_faculty_id:
-                swap_faculty = db.query(Faculty).filter(Faculty.id == entry.swap_faculty_id).first()
-                response += f"   🔄 Replaced by: {swap_faculty.name}\n"
+            if entry.is_swapped and entry.swapped_with:
+                response += f"   🔄 Replaced by: {entry.swapped_with}\n"
             response += "\n"
     
     return response
