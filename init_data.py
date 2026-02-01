@@ -115,26 +115,208 @@ def init_database():
     )
     db.add(admin)
     
-    # Add mock faculties (14 faculties)
+    # Add faculties (14 faculties from DATAS.TXT)
     # Images should be stored in static/images/ folder with filenames like: faculty1.jpg, faculty2.jpg, etc.
-    mock_faculties = [
-        {"name": "Dr. Ramesh Kumar", "email": "ramesh@college.edu", "phone": "9876543210", "dept": "AIDS-A", "image": "faculty1.jpg", "linkedin": "https://linkedin.com/in/ramesh-kumar", "github": "https://github.com/rameshkumar"},
-        {"name": "Ms. Priya Sharma", "email": "priya@college.edu", "phone": "9876543211", "dept": "AIDS-B", "image": "faculty2.jpg", "linkedin": "https://linkedin.com/in/priya-sharma", "github": "https://github.com/priyasharma"},
-        {"name": "Mr. Arun Prakash", "email": "arun@college.edu", "phone": "9876543212", "dept": "AIML-A", "image": "faculty3.jpg", "linkedin": "https://linkedin.com/in/arun-prakash", "github": "https://github.com/arunprakash"},
-        {"name": "Dr. Lakshmi Narayanan", "email": "lakshmi@college.edu", "phone": "9876543213", "dept": "AIML-B", "image": "faculty4.jpg", "linkedin": "https://linkedin.com/in/lakshmi-narayanan", "github": "https://github.com/lakshminarayanan"},
-        {"name": "Ms. N. Backiyalakshmi", "email": "backiya@college.edu", "phone": "9876543214", "dept": "CSBS", "image": "faculty5.jpg", "linkedin": "https://linkedin.com/in/backiyalakshmi", "github": "https://github.com/backiyalakshmi"},
-        {"name": "Mr. Senthil Kumar", "email": "senthil@college.edu", "phone": "9876543215", "dept": "CSE-A", "image": "faculty6.jpg", "linkedin": "https://linkedin.com/in/senthil-kumar", "github": "https://github.com/senthilkumar"},
-        {"name": "Dr. Vijay Anand", "email": "vijay@college.edu", "phone": "9876543216", "dept": "CSE-B", "image": "faculty7.jpg", "linkedin": "https://linkedin.com/in/vijay-anand", "github": "https://github.com/vijayanand"},
-        {"name": "Ms. Deepa Krishnan", "email": "deepa@college.edu", "phone": "9876543217", "dept": "CYS", "image": "faculty8.jpg", "linkedin": "https://linkedin.com/in/deepa-krishnan", "github": "https://github.com/deepakrishnan"},
-        {"name": "Mr. Karthik Raja", "email": "karthik@college.edu", "phone": "9876543218", "dept": "ECE-A", "image": "faculty9.jpg", "linkedin": "https://linkedin.com/in/karthik-raja", "github": "https://github.com/karthikraja"},
-        {"name": "Dr. Meena Sundaram", "email": "meena@college.edu", "phone": "9876543219", "dept": "ECE-B", "image": "faculty10.jpg", "linkedin": "https://linkedin.com/in/meena-sundaram", "github": "https://github.com/meenasundaram"},
-        {"name": "Mr. Rajesh Babu", "email": "rajesh@college.edu", "phone": "9876543220", "dept": "IT-A", "image": "faculty11.jpg", "linkedin": "https://linkedin.com/in/rajesh-babu", "github": "https://github.com/rajeshbabu"},
-        {"name": "Ms. Anjali Devi", "email": "anjali@college.edu", "phone": "9876543221", "dept": "IT-B", "image": "faculty12.jpg", "linkedin": "https://linkedin.com/in/anjali-devi", "github": "https://github.com/anjalidevi"},
-        {"name": "Dr. Suresh Rajan", "email": "suresh@college.edu", "phone": "9876543222", "dept": "MECH", "image": "faculty13.jpg", "linkedin": "https://linkedin.com/in/suresh-rajan", "github": "https://github.com/sureshrajan"},
-        {"name": "Mr. Gopal Krishnan", "email": "gopal@college.edu", "phone": "9876543223", "dept": "RA", "image": "faculty14.jpg", "linkedin": "https://linkedin.com/in/gopal-krishnan", "github": "https://github.com/gopalkrishnan"},
+    faculties_data = [
+        {
+            "name": "Sathish R",
+            "email": "r.sathish@kgkite.ac.in",
+            "phone": "9791406167",
+            "dept": "AIDS-A",
+            "image": "faculty1.jpg",
+            "linkedin": "https://www.linkedin.com/in/sathish-ramanujam-96545313a",
+            "github": "https://github.com/Professor-Sathish",
+            "experience": "13",
+            "c_exp": "1",
+            "py_exp": "9",
+            "research": "Machine Learning",
+            "personal_email": "sathishse13@gmail.com"
+        },
+        {
+            "name": "Sikkandhar Batcha J",
+            "email": "sikkandharbatcha.j@kgkite.ac.in",
+            "phone": "9486429598",
+            "dept": "AIDS-B",
+            "image": "faculty2.jpg",
+            "linkedin": "https://www.linkedin.com/in/sikkandhar-batcha-j-bb585271",
+            "github": "https://github.com/sssbatcha",
+            "experience": "9",
+            "c_exp": "1",
+            "py_exp": "2",
+            "research": "Deep Learning",
+            "personal_email": "sssbatcha@gmail.com"
+        },
+        {
+            "name": "Anitha M",
+            "email": "anitha.m@kgkite.ac.in",
+            "phone": "9597942750",
+            "dept": "AIML-A",
+            "image": "faculty3.jpg",
+            "linkedin": "https://www.linkedin.com/in/anitha-vimal-152295345",
+            "github": "https://github.com/anithavimal666",
+            "experience": "12",
+            "c_exp": "2",
+            "py_exp": "2",
+            "research": "Big Data Analytics with Deep Learning",
+            "personal_email": "manithatce@gmail.com"
+        },
+        {
+            "name": "Aruna R",
+            "email": "aruna.r@kgkite.ac.in",
+            "phone": "9585458088",
+            "dept": "AIML-B",
+            "image": "faculty4.jpg",
+            "linkedin": "https://www.linkedin.com/in/aruna-deepa-0957b9201/",
+            "github": "https://github.com/arunacse867-design",
+            "experience": "11.5",
+            "c_exp": "2",
+            "py_exp": "1",
+            "research": "Data Science",
+            "personal_email": "arunacse867@gmail.com"
+        },
+        {
+            "name": "Janani S",
+            "email": "janani.s@kgkite.ac.in",
+            "phone": "9786282598",
+            "dept": "CSE-A",
+            "image": "faculty5.jpg",
+            "linkedin": "https://www.linkedin.com/in/janani-s",
+            "github": "https://github.com/JANANI441992",
+            "experience": "9.5",
+            "c_exp": "4",
+            "py_exp": "3",
+            "research": "Deep Learning & Neural Networks",
+            "personal_email": "janani441992@gmail.com"
+        },
+        {
+            "name": "Indhumathi S",
+            "email": "indhumathi.s@kgkite.ac.in",
+            "phone": "7708146489",
+            "dept": "CSE-B",
+            "image": "faculty6.jpg",
+            "linkedin": "https://www.linkedin.com/in/indhumathi-subramaniam-35a770289",
+            "github": "https://github.com/IndhumathiSubramaniam",
+            "experience": "8",
+            "c_exp": "1",
+            "py_exp": "2",
+            "research": "Machine Learning & Deep Learning",
+            "personal_email": "indhumathisme@gmail.com"
+        },
+        {
+            "name": "Saranya S",
+            "email": "saranya.sh@kgkite.ac.in",
+            "phone": "7339511127",
+            "dept": "CSBS",
+            "image": "faculty7.jpg",
+            "linkedin": "https://www.linkedin.com/in/saranya-prabhakaran-2639a719b",
+            "github": "https://github.com/saranyaethvik/saran",
+            "experience": "0.4",
+            "c_exp": "0",
+            "py_exp": "0",
+            "research": "AI",
+            "personal_email": "saranyamtech12@gmail.com"
+        },
+        {
+            "name": "Anusha S",
+            "email": "anusha.s@kgkite.ac.in",
+            "phone": "8056008866",
+            "dept": "CYS",
+            "image": "faculty8.jpg",
+            "linkedin": "",
+            "github": "https://github.com/Anusha-1989",
+            "experience": "12.5",
+            "c_exp": "0",
+            "py_exp": "1",
+            "research": "Data Science",
+            "personal_email": "anusha76anu@gmail.com"
+        },
+        {
+            "name": "Kiruthikaa R",
+            "email": "kiruthikaa.r@kgkite.ac.in",
+            "phone": "6382754523",
+            "dept": "ECE-A",
+            "image": "faculty9.jpg",
+            "linkedin": "https://www.linkedin.com/in/kiruthikaa-r-42596a332/",
+            "github": "https://github.com/Kiruthikaa06",
+            "experience": "8.5",
+            "c_exp": "1",
+            "py_exp": "1",
+            "research": "IoT & Embedded Systems",
+            "personal_email": "kiruthikaar27@gmail.com"
+        },
+        {
+            "name": "Janani R",
+            "email": "janani.r@kgkite.ac.in",
+            "phone": "9488762688",
+            "dept": "ECE-B",
+            "image": "faculty10.jpg",
+            "linkedin": "https://www.linkedin.com/in/janani-ramannachetty-43b892137/",
+            "github": "https://github.com/Jananir22",
+            "experience": "2.5",
+            "c_exp": "0",
+            "py_exp": "0",
+            "research": "Machine Learning",
+            "personal_email": "jananiramannachetty@gmail.com"
+        },
+        {
+            "name": "Venkatesh Babu S",
+            "email": "Venkateshbabu.s@kgkite.ac.in",
+            "phone": "9790197267",
+            "dept": "IT-A",
+            "image": "faculty11.jpg",
+            "linkedin": "https://www.linkedin.com/in/venkateshbabusakthinarayanan/",
+            "github": "",
+            "experience": "20",
+            "c_exp": "",
+            "py_exp": "",
+            "research": "",
+            "personal_email": ""
+        },
+        {
+            "name": "Dhamayanthi P",
+            "email": "dhamayanthi.p@kgkite.ac.in",
+            "phone": "8220279253",
+            "dept": "IT-B",
+            "image": "faculty12.jpg",
+            "linkedin": "https://www.linkedin.com/in/dhamayanthi-satishkumar-580135104",
+            "github": "https://github.com/Dhamayanthi-ME/Dhamayanthi",
+            "experience": "5.1",
+            "c_exp": "0",
+            "py_exp": "0",
+            "research": "Machine Learning",
+            "personal_email": "damyanti.me@gmail.com"
+        },
+        {
+            "name": "Pradeep G",
+            "email": "pradeep.g@kgkite.ac.in",
+            "phone": "9600018957",
+            "dept": "MECH",
+            "image": "faculty13.jpg",
+            "linkedin": "https://www.linkedin.com/in/pradeep-g-b7275b46/",
+            "github": "https://github.com/pradeepgkite",
+            "experience": "9",
+            "c_exp": "0",
+            "py_exp": "0",
+            "research": "Deep Learning",
+            "personal_email": "pradeep.be2012@gmail.com"
+        },
+        {
+            "name": "Madhan S",
+            "email": "madhan.m@kgkite.ac.in",
+            "phone": "8344108003",
+            "dept": "RA",
+            "image": "faculty14.jpg",
+            "linkedin": "https://www.linkedin.com/in/madhan-m-9a0ba639/",
+            "github": "",
+            "experience": "0.4",
+            "c_exp": "0",
+            "py_exp": "0",
+            "research": "Deep Learning",
+            "personal_email": "madhanagathyam@gmail.com"
+        },
     ]
     
-    for faculty_data in mock_faculties:
+    for faculty_data in faculties_data:
         faculty = Faculty(
             name=faculty_data["name"],
             email=faculty_data["email"],
@@ -143,7 +325,12 @@ def init_database():
             image_url=f"/static/images/{faculty_data['image']}",
             linkedin_url=faculty_data["linkedin"],
             github_url=faculty_data["github"],
-            department=faculty_data["dept"]
+            department=faculty_data["dept"],
+            experience=faculty_data["experience"],
+            c_experience=faculty_data["c_exp"],
+            py_experience=faculty_data["py_exp"],
+            research_area=faculty_data["research"],
+            personal_email=faculty_data["personal_email"]
         )
         db.add(faculty)
     

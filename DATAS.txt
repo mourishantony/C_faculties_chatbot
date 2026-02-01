@@ -1,0 +1,50 @@
+SNO	CLASS	NAME	PHOTO	EMAIL	EXP (years)	C EXP	PY EXP	PHONE	RESEARCH AREA	LINKEDIN	GITHUB    PERSONAL EMAIL
+1	AI&DS A	SATHISH R		r.sathish@kgkite.ac.in	13	1	9	9791406167	Machine learning	https://www.linkedin.com/in/sathish-ramanujam-96545313a	https://github.com/Professor-Sathish	https://x.com/ProfSathish	sathishse13@gmail.com
+2	AI&DS B	Sikkandhar Batcha J	
+
+sikkandharbatcha.j@kgkite.ac.in	9	1	2	9486429598	Deep Learning	https://www.linkedin.com/in/sikkandhar-batcha-j-bb585271?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app	https://github.com/sssbatcha
+sssbatcha@gmail.com
+3	AIML A	Anitha M
+
+anitha.m@kgkite.ac.in	12	2	2	9597942750	Big Data Analytics with Deep Learning
+https://www.linkedin.com/in/anitha-vimal-152295345	https://github.com/anithavimal666
+manithatce@gmail.com
+4	AIML B	Aruna R	
+
+aruna.r@kgkite.ac.in	11.5	2	1	9585458088	Data Science	https://www.linkedin.com/in/aruna-deepa-0957b9201/
+https://github.com/arunacse867-design		arunacse867@gmail.com
+5	CSE A	Janani S	
+
+janani.s@kgkite.ac.in
+9.5	4	3	9786282598	Deep learning & neural networks
+www.linkedin.com/in/indhumathi-subramaniam-35a770289	https://github.com/JANANI441992		janani441992@gmail.com
+6	CSE B	Indhumathi S	
+
+indhumathi.s@kgkite.ac.in	8	1	2	7708146489	Machine Learning & Deep Learning	www.linkedin.com/in/indhumathi-subramaniam-35a770289	https://github.com/IndhumathiSubramaniam		indhumathisme@gmail.com
+7	CSBS	Saranya S	
+
+saranya.sh@kgkite.ac.in	0.4	0	0	7339511127	AI	www.linkedin.com/in/saranya-prabhakaran-2639a719b	https://github.com/saranyaethvik/saran	https://x.com/Saranyaethvik	saranyamtech12@gmail.com
+8	CYS	Anusha S	
+
+anusha.s@kgkite.ac.in	12.5	0	1	80560 08866	Data Science		https://github.com/Anusha-1989		anusha76anu@gmail.com
+9	ECE A	Kiruthikaa R	
+
+kiruthikaa.r@kgkite.ac.in	8.5	1	1	6382754523	
+IoT &Embedded Systems
+https://www.linkedin.com/in/kiruthikaa-r-42596a332/	https://github.com/Kiruthikaa06		kiruthikaar27@gmail.com
+10	ECE B	Janani R	
+
+janani.r@kgkite.ac.in	2.5	0	0	9488762688	Machine learning	https://www.linkedin.com/in/janani-ramannachetty-43b892137/	https://github.com/Jananir22	https://x.com/Jananir220812	jananiramannachetty@gmail.com
+11	IT A	Venkatesh Babu S	
+
+Venkateshbabu.s@kgkite.ac.in	20			9790197267		https://www.linkedin.com/in/venkateshbabusakthinarayanan/?originalSubdomain=in		https://x.com/venkatesh_3	
+12	IT B	Dhamayanthi P	
+
+dhamayanthi.p@kgkite.ac.in	5.1	0	0	8220279253	Machine learning	https://www.linkedin.com/in/dhamayanthi-satishkumar-580135104	https://github.com/Dhamayanthi-ME/Dhamayanthi	https://x.com/Dhamayanth3059	damyanti.me@gmail.com
+13	MECH	Pradeep G	
+
+pradeep.g@kgkite.ac.in	9	0	0	9600018957	Deep learning	https://www.linkedin.com/in/pradeep-g-b7275b46/	https://github.com/pradeepgkite		pradeep.be2012@gmail.com
+14	RA	Madhan S	
+
+
+madhan.m@kgkite.ac.in	0.4	0	0	8344108003	Deep Learning	https://www.linkedin.com/in/madhan-m-9a0ba639/		https://x.com/MadhanM5258	madhanagathyam@gmail.com

@@ -15,6 +15,11 @@ class Faculty(Base):
     linkedin_url = Column(String(255), nullable=True)
     github_url = Column(String(255), nullable=True)
     department = Column(String(100), nullable=True)
+    experience = Column(String(20), nullable=True)  # Total experience in years
+    c_experience = Column(String(20), nullable=True)  # C programming experience
+    py_experience = Column(String(20), nullable=True)  # Python experience
+    research_area = Column(String(255), nullable=True)  # Research area
+    personal_email = Column(String(100), nullable=True)  # Personal email
     created_at = Column(DateTime, default=datetime.utcnow)
     is_active = Column(Boolean, default=True)
     
