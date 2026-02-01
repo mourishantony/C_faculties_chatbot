@@ -368,6 +368,40 @@ def get_today_summary(db: Session = Depends(get_db)):
         "swapped": swapped
     }
 
+@app.get("/api/admin/classes-by-type")
+def get_classes_by_type(class_type: str, db: Session = Depends(get_db)):
+    """Get all classes filtered by type (theory, lab, mini_project)"""
+    # Get all timetable entries of this type
+    entries = db.query(TimetableEntry).filter(
+        TimetableEntry.class_type == class_type
+    ).order_by(TimetableEntry.day, TimetableEntry.period).all()
+    
+    result = []
+    for entry in entries:
+        faculty = db.query(Faculty).filter(Faculty.id == entry.faculty_id).first()
+        dept = db.query(Department).filter(Department.id == entry.department_id).first()
+        
+        result.append({
+            "id": entry.id,
+            "faculty_id": entry.faculty_id,
+            "faculty_name": faculty.name if faculty else "Unknown",
+            "faculty_email": faculty.email if faculty else None,
+            "department_id": entry.department_id,
+            "department_name": dept.name if dept else "Unknown",
+            "department_code": dept.code if dept else "Unknown",
+            "day": entry.day,
+            "period": entry.period,
+            "subject_code": entry.subject_code,
+            "subject_name": entry.subject_name,
+            "class_type": entry.class_type
+        })
+    
+    return {
+        "class_type": class_type,
+        "total_classes": len(result),
+        "classes": result
+    }
+
 # ----- Chatbot Route -----
 @app.post("/api/chatbot")
 def chatbot_query(data: ChatQuery, db: Session = Depends(get_db)):
@@ -397,4 +431,4 @@ def admin_dashboard_page(request: Request):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="127.0.0.1", port=8000)

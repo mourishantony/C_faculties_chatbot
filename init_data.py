@@ -488,7 +488,6 @@ def init_database():
     mock_timetable = [
         # Faculty 1 - Mr. Sathish R handles AIDS-A
         # Tuesday: Theory (1 period)
-        {"faculty_id": 1, "dept_code": "AIDS-A", "day": "Sunday", "period": 5, "class_type": "theory"},
         {"faculty_id": 1, "dept_code": "AIDS-A", "day": "Tuesday", "period": 7, "class_type": "theory"},
         # Wednesday: mini_project (1 period) + Lab (3 periods)                  
         {"faculty_id": 1, "dept_code": "AIDS-A", "day": "Wednesday", "period": 5, "class_type": "mini_project"},
@@ -497,7 +496,6 @@ def init_database():
         {"faculty_id": 1, "dept_code": "AIDS-A", "day": "Wednesday", "period": 8, "class_type": "lab"},
         # Thursday: Theory(2 periods)
         {"faculty_id": 1, "dept_code": "AIDS-A", "day": "Thursday", "period": 8, "class_type": "theory"},
-        {"faculty_id": 1, "dept_code": "AIDS-A", "day": "Thursday", "period": 9, "class_type": "theory"},
         # Friday: Theory
         {"faculty_id": 1, "dept_code": "AIDS-A", "day": "Friday", "period": 5, "class_type": "theory"},
         # Saturday: Theory
