@@ -16,20 +16,51 @@ A web application for managing C Programming faculty schedules, daily entries, a
 - **Database**: SQLite
 - **Frontend**: HTML, CSS, JavaScript
 - **Authentication**: JWT Tokens
+- **AI/ML**: Sentence Transformers, FAISS (Semantic Search)
 
 ## Installation
 
-1. **Install Python dependencies:**
+### Option 1: Docker (Recommended)
+
+1. **Build and run with Docker Compose:**
+   ```bash
+   docker-compose up --build
+   ```
+
+2. **Access the application:**
+   - Home: http://localhost:8000
+   - Chatbot: http://localhost:8000/chatbot
+   - Faculty Login: http://localhost:8000/faculty/login
+   - Admin Login: http://localhost:8000/admin/login
+
+3. **Stop the application:**
+   ```bash
+   docker-compose down
+   ```
+
+### Option 2: Manual Setup
+
+**Requirements:** Python 3.10 or 3.11 (Python 3.13+ not yet supported)
+
+1. **Create virtual environment:**
+   ```bash
+   python -m venv venv
+   venv\Scripts\activate  # Windows
+   # or
+   source venv/bin/activate  # Linux/Mac
+   ```
+
+2. **Install Python dependencies:**
    ```bash
    pip install -r requirements.txt
    ```
 
-2. **Initialize the database with mock data:**
+3. **Initialize the database with mock data:**
    ```bash
    python init_data.py
    ```
 
-3. **Run the application:**
+4. **Run the application:**
    ```bash
    python main.py
    ```
@@ -39,7 +70,7 @@ A web application for managing C Programming faculty schedules, daily entries, a
    uvicorn main:app --reload --host 0.0.0.0 --port 8000
    ```
 
-4. **Open in browser:**
+5. **Open in browser:**
    - Home: http://localhost:8000
    - Chatbot: http://localhost:8000/chatbot
    - Faculty Login: http://localhost:8000/faculty/login
