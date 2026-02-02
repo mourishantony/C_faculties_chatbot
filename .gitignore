@@ -16,3 +16,4 @@ chatbot_index.faiss
 chatbot_intents.pkl
 .idea/
 requirements.txt
+env310/
