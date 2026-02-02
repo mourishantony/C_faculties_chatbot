@@ -1,0 +1,1519 @@
+﻿WEEK 1
+24UCS271 - Programming in C
+Week 1 Lab Manual: Programs using I/O Statements, Operators, and Expressions
+________________
+
+
+Pre-Lab 1: Reading and Displaying Basic Data
+Description
+Write a C program that reads two integers from the user and displays them exactly as entered.
+This exercise introduces standard input and output using scanf() and printf() and reinforces the idea that a program can interact with the user.
+Input Format
+Two integers entered one after the other, separated by a space.
+Expected Output
+The two integers should be printed on separate lines with clear labels.
+Sample Output Format
+First Number: <value>
+Second Number: <value>
+
+
+________________
+
+
+Pre-Lab 2: Simple Arithmetic Operations
+Description
+Develop a C program that reads two integers and computes their sum and difference.
+This problem focuses on arithmetic operators (+, -) and expression evaluation.
+Input Format
+Two integers entered in a single line separated by a space.
+Expected Output
+Display the sum and difference of the two numbers.
+Sample Output Format
+Sum = <value>
+Difference = <value>
+
+
+________________
+
+
+Pre-Lab 3: Using Multiple Operators in an Expression
+Description
+Write a C program that reads three integers and evaluates the expression:
+[
+\text{Result} = (a + b) \times c
+]
+This task emphasizes operator precedence and the use of parentheses in expressions.
+Input Format
+Three integers a, b, and c separated by spaces.
+Expected Output
+Display the computed result.
+Sample Output Format
+Result = <value>
+
+
+________________
+
+
+Pre-Lab 4: Computing Average Using Expressions
+Description
+Create a C program that reads three integer marks and calculates their average as a floating-point value.
+This exercise introduces type conversion and mixed expressions involving integers and floating-point numbers.
+Input Format
+Three integers representing marks, separated by spaces.
+Expected Output
+Display the average value up to two decimal places.
+Sample Output Format
+Average = <value>
+
+
+________________
+
+
+
+
+
+
+
+
+________________
+
+
+In-Lab Problem: Student Marks Calculator
+Description
+A student enters marks obtained in three subjects.
+Write a C program that:
+1. Reads the student’s roll number.
+2. Reads marks of three subjects.
+3. Calculates:
+   * Total marks
+   * Average marks
+This problem combines input/output handling, arithmetic operators, and expression evaluation into a single application.
+Input Format
+   * An integer representing the roll number
+   * Three integers representing marks in three subjects (space-separated)
+Output Format
+Display the roll number, total marks, and average marks (rounded to two decimal places).
+Example Run
+Input:
+101
+75 82 68
+
+
+Output:
+Roll Number: 101
+Total Marks: 225
+Average Marks: 75.00
+
+
+WEEK 2
+Week 2 Lab Manual: Programs using Branching Statements
+This week shifts from straight-line computation to decision-making. Programs now respond differently depending on conditions.
+________________
+
+
+Pre-Lab 1: Simple Decision Using if
+Description
+Write a C program that reads an integer and checks whether the number is positive.
+If the number is positive, print a message. If not, the program produces no output.
+This exercise introduces the if statement as a one-way decision.
+Input Format
+A single integer.
+Expected Output
+Print the message only if the number is positive.
+Sample Output Format
+Number is positive
+
+
+________________
+
+
+Pre-Lab 2: Two-Way Decision Using if-else
+Description
+Write a C program that reads an integer and checks whether it is even or odd.
+This task demonstrates a clear two-path decision using if-else.
+Input Format
+A single integer.
+Expected Output
+Display whether the number is even or odd.
+Sample Output Format
+Even number
+
+
+or
+Odd number
+
+
+________________
+
+
+Pre-Lab 3: Multiple Conditions Using nested if
+Description
+Write a C program that reads the marks of a student and assigns a grade based on the following rules:
+   * Marks ≥ 90 → Grade A
+   * Marks ≥ 75 → Grade B
+   * Marks ≥ 50 → Grade C
+   * Marks < 50 → Grade F
+This problem introduces nested decision-making, where conditions are checked in sequence.
+Input Format
+A single integer representing marks.
+Expected Output
+Display the corresponding grade.
+Sample Output Format
+Grade: B
+
+
+________________
+
+
+Pre-Lab 4: Menu-Based Choice Using switch-case
+Description
+Write a C program that displays a simple calculator menu and performs an operation based on user choice.
+Menu:
+   1. Addition
+   2. Subtraction
+   3. Multiplication
+   4. Division
+The user enters two integers and a choice.
+This exercise introduces switch-case as an alternative to multiple if-else statements.
+Input Format
+   * Two integers
+   * An integer choice (1-4)
+Expected Output
+Display the result of the selected operation.
+Sample Output Format
+Result = <value>
+
+
+________________
+
+
+In-Lab W2: Employee Performance Evaluation System
+Description
+ Design a C program for a basic employee performance evaluation system used in a company HR department.
+The program should:
+   * Read an employee ID.
+   * Read performance scores in three criteria (for example: Technical Skill, Communication, and Teamwork).
+   * Calculate total and average score.
+   * Determine the performance grade using branching rules:
+   * If any criterion score is less than 50 => Poor Performance
+Else if average ≥ 75 => Outstanding
+Else if average ≥ 60 => Satisfactory
+Else => Needs Improvement
+Input Format
+ An integer employee ID
+Three integers representing performance scores (space-separated)
+Output Format
+ Display employee ID, total score, average score (two decimal places), and performance grade.
+Example Run
+Input:
+ 204
+78 69 85
+Output:
+ Employee ID: 204
+Total Score: 232
+Average Score: 77.33
+Performance Grade: Outstanding
+
+
+WEEK 3
+Week 3 Lab Manual: Programs using Looping Statements
+This week introduces controlled repetition. Until now, every statement ran once. Loops let the program do work repeatedly, but only as long as a condition holds. We will use while, do-while, and for loops carefully, without arrays or functions yet.
+________________
+
+
+Pre-Lab 1: Printing Numbers Using while Loop
+Description
+Write a C program that prints numbers from 1 to N using a while loop.
+This task introduces loop initialization, condition checking, and iteration.
+Input Format
+A single integer N.
+Expected Output
+Print numbers from 1 to N, each on a new line.
+Sample Output Format
+1
+2
+3
+...
+N
+
+
+________________
+
+
+Pre-Lab 2: Sum of Natural Numbers Using for Loop
+Description
+Write a C program that calculates the sum of the first N natural numbers using a for loop.
+This exercise emphasizes counting loops and accumulation using an expression.
+Input Format
+A single integer N.
+Expected Output
+Display the sum of numbers from 1 to N.
+Sample Output Format
+Sum = <value>
+
+
+________________
+
+
+Pre-Lab 3: Digit Count Using do-while Loop
+Description
+Write a C program that counts the number of digits in a given integer.
+A do-while loop is used to ensure the loop executes at least once, even if the number is 0.
+Input Format
+A single integer.
+Expected Output
+Display the number of digits.
+Sample Output Format
+Number of digits = <value>
+
+
+________________
+
+
+Pre-Lab 4: Skipping Values Using continue
+Description
+Write a C program that prints numbers from 1 to N, skipping all multiples of 5.
+This problem introduces the continue statement to skip the current iteration of a loop.
+Input Format
+A single integer N.
+Expected Output
+Print numbers except multiples of 5, each on a new line.
+Sample Output Format
+1
+2
+3
+4
+6
+7
+...
+
+
+________________
+
+
+In-Lab Problem: FizzBuzz Analyzer
+Description
+FizzBuzz looks playful, but it quietly tests deep understanding of loops, conditions, and control flow.
+Write a C program that processes numbers from 1 to N and applies the following rules:
+      * If the number is divisible by 3, print Fizz
+      * If the number is divisible by 5, print Buzz
+      * If the number is divisible by both 3 and 5, print FizzBuzz
+      * Otherwise, print the number itself
+This problem integrates:
+      * for loop iteration
+      * if-else and nested conditions
+      * Logical reasoning with operators
+      * Clean output formatting
+Input Format
+A single integer N.
+Output Format
+Print one output per line from 1 to N, following the FizzBuzz rules.
+Example Run
+Input:
+15
+
+
+Output:
+1
+2
+Fizz
+4
+Buzz
+Fizz
+7
+8
+Fizz
+Buzz
+11
+Fizz
+13
+14
+FizzBuzz
+
+
+WEEK 4
+Week 4 Lab Manual: Programs using 1D and 2D Arrays
+This week introduces arrays, the idea that memory can hold collections of values under a single name.
+So far, programs have handled one value at a time. Arrays allow structured data handling and naturally pair with loops. 
+________________
+
+
+Pre-Lab 1: Reading and Displaying a 1D Array
+Description
+Write a C program that reads N integers into a one-dimensional array and displays them in the same order.
+This exercise introduces array declaration, indexing, and traversal using a loop.
+Input Format
+      * An integer N indicating the number of elements
+      * N integers separated by spaces
+Expected Output
+Display the array elements in order, separated by a space.
+Sample Output Format
+Array elements: <a1> <a2> <a3> ... <aN>
+
+
+________________
+
+
+Pre-Lab 2: Sum and Average of Array Elements
+Description
+Write a C program that reads N integers into a 1D array and computes:
+      * The sum of all elements
+      * The average of the elements
+This task reinforces array traversal and accumulation using expressions.
+Input Format
+      * An integer N
+      * N integers
+Expected Output
+Display the sum and average (up to two decimal places).
+Sample Output Format
+Sum = <value>
+Average = <value>
+
+
+________________
+
+
+Pre-Lab 3: Finding the Largest Element in an Array
+Description
+Write a C program that finds the largest element in a given 1D array.
+This problem focuses on comparison logic combined with array indexing.
+Input Format
+      * An integer N
+      * N integers
+Expected Output
+Display the largest value in the array.
+Sample Output Format
+Largest element = <value>
+
+
+________________
+
+
+Pre-Lab 4: Reading and Displaying a 2D Array (Matrix)
+Description
+Write a C program that reads a matrix of size R × C and displays it in matrix form.
+This introduces two-dimensional arrays and nested loops.
+Input Format
+      * Two integers R and C
+      * R × C integers entered row-wise
+Expected Output
+Display the matrix in row-column format.
+Sample Output Format
+Matrix:
+a11 a12 a13
+a21 a22 a23
+...
+
+
+________________
+
+
+In-Lab Problem: Student Marks Analysis System
+Description
+A class consists of N students, each evaluated in three subjects.
+Write a C program that:
+      1. Reads marks of all students into a 2D array (N × 3)
+      2. Calculates the total marks for each student
+      3. Calculates the class average for each subject
+      4. Displays all results neatly
+This problem integrates:
+      * 2D arrays
+      * Nested loops
+      * Array-based accumulation and comparison
+      * Clean tabular output
+Input Format
+      * An integer N (number of students)
+      * N lines, each containing 3 integers (marks of 3 subjects)
+Output Format
+      * Display total marks for each student
+      * Display average marks for each subject (two decimal places)
+Example Run
+Input:
+3
+78 85 69
+90 88 92
+65 70 72
+
+
+Output:
+Student 1 Total: 232
+Student 2 Total: 270
+Student 3 Total: 207
+
+
+Subject 1 Average: 77.67
+Subject 2 Average: 81.00
+Subject 3 Average: 77.67
+
+
+WEEK 5
+Week 5 Lab Manual: Programs using String Operations
+This week moves from numbers to text. In C, strings are character arrays terminated by the null character '\0'.
+________________
+
+
+Pre-Lab 1: Reading and Displaying a String
+Description
+Write a C program that reads a single word (no spaces) and displays it exactly as entered.
+This exercise introduces string declaration and basic input/output for strings.
+Input Format
+A single word consisting of alphabetic characters.
+Expected Output
+Display the entered string.
+Sample Output Format
+Entered string: <string>
+
+
+________________
+
+
+Pre-Lab 2: Finding the Length of a String
+Description
+Write a C program that reads a string and finds its length using the standard library function strlen().
+This problem helps students understand how C determines the size of a string using the null terminator.
+Input Format
+A single word (string without spaces).
+Expected Output
+Display the length of the string.
+Sample Output Format
+Length of string = <value>
+
+
+________________
+
+
+Pre-Lab 3: Comparing Two Strings
+Description
+Write a C program that reads two strings and compares them using strcmp().
+The program should indicate whether the strings are equal or not.
+Input Format
+Two strings entered on separate lines.
+Expected Output
+Display whether the strings are the same.
+Sample Output Format
+Strings are equal
+
+
+or
+Strings are not equal
+
+
+________________
+
+
+Pre-Lab 4: Concatenating Two Strings
+Description
+Write a C program that reads two strings and concatenates the second string to the first using strcat().
+This task demonstrates how strings can be combined in C.
+Input Format
+Two strings entered on separate lines.
+Expected Output
+Display the concatenated string.
+Sample Output Format
+Concatenated string: <result>
+
+
+________________
+
+
+In-Lab Problem: Username Processing System
+Description
+A simple system is required to process user names entered during registration.
+Write a C program that:
+      1. Reads a user’s first name and last name as strings.
+      2. Displays the length of each name.
+      3. Checks whether both names are identical.
+      4. Creates a username by concatenating the first name and last name.
+This problem combines:
+      * String input/output
+      * Length calculation
+      * String comparison
+      * String concatenation
+All operations must use standard string functions.
+Input Format
+      * First name (string)
+      * Last name (string)
+Output Format
+Display:
+      * Length of first name
+      * Length of last name
+      * Comparison result
+      * Generated username
+Example Run
+Input:
+Arun
+Kumar
+
+
+Output:
+First Name Length: 4
+Last Name Length: 5
+Names are not equal
+Username: ArunKumar
+
+
+WEEK 6
+Week 6 Lab Manual: Programs using Functions (Passing, Returning Values and Arrays)
+This week introduces functions, the core mechanism for modular thinking in C.
+Until now, programs were written as one long sequence. Functions allow logic to be named, reused, tested independently, and reasoned about. We will cover:
+      * Passing values to functions
+      * Returning values from functions
+      * Passing arrays to functions
+________________
+
+
+Pre-Lab 1: Function to Find the Square of a Number
+Description
+Write a C program that defines a function square() which accepts an integer as a parameter and returns its square.
+The main() function should read a number, call square(), and display the result.
+This exercise introduces:
+      * Function declaration and definition
+      * Passing arguments
+      * Returning a value
+Input Format
+A single integer.
+Expected Output
+Display the square of the number.
+Sample Output Format
+Square = <value>
+
+
+________________
+
+
+Pre-Lab 2: Function to Check Even or Odd
+Description
+Write a C program that defines a function isEven() which takes an integer and returns 1 if the number is even, otherwise returns 0.
+The main() function should use the return value to print the result.
+This problem reinforces decision-making inside functions and return-based logic.
+Input Format
+A single integer.
+Expected Output
+Display whether the number is even or odd.
+Sample Output Format
+Even number
+
+
+or
+Odd number
+
+
+________________
+
+
+Pre-Lab 3: Function to Find Sum of Array Elements
+Description
+Write a C program that defines a function arraySum() which accepts an integer array and its size as parameters and returns the sum of all elements.
+The array should be read in main() and passed to the function.
+This task introduces:
+      * Passing arrays to functions
+      * Array traversal inside functions
+Input Format
+      * An integer N
+      * N integers
+Expected Output
+Display the sum of array elements.
+Sample Output Format
+Sum = <value>
+
+
+________________
+
+
+Pre-Lab 4: Function to Find the Largest Element in an Array
+Description
+Write a C program that defines a function findLargest() which takes an integer array and its size and returns the largest element.
+This problem combines array handling with comparison logic inside a function.
+Input Format
+      * An integer N
+      * N integers
+Expected Output
+Display the largest element.
+Sample Output Format
+Largest element = <value>
+
+
+________________
+
+
+In-Lab Problem: Prime Factorization Using Functions
+Description
+Write a C program that:
+      * Uses a function to find the prime factors of a given number n.
+      * Uses an array to store the prime factors in non-decreasing order.
+      * Uses a function to return the total number of prime factors found.
+      * Displays the prime factors from main().
+Each task must be handled by a separate function, and the array must be passed between functions.
+
+
+Input Format
+      * An integer N
+Output Format
+Display the prime factors of n in non-decreasing order.
+Example Run
+Input:
+100
+
+
+Output:
+Prime Factors: 2 2 5 5
+
+
+WEEK 7
+Week 7 Lab Manual: Programs using Recursion
+Recursion is a technique where a function calls itself to solve a problem by breaking it into smaller subproblems. Every recursive solution must have:
+      1. Base Case - stops recursion
+      2. Recursive Case - reduces the problem size
+________________
+
+
+Pre-Lab 1:  Recursive Calculation of Factorial
+Description
+Write a recursive function to compute the factorial of a given non-negative integer.
+Factorial of n is defined as:
+      * n! = 1 if n = 0
+      * n! = n × (n-1)! if n > 0
+This problem introduces the simplest recursive structure.
+Input Format
+A single integer n (n ≥ 0)
+Expected Output
+Factorial of the given number
+Example
+Input:
+5
+
+
+Output:
+Factorial = 120
+
+
+________________
+
+
+Pre-Lab 2:  Recursive Calculation of Fibonacci Series Term
+Description
+Write a recursive function to find the n-th Fibonacci number.
+Fibonacci sequence is defined as:
+      * F(0) = 0
+      * F(1) = 1
+      * F(n) = F(n-1) + F(n-2) for n > 1
+This problem demonstrates multiple recursive calls.
+Input Format
+A single integer n (n ≥ 0)
+Expected Output
+The n-th Fibonacci number
+Example
+Input:
+6
+
+
+Output:
+Fibonacci number = 8
+________________
+
+
+Pre-Lab 3:  Recursive Sum of First N Natural Numbers
+Description
+Write a recursive function to calculate the sum of the first n natural numbers.
+Mathematical definition:
+      * Sum(n) = n + Sum(n-1)
+      * Sum(0) = 0
+This problem strengthens understanding of recursive reduction.
+Input Format
+A single integer n (n ≥ 0)
+Expected Output
+Sum of the first n natural numbers
+Example
+Input:
+10
+
+
+Output:
+Sum = 55
+________________
+
+
+Pre-Lab 4:  Recursive Power Calculation
+Description
+Write a recursive function to compute x^n (x raised to the power n).
+Rules:
+      * x^0 = 1
+      * x^n = x × x^(n-1) for n > 0
+This problem models real-world exponential computation using recursion.
+Input Format
+Two integers x and n
+(where n ≥ 0)
+Expected Output
+Value of x raised to power n
+Example
+Input:
+2 5
+
+
+Output:
+Result = 32
+
+
+________________
+
+
+In-Lab Problem: Binary Search Using Recursion
+Description
+Write a C program that:
+      * Uses a recursive function to perform binary search on a sorted array.
+      * Uses a function to read N elements into an array in ascending order.
+      * Uses a recursive function to search for a given key.
+      * Displays whether the search element is found or not from main().
+Input Format
+      1. An integer N (number of elements)
+      2. N integers in ascending order
+      3. An integer key to be searched
+Output Format
+Display whether the search element is found in the array.
+Example Run
+Input:
+3
+15 25 35
+35
+
+
+Output:
+The search number found in the array.
+Input:
+4
+10 20 30 40
+25
+
+
+Output:
+The search number not found in the array.
+WEEK 8
+Week 8 Lab Manual: Programs using Pointers
+________________
+
+
+Pre-Lab 1: Pointer to an Array for Statistical Computation
+Description
+Write a C program that reads n integer values into an array and uses a pointer to traverse the array and compute the sum and average of the elements.
+The array should not be accessed using index notation inside the computation logic—only pointer arithmetic.
+Input Format
+      * An integer n representing the number of elements
+      * n integers separated by spaces
+Expected Output
+Display the sum and average of the elements.
+Sample Output Format
+Sum = <value>
+Average = <value>
+
+
+________________
+
+
+Pre-Lab 2: Pointer to String for Character Analysis
+Description
+Write a C program that reads a string and uses a pointer to count:
+      * Total number of characters
+      * Number of vowels in the string
+Do not use string library functions such as strlen().
+Input Format
+A single line string (no spaces).
+Expected Output
+Display the character count and vowel count.
+Sample Output Format
+Total Characters: <value>
+Vowels: <value>
+
+
+________________
+
+
+Pre-Lab 3: Pointer to Pointer for Value Modification
+Description
+Write a C program that demonstrates the use of a pointer to a pointer to modify the value of an integer variable.
+The value must be changed only through a double pointer.
+Input Format
+A single integer value.
+Expected Output
+Display the value before and after modification.
+Sample Output Format
+Before Modification: <value>
+After Modification: <value>
+
+
+________________
+
+
+Pre-Lab 4: Array of Function Pointers for Computation
+Description
+Write a C program that defines four arithmetic functions: addition, subtraction, multiplication, and division.
+Store their addresses in an array of function pointers and invoke each function using the pointer array.
+Input Format
+Two integers a and b.
+Expected Output
+Display results of all four operations.
+Sample Output Format
+Addition: <value>
+Subtraction: <value>
+Multiplication: <value>
+Division: <value>
+
+
+________________
+
+
+In-Lab Problem: Array Element Swap Using Pointers
+Description
+Write a C program that:
+Uses a function to read N integers into an array.
+Uses a function to swap two array elements using pointers.
+Uses pointer notation to access and modify array elements.
+Displays the array before and after swapping from main().
+The swapping operation must be performed only using pointers, not array indexing.
+Input Format
+      * An integer N (number of elements)
+      * N integers representing array elements
+      * Two indices i and j to be swapped
+Output Format
+Display the array before swapping
+Display the array after swapping
+Example Run
+Input:
+5
+10 20 30 40 50
+1 3
+
+
+Output:
+Array before swapping:
+10 20 30 40 50
+
+
+Array after swapping:
+10 40 30 20 50
+
+
+
+
+
+
+WEEK 9
+Week 9 Lab Manual: Programs using Structures and Unions
+      * Structures
+      * Nested structures
+      * Pointers to structures
+      * Arrays of structures
+________________
+
+
+Pre-Lab 1: Basic Structure for Student Record
+Description
+Write a C program that defines a structure to store a student’s roll number, name, and total marks.
+Read the details of one student and display them.
+This introduces structure declaration, member access using the dot (.) operator, and basic I/O with structures.
+Input Format
+      * Integer roll number
+      * String name (no spaces)
+      * Integer total marks
+Expected Output
+Display the student details clearly.
+Sample Output Format
+Roll Number: <value>
+Name: <value>
+Total Marks: <value>
+
+
+________________
+
+
+Pre-Lab 2: Array of Structures for Multiple Records
+Description
+Write a C program that stores details of n students using an array of structures.
+Each structure should store roll number and marks.
+Display all student records after input.
+This builds understanding of handling multiple records using structures.
+Input Format
+      * Integer n (number of students)
+      * For each student:
+      * Integer roll number
+      * Integer marks
+Expected Output
+Display all student records line by line.
+Sample Output Format
+Student 1: Roll = <value>, Marks = <value>
+Student 2: Roll = <value>, Marks = <value>
+
+
+________________
+
+
+Pre-Lab 3: Pointer to Structure for Data Access
+Description
+Write a C program that uses a pointer to a structure to read and display employee details (ID and salary).
+Access all structure members only through the structure pointer using the arrow (->) operator.
+This introduces indirection and pointer-based structure access.
+Input Format
+      * Integer employee ID
+      * Integer salary
+Expected Output
+Display the employee details.
+Sample Output Format
+Employee ID: <value>
+Salary: <value>
+
+
+________________
+
+
+Pre-Lab 4: Nested Structures for Date Handling
+Description
+Write a C program that defines a structure Date (day, month, year) and nests it inside another structure Event.
+Read an event name and event date, then display them.
+This introduces nesting of structures for modeling real-world entities.
+Input Format
+      * String event name
+      * Integer day
+      * Integer month
+      * Integer year
+Expected Output
+Display the event details.
+Sample Output Format
+Event: <value>
+Date: <dd>/<mm>/<yyyy>
+
+
+________________
+
+
+In-Lab Problem: Library Book Record Management System
+Description
+A library maintains records of books issued to students.
+Each record contains:
+      * Book ID
+      * Book title
+      * Student details
+      * Issue date
+Write a C program that:
+      1. Uses a nested structure to represent issue date
+      2. Uses a structure for student details
+      3. Stores multiple records using an array of structures
+      4. Uses a pointer to structure to traverse and display records
+This models how structured data is organized in real systems without unnecessary control logic.
+Input Format
+      * Integer n => number of issued books
+For each record:
+      * Integer book ID
+      * String book title (no spaces)
+      * Integer student roll number
+      * String student name (no spaces)
+      * Integer day
+      * Integer month
+      * Integer year
+Output Format
+For each issued book, display:
+      * Book ID and title
+      * Student roll number and name
+      * Issue date in dd/mm/yyyy format
+Example Run
+Input:
+2
+101
+C_Programming
+23
+Anita
+12 8 2024
+102
+Data_Structures
+45
+Rahul
+15 8 2024
+
+
+Output:
+Book ID: 101
+Title: C_Programming
+Issued To: Anita (Roll No: 23)
+Issue Date: 12/08/2024
+
+
+Book ID: 102
+Title: Data_Structures
+Issued To: Rahul (Roll No: 45)
+Issue Date: 15/08/2024
+________________
+
+
+
+
+WEEK 10
+Week 10 Lab Manual: Programs using File Operations
+      * Basic file creation
+      * Writing to files
+      * Reading from files
+      * File pointers
+      * Very light introduction to random access
+________________
+
+
+Pre-Lab 1: Writing Data to a File
+Description
+Write a C program that creates a text file and writes a student’s name and roll number into the file using file pointers.
+This introduces file creation, opening a file in write mode, and storing data permanently.
+Input Format
+      * String student name (no spaces)
+      * Integer roll number
+Expected Output
+Data written to file successfully.
+
+
+________________
+
+
+Pre-Lab 2: Reading Data from a File
+Description
+Write a C program that reads and displays the contents of a file created earlier.
+The program should open the file in read mode and print the stored data on the screen.
+This helps students understand how data can be retrieved from files.
+Input Format
+No user input (data is read from the file).
+Expected Output
+Student Name: <value>
+Roll Number: <value>
+
+
+________________
+
+
+Pre-Lab 3: Appending Data to an Existing File
+Description
+Write a C program that appends a new line containing a subject name and marks to an existing file without deleting previous data.
+This introduces append mode and reinforces file pointer usage.
+Input Format
+      * String subject name (no spaces)
+      * Integer marks
+Expected Output
+Data appended successfully.
+
+
+________________
+
+
+Pre-Lab 4: Simple Random Access Using File Pointer
+Description
+Write a C program that opens a file and uses fseek() to move the file pointer to the beginning and display the first line of the file.
+This introduces the idea that file pointers can jump to specific positions.
+Input Format
+No user input.
+Expected Output
+First Record:
+<content>
+
+
+________________
+
+
+In-Lab Problem: Student Report File System
+Description
+A college department wants to store student academic details in a file so that the data is not lost when the program ends.
+Write a C program that:
+      1. Writes student details to a file
+      2. Appends subject marks to the same file
+      3. Reads and displays the complete file content
+      4. Uses a file pointer to re-read the file from the beginning
+Input Format
+      * String student name
+      * Integer roll number
+      * String subject name
+      * Integer marks
+Output Format
+Display all stored details exactly as read from the file.
+Example Run
+Input:
+Anita
+23
+C_Programming
+85
+
+
+Output:
+Student Name: Anita
+Roll Number: 23
+Subject: C_Programming
+Marks: 85
+
+
+________________
+
+
+
+
+IN-LABS
+In-Lab W1: Student Marks Calculator
+Description
+A student enters marks obtained in three subjects.
+Write a C program that:
+      1. Reads the student’s roll number.
+      2. Reads marks of three subjects.
+      3. Calculates:
+      * Total marks
+      * Average marks
+This problem combines input/output handling, arithmetic operators, and expression evaluation into a single application.
+Input Format
+         * An integer representing the roll number
+         * Three integers representing marks in three subjects (space-separated)
+         * Output Format
+Display the roll number, total marks, and average marks (rounded to two decimal places).
+Example Run
+Input:
+101
+75 82 68
+
+
+Output:
+Roll Number: 101
+Total Marks: 225
+Average Marks: 75.00
+
+
+
+
+________________
+
+
+In-Lab W2: Employee Performance Evaluation System
+Description
+ Design a C program for a basic employee performance evaluation system used in a company HR department.
+The program should:
+         * Read an employee ID.
+         * Read performance scores in three criteria (for example: Technical Skill, Communication, and Teamwork).
+         * Calculate total and average score.
+         * Determine the performance grade using branching rules:
+         * If any criterion score is less than 50 => Poor Performance
+Else if average ≥ 75 => Outstanding
+Else if average ≥ 60 => Satisfactory
+Else => Needs Improvement
+Input Format
+ An integer employee ID
+Three integers representing performance scores (space-separated)
+Output Format
+ Display employee ID, total score, average score (two decimal places), and performance grade.
+Example Run
+Input:
+ 204
+78 69 85
+Output:
+ Employee ID: 204
+Total Score: 232
+Average Score: 77.33
+Performance Grade: Outstanding
+
+
+________________
+
+
+In-Lab W3: FizzBuzz
+Description
+FizzBuzz looks playful, but it quietly tests deep understanding of loops, conditions, and control flow.
+Write a C program that processes numbers from 1 to N and applies the following rules:
+            * If the number is divisible by 3, print Fizz
+            * If the number is divisible by 5, print Buzz
+            * If the number is divisible by both 3 and 5, print FizzBuzz
+            * Otherwise, print the number itself
+This problem integrates:
+            * for loop iteration
+            * if-else and nested conditions
+            * Logical reasoning with operators
+            * Clean output formatting
+Input Format
+A single integer N.
+Output Format
+Print one output per line from 1 to N, following the FizzBuzz rules.
+Example Run
+Input:
+15
+
+
+Output:
+1
+2
+Fizz
+4
+Buzz
+Fizz
+7
+8
+Fizz
+Buzz
+11
+Fizz
+13
+14
+FizzBuzz
+
+
+________________
+
+
+In-Lab W4: Student Marks Analysis System
+Description
+A class consists of N students, each evaluated in three subjects.
+Write a C program that:
+            1. Reads marks of all students into a 2D array (N × 3)
+            2. Calculates the total marks for each student
+            3. Calculates the class average for each subject
+            4. Displays all results neatly
+This problem integrates:
+            * 2D arrays
+            * Nested loops
+            * Array-based accumulation and comparison
+            * Clean tabular output
+Input Format
+            * An integer N (number of students)
+            * N lines, each containing 3 integers (marks of 3 subjects)
+Output Format
+            * Display total marks for each student
+            * Display average marks for each subject (two decimal places)
+Example Run
+Input:
+3
+78 85 69
+90 88 92
+65 70 72
+
+
+Output:
+Student 1 Total: 232
+Student 2 Total: 270
+Student 3 Total: 207
+
+
+Subject 1 Average: 77.67
+Subject 2 Average: 81.00
+Subject 3 Average: 77.67
+
+
+________________
+
+
+In-Lab W5: Username Processing System
+Description
+A simple system is required to process user names entered during registration.
+Write a C program that:
+            1. Reads a user’s first name and last name as strings.
+            2. Displays the length of each name.
+            3. Checks whether both names are identical.
+            4. Creates a username by concatenating the first name and last name.
+This problem combines:
+            * String input/output
+            * Length calculation
+            * String comparison
+            * String concatenation
+All operations must use standard string functions.
+Input Format
+            * First name (string)
+            * Last name (string)
+Output Format
+Display:
+            * Length of first name
+            * Length of last name
+            * Comparison result
+            * Generated username
+Example Run
+Input:
+Arun
+Kumar
+
+
+Output:
+First Name Length: 4
+Last Name Length: 5
+Names are not equal
+Username: ArunKumar
+________________
+
+
+In-Lab W6: Prime Factorization Using Functions
+Description
+Write a C program that:
+            * Uses a function to find the prime factors of a given number n.
+            * Uses an array to store the prime factors in non-decreasing order.
+            * Uses a function to return the total number of prime factors found.
+            * Displays the prime factors from main().
+Each task must be handled by a separate function, and the array must be passed between functions.
+
+
+Input Format
+            * An integer N
+Output Format
+Display the prime factors of n in non-decreasing order.
+Example Run
+Input:
+100
+
+
+Output:
+Prime Factors: 2 2 5 5
+
+
+________________
+
+
+In-Lab W7: Binary Search Using Recursion
+Description
+Write a C program that:
+            * Uses a recursive function to perform binary search on a sorted array.
+            * Uses a function to read N elements into an array in ascending order.
+            * Uses a recursive function to search for a given key.
+            * Displays whether the search element is found or not from main().
+Input Format
+            1. An integer N (number of elements)
+            2. N integers in ascending order
+            3. An integer key to be searched
+Output Format
+Display whether the search element is found in the array.
+Example Run
+Input:
+3
+15 25 35
+35
+
+
+Output:
+The search number found in the array.
+Input:
+4
+10 20 30 40
+25
+
+
+Output:
+The search number not found in the array.
+________________
+
+
+In-Lab W8: Array Element Swap Using Pointers
+Description
+Write a C program that:
+Uses a function to read N integers into an array.
+Uses a function to swap two array elements using pointers.
+Uses pointer notation to access and modify array elements.
+Displays the array before and after swapping from main().
+The swapping operation must be performed only using pointers, not array indexing.
+Input Format
+            * An integer N (number of elements)
+            * N integers representing array elements
+            * Two indices i and j to be swapped
+Output Format
+Display the array before swapping
+Display the array after swapping
+Example Run
+Input:
+5
+10 20 30 40 50
+1 3
+
+
+Output:
+Array before swapping:
+10 20 30 40 50
+
+
+Array after swapping:
+10 40 30 20 50
+
+
+________________
+
+
+In-Lab W9: Library Book Record Management System
+Description
+A library maintains records of books issued to students.
+Each record contains:
+            * Book ID
+            * Book title
+            * Student details
+            * Issue date
+Write a C program that:
+            1. Uses a nested structure to represent issue date
+            2. Uses a structure for student details
+            3. Stores multiple records using an array of structures
+            4. Uses a pointer to structure to traverse and display records
+This models how structured data is organized in real systems without unnecessary control logic.
+Input Format
+            * Integer n => number of issued books
+For each record:
+            * Integer book ID
+            * String book title (no spaces)
+            * Integer student roll number
+            * String student name (no spaces)
+            * Integer day
+            * Integer month
+            * Integer year
+Output Format
+For each issued book, display:
+            * Book ID and title
+            * Student roll number and name
+            * Issue date in dd/mm/yyyy format
+Example Run
+Input:
+2
+101
+C_Programming
+23
+Anita
+12 8 2024
+102
+Data_Structures
+45
+Rahul
+15 8 2024
+
+
+Output:
+Book ID: 101
+Title: C_Programming
+Issued To: Anita (Roll No: 23)
+Issue Date: 12/08/2024
+
+
+Book ID: 102
+Title: Data_Structures
+Issued To: Rahul (Roll No: 45)
+Issue Date: 15/08/2024
+
+
+________________
+
+
+
+
+In-Lab W10: Student Report File System
+Description
+A college department wants to store student academic details in a file so that the data is not lost when the program ends.
+Write a C program that:
+            1. Writes student details to a file
+            2. Appends subject marks to the same file
+            3. Reads and displays the complete file content
+            4. Uses a file pointer to re-read the file from the beginning
+Input Format
+            * String student name
+            * Integer roll number
+            * String subject name
+            * Integer marks
+Output Format
+Display all stored details exactly as read from the file.
+Example Run
+Input:
+Anita
+23
+C_Programming
+85
+
+
+Output:
+Student Name: Anita
+Roll Number: 23
+Subject: C_Programming
+Marks: 85
+
+
+________________
