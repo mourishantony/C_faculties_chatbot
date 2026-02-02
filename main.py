@@ -434,20 +434,12 @@ def admin_chatbot_query(data: ChatQuery, db: Session = Depends(get_db)):
 
 # ============ HTML Page Routes ============
 @app.get("/", response_class=HTMLResponse)
-def home(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
-
-@app.get("/faculty/login", response_class=HTMLResponse)
-def faculty_login_page(request: Request):
-    return templates.TemplateResponse("faculty_login.html", {"request": request})
+def login_page(request: Request):
+    return templates.TemplateResponse("login.html", {"request": request})
 
 @app.get("/faculty/dashboard", response_class=HTMLResponse)
 def faculty_dashboard_page(request: Request):
     return templates.TemplateResponse("faculty_dashboard.html", {"request": request})
-
-@app.get("/admin/login", response_class=HTMLResponse)
-def admin_login_page(request: Request):
-    return templates.TemplateResponse("admin_login.html", {"request": request})
 
 @app.get("/admin/dashboard", response_class=HTMLResponse)
 def admin_dashboard_page(request: Request):
