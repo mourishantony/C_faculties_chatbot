@@ -291,13 +291,13 @@ def init_database():
             "email": "raakesh.m@kgkite.ac.in",
             "phone": "9360758406",
             "dept": "AIML-A",
-            "image": "faculty3.jpg",
+            "image": None,
             "linkedin": "https://www.linkedin.com/in/raakesh-muthuvel",
             "github": "https://github.com/Raa96",
             "experience": "0.2",
             "c_exp": "0",
             "py_exp": "0",
-            "research": "Data Science",
+            "research": None,
             "personal_email": "raakeshmuthuvel@gmail.com"
         },
         {

@@ -36,12 +36,12 @@ semantic_chatbot = None
 async def startup_event():
     """Load semantic model on startup"""
     global semantic_chatbot
-    print("🚀 Loading semantic chatbot model...")
+    print(" Loading semantic chatbot model...")
     # Create a dummy db session just to initialize the model
     db = SessionLocal()
     semantic_chatbot = SemanticChatbotService(db)
     db.close()
-    print("✅ Semantic chatbot ready!")
+    print(" Semantic chatbot ready!")
 
 # ============ Pydantic Models ============
 class FacultyLogin(BaseModel):
