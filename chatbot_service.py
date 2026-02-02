@@ -100,7 +100,7 @@ class ChatbotService:
         
         # Intent 10: Greetings
         if any(word in question for word in ["hi", "hello", "hey", "greetings"]):
-            return f"Hello Admin! 👋 How can I assist you today?\n\n{self._get_help_message()}"
+            return f"Hello Admin! How can I assist you today?\n\n{self._get_help_message()}"
         
         # Default: Try to be helpful
         return f"I'm not sure I understood that question. {self._get_help_message()}"
@@ -119,8 +119,8 @@ class ChatbotService:
         
         # For now, we assume all scheduled faculty are present
         # In a real system, you'd have an Attendance or Absence table
-        response = f"📋 **Faculty Status for {day}:**\n\n"
-        response += f"✅ **All {len(scheduled_faculties)} scheduled faculties are present:**\n\n"
+        response = f"**Faculty Status for {day}:**\n\n"
+        response += f"**All {len(scheduled_faculties)} scheduled faculties are present:**\n\n"
         
         for faculty in scheduled_faculties:
             # Get their periods
@@ -131,7 +131,7 @@ class ChatbotService:
             period_list = ", ".join([f"Period {p.period}" for p in periods])
             response += f"• **{faculty.name}** - {period_list}\n"
         
-        response += "\n💡 *Note: To track absences, mark faculty as absent in the system.*"
+        response += "\n*Note: To track absences, mark faculty as absent in the system.*"
         return response
     
     def _get_faculty_with_class_today(self, day: str) -> str:
@@ -146,7 +146,7 @@ class ChatbotService:
         if not entries:
             return f"No C Programming classes scheduled for {day}."
         
-        response = f"📅 **C Programming Classes on {day}:**\n\n"
+        response = f"**C Programming Classes on {day}:**\n\n"
         for entry, faculty, dept in entries:
             timing = self.db.query(PeriodTiming).filter_by(period=entry.period).first()
             time_str = timing.display_time if timing else f"Period {entry.period}"
@@ -162,7 +162,7 @@ class ChatbotService:
         if not program:
             return f"No lab program found for Week {week_num}."
         
-        response = f"🔬 **Lab Program - Week {week_num}:**\n\n"
+        response = f"**Lab Program - Week {week_num}:**\n\n"
         response += f"**Title:** {program.program_title}\n\n"
         response += f"**Description:** {program.description}\n\n"
         if program.moodle_url:
@@ -179,7 +179,7 @@ class ChatbotService:
         if not session:
             return f"No session found for Session {session_num}."
         
-        response = f"📊 **Session {session_num}:**\n\n"
+        response = f"**Session {session_num}:**\n\n"
         response += f"**Title:** {session.session_title}\n"
         response += f"**Unit:** {session.unit}\n\n"
         response += f"**Topics:** {session.topics}\n\n"
@@ -204,7 +204,7 @@ class ChatbotService:
         
         timetable, faculty, dept = entry
         
-        response = f"👨‍🏫 **Faculty for {dept.name}:**\n\n"
+        response = f"**Faculty for {dept.name}:**\n\n"
         response += f"**Name:** {faculty.name}\n"
         response += f"**Email:** {faculty.email}\n"
         response += f"**Phone:** {faculty.phone}\n"
@@ -221,7 +221,7 @@ class ChatbotService:
         if not faculties:
             return "No faculties found."
         
-        response = f"👥 **All Faculties ({len(faculties)}):**\n\n"
+        response = f"**All Faculties ({len(faculties)}):**\n\n"
         for fac in faculties:
             response += f"• **{fac.name}** ({fac.department})\n"
             response += f"  {fac.email} | {fac.phone}\n\n"
@@ -240,7 +240,7 @@ class ChatbotService:
         if not entries:
             return f"No classes scheduled for {day}."
         
-        response = f"📅 **Complete Schedule for {day}:**\n\n"
+        response = f"**Complete Schedule for {day}:**\n\n"
         
         # Group by department
         dept_schedule = {}
@@ -271,7 +271,7 @@ class ChatbotService:
         if not entries:
             return "No recent teaching entries found."
         
-        response = f"📚 **Recent Teaching Entries:**\n\n"
+        response = f"**Recent Teaching Entries:**\n\n"
         for entry, faculty, dept in entries:
             response += f"**{entry.date.strftime('%Y-%m-%d')}** - {faculty.name} ({dept.name})\n"
             if entry.summary:
@@ -282,30 +282,30 @@ class ChatbotService:
     
     def _get_help_message(self) -> str:
         """Return help message with example questions"""
-        return """🤖 **I can help you with:**
+        return """**I can help you with:**
 
-📅 **Schedule Queries:**
+**Schedule Queries:**
 • "Who has C period today?"
 • "Show today's complete schedule"
 • "Monday schedule" / "Friday schedule"
 • "Who is absent today?"
 
-🔬 **Lab Programs:**
+**Lab Programs:**
 • "Lab program for week 5"
 • "Show week 3 lab" / "W3 lab"
 • "Moodle link for week 2"
 
-📊 **Session Materials:**
+**Session Materials:**
 • "PPT for session 3"
 • "Show deck 5" / "Session 7 slides"
 
-👥 **Faculty Information:**
+**Faculty Information:**
 • "Who is teaching AIDS-A?"
 • "Faculty for CSE-B today"
 • "List all faculties"
 
-📚 **Teaching History:**
+**Teaching History:**
 • "What was taught recently?"
 • "Show recent classes"
 
-Just ask naturally - I understand variations! 😊"""
+Just ask naturally - I understand variations!"""
