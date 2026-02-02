@@ -1,7 +1,7 @@
 /* ============ CSS Variables ============ */
 :root {
-    --primary-color: #000dff;
-    --primary-dark: #0008fe;
+    --primary-color: #000cee;
+    --primary-dark: #0008ea;
     --secondary-color: #64748b;
     --success-color: #22c55e;
     --danger-color: #ef4444;
@@ -75,7 +75,7 @@ a:hover {
 
 /* ============ Header/Navbar ============ */
 .navbar {
-    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+       background: linear-gradient(135deg, #3875f9);
     color: white;
     padding: 15px 0;
     box-shadow: var(--shadow);
