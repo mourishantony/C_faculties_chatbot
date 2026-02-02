@@ -15,6 +15,8 @@ from auth import (
     get_current_faculty, get_current_admin
 )
 from chatbot import process_chatbot_query
+from chatbot_service import ChatbotService
+from chatbot_semantic import SemanticChatbotService
 
 # Create tables
 Base.metadata.create_all(bind=engine)
@@ -406,6 +408,13 @@ def get_classes_by_type(class_type: str, db: Session = Depends(get_db)):
 @app.post("/api/chatbot")
 def chatbot_query(data: ChatQuery, db: Session = Depends(get_db)):
     response = process_chatbot_query(data.query, db)
+    return {"response": response}
+
+@app.post("/api/admin/chatbot")
+def admin_chatbot_query(data: ChatQuery, db: Session = Depends(get_db)):
+    """Admin-specific chatbot endpoint with semantic understanding"""
+    chatbot = SemanticChatbotService(db)
+    response = chatbot.process_question(data.query)
     return {"response": response}
 
 # ============ HTML Page Routes ============

@@ -1736,7 +1736,7 @@
             scrollChatToBottom();
             
             try {
-                const response = await apiRequest('/api/chatbot', 'POST', { query: message });
+                const response = await apiRequest('/api/admin/chatbot', 'POST', { query: message });
                 
                 // Remove typing indicator
                 document.getElementById(typingId).remove();
