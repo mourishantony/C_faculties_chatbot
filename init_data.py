@@ -202,48 +202,37 @@ def init_database():
     for session in syllabus_sessions:
         db.add(Syllabus(**session))
     
-    # Add Lab Programs
+    # Add Lab Programs - Only In-Lab Programs (Week 1-10)
     lab_programs = [
-        {"program_number": 1, "program_title": "Hello World and Basic I/O", "description": "Write a program to display 'Hello World' and practice basic input/output operations using printf and scanf."},
-        {"program_number": 2, "program_title": "Arithmetic Operations", "description": "Program to perform addition, subtraction, multiplication, division on two numbers."},
-        {"program_number": 3, "program_title": "Area and Perimeter Calculations", "description": "Calculate area and perimeter of rectangle, circle, and triangle."},
-        {"program_number": 4, "program_title": "Temperature Conversion", "description": "Convert temperature from Celsius to Fahrenheit and vice versa."},
-        {"program_number": 5, "program_title": "Simple Interest Calculator", "description": "Calculate simple interest given principal, rate, and time."},
-        {"program_number": 6, "program_title": "Largest of Three Numbers", "description": "Find the largest among three numbers using if-else statements."},
-        {"program_number": 7, "program_title": "Even or Odd Check", "description": "Check whether a given number is even or odd."},
-        {"program_number": 8, "program_title": "Leap Year Check", "description": "Determine if a given year is a leap year or not."},
-        {"program_number": 9, "program_title": "Grade Calculator", "description": "Calculate grade based on marks using switch-case or if-else ladder."},
-        {"program_number": 10, "program_title": "Factorial using Loop", "description": "Calculate factorial of a number using for/while loop."},
-        {"program_number": 11, "program_title": "Fibonacci Series", "description": "Generate Fibonacci series up to n terms using loop."},
-        {"program_number": 12, "program_title": "Prime Number Check", "description": "Check whether a given number is prime or not."},
-        {"program_number": 13, "program_title": "Pattern Printing - Triangle", "description": "Print star patterns - right triangle, pyramid, inverted pyramid."},
-        {"program_number": 14, "program_title": "Pattern Printing - Diamond", "description": "Print diamond and hollow patterns using nested loops."},
-        {"program_number": 15, "program_title": "Sum of Array Elements", "description": "Find sum of all elements in a 1D array."},
-        {"program_number": 16, "program_title": "Largest Element in Array", "description": "Find the largest and smallest element in an array."},
-        {"program_number": 17, "program_title": "Linear Search", "description": "Implement linear search to find an element in array."},
-        {"program_number": 18, "program_title": "Bubble Sort", "description": "Sort an array using bubble sort algorithm."},
-        {"program_number": 19, "program_title": "Matrix Addition", "description": "Add two matrices and display the result."},
-        {"program_number": 20, "program_title": "Matrix Multiplication", "description": "Multiply two matrices and display the result."},
-        {"program_number": 21, "program_title": "String Length without strlen", "description": "Calculate string length without using library function."},
-        {"program_number": 22, "program_title": "String Palindrome Check", "description": "Check if a given string is palindrome or not."},
-        {"program_number": 23, "program_title": "String Reversal", "description": "Reverse a string without using library function."},
-        {"program_number": 24, "program_title": "String Concatenation", "description": "Concatenate two strings without using strcat()."},
-        {"program_number": 25, "program_title": "Factorial using Recursion", "description": "Calculate factorial using recursive function."},
-        {"program_number": 26, "program_title": "Fibonacci using Recursion", "description": "Generate Fibonacci series using recursive function."},
-        {"program_number": 27, "program_title": "Pointer Basics", "description": "Demonstrate pointer declaration, initialization, and dereferencing."},
-        {"program_number": 28, "program_title": "Swap using Pointers", "description": "Swap two numbers using pointers (call by reference)."},
-        {"program_number": 29, "program_title": "Array using Pointers", "description": "Access and manipulate array elements using pointers."},
-        {"program_number": 30, "program_title": "Dynamic Memory Allocation", "description": "Demonstrate malloc, calloc, realloc, and free operations."},
-        {"program_number": 31, "program_title": "Structure - Student Record", "description": "Create structure for student with name, roll, marks and display details."},
-        {"program_number": 32, "program_title": "Array of Structures", "description": "Store and display multiple student records using array of structures."},
-        {"program_number": 33, "program_title": "Nested Structures", "description": "Implement nested structures (e.g., Student with Address)."},
-        {"program_number": 34, "program_title": "Structure with Pointers", "description": "Access structure members using pointer and arrow operator."},
-        {"program_number": 35, "program_title": "Singly Linked List Implementation", "description": "Create, insert, delete and display singly linked list."},
-        {"program_number": 36, "program_title": "File Write Operation", "description": "Write data to a text file using fprintf/fputs."},
-        {"program_number": 37, "program_title": "File Read Operation", "description": "Read data from a text file using fscanf/fgets."},
-        {"program_number": 38, "program_title": "File Copy Program", "description": "Copy contents from one file to another."},
-        {"program_number": 39, "program_title": "Student Database using File", "description": "Store and retrieve student records from binary file."},
-        {"program_number": 40, "program_title": "Mini Project - Library Management", "description": "Simple library management system with add, search, delete books."},
+        {"program_number": 1, "program_title": "In-Lab W1: Student Marks Calculator", 
+         "description": "A student enters marks obtained in three subjects. Write a C program that: 1) Reads the student's roll number, 2) Reads marks of three subjects, 3) Calculates total marks and average marks. This problem combines input/output handling, arithmetic operators, and expression evaluation into a single application."},
+        
+        {"program_number": 2, "program_title": "In-Lab W2: Employee Performance Evaluation System", 
+         "description": "Design a C program for a basic employee performance evaluation system used in a company HR department. The program should: Read an employee ID, read performance scores in three criteria (Technical Skill, Communication, and Teamwork), calculate total and average score, determine the performance grade using branching rules: If any criterion score is less than 50 => Poor Performance, Else if average ≥ 75 => Outstanding, Else if average ≥ 60 => Satisfactory, Else => Needs Improvement."},
+        
+        {"program_number": 3, "program_title": "In-Lab W3: FizzBuzz Analyzer", 
+         "description": "FizzBuzz looks playful, but it quietly tests deep understanding of loops, conditions, and control flow. Write a C program that processes numbers from 1 to N and applies the following rules: If the number is divisible by 3, print Fizz; If the number is divisible by 5, print Buzz; If the number is divisible by both 3 and 5, print FizzBuzz; Otherwise, print the number itself. This problem integrates for loop iteration, if-else and nested conditions, logical reasoning with operators, and clean output formatting."},
+        
+        {"program_number": 4, "program_title": "In-Lab W4: Student Marks Analysis System", 
+         "description": "A class consists of N students, each evaluated in three subjects. Write a C program that: 1) Reads marks of all students into a 2D array (N × 3), 2) Calculates the total marks for each student, 3) Calculates the class average for each subject, 4) Displays all results neatly. This problem integrates 2D arrays, nested loops, array-based accumulation and comparison, and clean tabular output."},
+        
+        {"program_number": 5, "program_title": "In-Lab W5: Username Processing System", 
+         "description": "A simple system is required to process user names entered during registration. Write a C program that: 1) Reads a user's first name and last name as strings, 2) Displays the length of each name, 3) Checks whether both names are identical, 4) Creates a username by concatenating the first name and last name. This problem combines string input/output, length calculation, string comparison, and string concatenation. All operations must use standard string functions."},
+        
+        {"program_number": 6, "program_title": "In-Lab W6: Prime Factorization Using Functions", 
+         "description": "Write a C program that: Uses a function to find the prime factors of a given number n, uses an array to store the prime factors in non-decreasing order, uses a function to return the total number of prime factors found, and displays the prime factors from main(). Each task must be handled by a separate function, and the array must be passed between functions."},
+        
+        {"program_number": 7, "program_title": "In-Lab W7: Binary Search Using Recursion", 
+         "description": "Write a C program that: Uses a recursive function to perform binary search on a sorted array, uses a function to read N elements into an array in ascending order, uses a recursive function to search for a given key, and displays whether the search element is found or not from main()."},
+        
+        {"program_number": 8, "program_title": "In-Lab W8: Array Element Swap Using Pointers", 
+         "description": "Write a C program that: Uses a function to read N integers into an array, uses a function to swap two array elements using pointers, uses pointer notation to access and modify array elements, and displays the array before and after swapping from main(). The swapping operation must be performed only using pointers, not array indexing."},
+        
+        {"program_number": 9, "program_title": "In-Lab W9: Library Book Record Management System", 
+         "description": "A library maintains records of books issued to students. Each record contains: Book ID, Book title, Student details, and Issue date. Write a C program that: 1) Uses a nested structure to represent issue date, 2) Uses a structure for student details, 3) Stores multiple records using an array of structures, 4) Uses a pointer to structure to traverse and display records. This models how structured data is organized in real systems."},
+        
+        {"program_number": 10, "program_title": "In-Lab W10: Student Report File System", 
+         "description": "A college department wants to store student academic details in a file so that the data is not lost when the program ends. Write a C program that: 1) Writes student details to a file, 2) Appends subject marks to the same file, 3) Reads and displays the complete file content, 4) Uses a file pointer to re-read the file from the beginning."},
     ]
     
     for prog in lab_programs:
