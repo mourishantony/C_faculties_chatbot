@@ -49,7 +49,7 @@ class FacultyLogin(BaseModel):
     password: str
 
 class AdminLogin(BaseModel):
-    username: str
+    email: str
     password: str
 
 class DailyEntryCreate(BaseModel):
@@ -81,6 +81,10 @@ class DailyEntryCreate(BaseModel):
 class ChatQuery(BaseModel):
     query: str
 
+class UnifiedLogin(BaseModel):
+    email: str
+    password: str
+
 # ============ Helper Functions ============
 def get_day_name(d: date = None):
     if d is None:
@@ -108,12 +112,39 @@ def login_faculty(data: FacultyLogin, db: Session = Depends(get_db)):
 
 @app.post("/api/admin/login")
 def login_admin(data: AdminLogin, db: Session = Depends(get_db)):
-    admin = db.query(Admin).filter(Admin.username == data.username).first()
+    # We treat the admin's email as their username in the DB
+    admin = db.query(Admin).filter(Admin.username == data.email).first()
     if not admin or not verify_password(data.password, admin.password):
         raise HTTPException(status_code=401, detail="Invalid credentials")
     
     token = create_access_token({"sub": str(admin.id), "type": "admin"})
     return {"access_token": token, "token_type": "bearer"}
+
+@app.post("/api/login")
+def unified_login(data: UnifiedLogin, db: Session = Depends(get_db)):
+    """Single login endpoint for both faculty and admin using email."""
+    # Try faculty first
+    faculty = db.query(Faculty).filter(Faculty.email == data.email).first()
+    if faculty and verify_password(data.password, faculty.password):
+        token = create_access_token({"sub": str(faculty.id), "type": "faculty"})
+        return {
+            "access_token": token,
+            "token_type": "bearer",
+            "user_type": "faculty",
+            "faculty_name": faculty.name,
+        }
+
+    # Then try admin (username stores admin email)
+    admin = db.query(Admin).filter(Admin.username == data.email).first()
+    if admin and verify_password(data.password, admin.password):
+        token = create_access_token({"sub": str(admin.id), "type": "admin"})
+        return {
+            "access_token": token,
+            "token_type": "bearer",
+            "user_type": "admin",
+        }
+
+    raise HTTPException(status_code=401, detail="Invalid credentials")
 
 # ----- Faculty Routes -----
 @app.get("/api/faculty/me")

@@ -59,48 +59,20 @@
                 <p>Sign in to continue</p>
             </div>
             
-            <div class="login-type-selector">
-                <button class="login-type-btn active" onclick="switchLoginType('faculty')" id="facultyBtn">
-                    <i class="material-icons">person</i>
-                    <span>Faculty</span>
-                </button>
-                <button class="login-type-btn" onclick="switchLoginType('admin')" id="adminBtn">
-                    <i class="material-icons">admin_panel_settings</i>
-                    <span>Admin</span>
-                </button>
-            </div>
-            
-            <!-- Faculty Login Form -->
-            <form id="facultyLoginForm" class="form-section active">
+            <!-- Unified Login Form -->
+            <form id="loginForm" class="form-section active">
                 <div class="form-group">
                     <label class="form-label">Email Address</label>
-                    <input type="email" class="form-control" id="facultyEmail" placeholder="Enter your email" required>
+                    <input type="email" class="form-control" id="email" placeholder="Enter your faculty/admin email" required>
                 </div>
                 
                 <div class="form-group">
                     <label class="form-label">Password</label>
-                    <input type="password" class="form-control" id="facultyPassword" placeholder="Enter your password" required>
+                    <input type="password" class="form-control" id="password" placeholder="Enter your password" required>
                 </div>
                 
                 <button type="submit" class="btn btn-primary btn-block btn-lg">
-                    Login as Faculty
-                </button>
-            </form>
-            
-            <!-- Admin Login Form -->
-            <form id="adminLoginForm" class="form-section">
-                <div class="form-group">
-                    <label class="form-label">Username</label>
-                    <input type="text" class="form-control" id="adminUsername" placeholder="Enter username" required>
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">Password</label>
-                    <input type="password" class="form-control" id="adminPassword" placeholder="Enter password" required>
-                </div>
-                
-                <button type="submit" class="btn btn-primary btn-block btn-lg">
-                    Login as Admin
+                    Login
                 </button>
             </form>
             
@@ -120,58 +92,26 @@
         localStorage.removeItem('userType');
         localStorage.removeItem('userName');
         
-        let currentLoginType = 'faculty';
-        
-        function switchLoginType(type) {
-            currentLoginType = type;
-            
-            // Update buttons
-            document.getElementById('facultyBtn').classList.toggle('active', type === 'faculty');
-            document.getElementById('adminBtn').classList.toggle('active', type === 'admin');
-            
-            // Update forms
-            document.getElementById('facultyLoginForm').classList.toggle('active', type === 'faculty');
-            document.getElementById('adminLoginForm').classList.toggle('active', type === 'admin');
-        }
-        
-        // Faculty Login Handler
-        document.getElementById('facultyLoginForm').addEventListener('submit', async (e) => {
+        // Unified Login Handler
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
-            const email = document.getElementById('facultyEmail').value;
-            const password = document.getElementById('facultyPassword').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
             
             try {
                 showLoading();
-                const result = await apiRequest('/api/faculty/login', 'POST', { email, password });
-                
+                const result = await apiRequest('/api/login', 'POST', { email, password });
+
                 localStorage.setItem('token', result.access_token);
-                localStorage.setItem('userType', 'faculty');
-                localStorage.setItem('userName', result.faculty_name);
-                
-                window.location.href = '/faculty/dashboard';
-            } catch (error) {
-                hideLoading();
-                showAlert(error.message);
-            }
-        });
-        
-        // Admin Login Handler
-        document.getElementById('adminLoginForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const username = document.getElementById('adminUsername').value;
-            const password = document.getElementById('adminPassword').value;
-            
-            try {
-                showLoading();
-                const result = await apiRequest('/api/admin/login', 'POST', { username, password });
-                
-                localStorage.setItem('token', result.access_token);
-                localStorage.setItem('userType', 'admin');
-                localStorage.setItem('userName', 'Admin');
-                
-                window.location.href = '/admin/dashboard';
+                localStorage.setItem('userType', result.user_type);
+                localStorage.setItem('userName', result.user_type === 'faculty' ? result.faculty_name : 'Admin');
+
+                if (result.user_type === 'admin') {
+                    window.location.href = '/admin/dashboard';
+                } else {
+                    window.location.href = '/faculty/dashboard';
+                }
             } catch (error) {
                 hideLoading();
                 showAlert(error.message);
