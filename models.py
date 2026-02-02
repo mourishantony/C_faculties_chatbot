@@ -73,6 +73,7 @@ class LabProgram(Base):
     program_number = Column(Integer, nullable=False)
     program_title = Column(String(255), nullable=False)
     description = Column(Text, nullable=True)
+    moodle_url = Column(String(255), nullable=True)
 
 class PeriodTiming(Base):
     __tablename__ = "period_timings"

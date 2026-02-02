@@ -1248,9 +1248,12 @@
 
     <script src="/static/js/app.js"></script>
     <script>
+        // Global variables
+        let chatStarted = false;
+        
         // Check auth
         if (!isLoggedIn() || getUserType() !== 'admin') {
-            window.location.href = '/admin/login';
+            window.location.href = '/';
         }
         
         // Set default dates
@@ -1736,7 +1739,7 @@
             scrollChatToBottom();
             
             try {
-                const response = await apiRequest('/api/chatbot', 'POST', { query: message });
+                const response = await apiRequest('/api/admin/chatbot', 'POST', { query: message });
                 
                 // Remove typing indicator
                 document.getElementById(typingId).remove();
