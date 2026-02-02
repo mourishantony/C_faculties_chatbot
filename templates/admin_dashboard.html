@@ -29,49 +29,6 @@
                     <h1 class="dashboard-title"><i class="material-icons" style="vertical-align: middle; margin-right: 8px;">dashboard</i>Admin Dashboard</h1>
                 </div>
 
-                <!-- Stats -->
-                <div class="stats-grid" id="statsGrid">
-                    <div class="stat-card">
-                        <div class="stat-value" id="totalScheduled">-</div>
-                        <div class="stat-label">Total Classes Today</div>
-                    </div>
-                    <div class="stat-card success">
-                        <div class="stat-value" id="filledCount">-</div>
-                        <div class="stat-label">Entries Filled</div>
-                    </div>
-                    <div class="stat-card warning">
-                        <div class="stat-value" id="pendingCount">-</div>
-                        <div class="stat-label">Pending</div>
-                    </div>
-                    <div class="stat-card danger">
-                        <div class="stat-value" id="absentCount">-</div>
-                        <div class="stat-label">Absent</div>
-                    </div>
-                </div>
-
-                <!-- Report Section -->
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title"><i class="material-icons" style="vertical-align: middle; margin-right: 6px; font-size: 20px;">assignment</i>Daily Reports</h3>
-                    </div>
-                    
-                    <div class="report-filters">
-                        <div class="filter-group">
-                            <label>Start Date</label>
-                            <input type="date" id="startDate" class="form-control">
-                        </div>
-                        <div class="filter-group">
-                            <label>End Date</label>
-                            <input type="date" id="endDate" class="form-control">
-                        </div>
-                        <button class="btn btn-primary" onclick="loadReport()">Load Report</button>
-                    </div>
-                    
-                    <div id="reportContainer">
-                        <p class="text-center" style="padding: 20px;">Select date range and click "Load Report"</p>
-                    </div>
-                </div>
-
                 <!-- Class Type Filter Section -->
                 <div class="card">
                     <div class="card-header">
@@ -116,6 +73,29 @@
                     </div>
                 </div>
 
+                <!-- Report Section -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title"><i class="material-icons" style="vertical-align: middle; margin-right: 6px; font-size: 20px;">assignment</i>Daily Reports</h3>
+                    </div>
+                    
+                    <div class="report-filters">
+                        <div class="filter-group">
+                            <label>Start Date</label>
+                            <input type="date" id="startDate" class="form-control">
+                        </div>
+                        <div class="filter-group">
+                            <label>End Date</label>
+                            <input type="date" id="endDate" class="form-control">
+                        </div>
+                        <button class="btn btn-primary" onclick="loadReport()">Load Report</button>
+                    </div>
+                    
+                    <div id="reportContainer">
+                        <p class="text-center" style="padding: 20px;">Select date range and click "Load Report"</p>
+                    </div>
+                </div>
+
                 <!-- Faculties List -->
                 <div class="card">
                     <div class="card-header">
@@ -125,6 +105,26 @@
                         <p>Loading...</p>
                     </div>
                 </div>
+                
+                <!-- Stats -->
+                <div class="stats-grid" id="statsGrid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalScheduled">-</div>
+                        <div class="stat-label">Total Classes Today</div>
+                    </div>
+                    <div class="stat-card success">
+                        <div class="stat-value" id="filledCount">-</div>
+                        <div class="stat-label">Entries Filled</div>
+                    </div>
+                    <div class="stat-card warning">
+                        <div class="stat-value" id="pendingCount">-</div>
+                        <div class="stat-label">Pending</div>
+                    </div>
+                    <div class="stat-card danger">
+                        <div class="stat-value" id="absentCount">-</div>
+                        <div class="stat-label">Absent</div>
+                    </div>
+                </div>                                       
             </div>
         </div>
 
