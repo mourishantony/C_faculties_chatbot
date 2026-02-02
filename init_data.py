@@ -287,18 +287,18 @@ def init_database():
             "personal_email": "sssbatcha@gmail.com"
         },
         {
-            "name": "Anitha M",
-            "email": "anitha.m@kgkite.ac.in",
-            "phone": "9597942750",
+            "name": "Raakesh M",
+            "email": "raakesh.m@kgkite.ac.in",
+            "phone": "9360758406",
             "dept": "AIML-A",
             "image": "faculty3.jpg",
-            "linkedin": "https://www.linkedin.com/in/anitha-vimal-152295345",
-            "github": "https://github.com/anithavimal666",
-            "experience": "12",
-            "c_exp": "2",
-            "py_exp": "2",
-            "research": "Big Data Analytics with Deep Learning",
-            "personal_email": "manithatce@gmail.com"
+            "linkedin": "https://www.linkedin.com/in/raakesh-muthuvel",
+            "github": "https://github.com/Raa96",
+            "experience": "0.2",
+            "c_exp": "0",
+            "py_exp": "0",
+            "research": "Data Science",
+            "personal_email": "raakeshmuthuvel@gmail.com"
         },
         {
             "name": "Aruna R",

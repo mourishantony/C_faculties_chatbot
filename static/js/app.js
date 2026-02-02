@@ -179,6 +179,5 @@ function parseMarkdown(text) {
     text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
     // Newlines
     text = text.replace(/\n/g, '<br>');
-    // Emojis are already supported
     return text;
 }

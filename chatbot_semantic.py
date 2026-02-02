@@ -173,7 +173,7 @@ class SemanticChatbotService:
         with open(self.intents_file, 'wb') as f:
             pickle.dump({'intent_map': self.intent_map, 'intents': self.intents}, f)
         
-        print(f"✅ Built semantic index with {len(all_examples)} examples")
+        print(f"Built semantic index with {len(all_examples)} examples")
     
     def load_index(self):
         """Load pre-built semantic search index"""
@@ -182,7 +182,7 @@ class SemanticChatbotService:
             data = pickle.load(f)
             self.intent_map = data['intent_map']
             self.intents = data['intents']
-        print(f"✅ Loaded semantic index with {len(self.intent_map)} examples")
+        print(f"Loaded semantic index with {len(self.intent_map)} examples")
     
     def process_question(self, question: str) -> str:
         """Process the admin's question using semantic search"""
@@ -203,7 +203,7 @@ class SemanticChatbotService:
         confidence_threshold = 0.8  # Stricter threshold
         
         if best_distance > confidence_threshold:
-            return f"🤔 I'm not sure I understood that question.\n\n{self._get_help_message()}"
+            return f"I'm not sure I understood that question.\n\n{self._get_help_message()}"
         
         # Get today's info
         today = date.today()
@@ -260,7 +260,7 @@ class SemanticChatbotService:
             return self._get_help_message()
         
         elif intent == "greeting":
-            return f"Hello Admin! 👋 How can I assist you today?\n\n{self._get_help_message()}"
+            return f"Hello Admin! How can I assist you today?\n\n{self._get_help_message()}"
         
         return self._get_help_message()
     
@@ -295,7 +295,7 @@ class SemanticChatbotService:
         if not entries:
             return f"**{matched_faculty.name}** has no scheduled classes."
         
-        response = f"📅 **Schedule for {matched_faculty.name}:**\n\n"
+        response = f"**Schedule for {matched_faculty.name}:**\n\n"
         
         # Group by day
         from collections import defaultdict
@@ -325,8 +325,8 @@ class SemanticChatbotService:
         if not scheduled_faculties:
             return f"No classes scheduled for {day}, so no faculty absences to track."
         
-        response = f"📋 **Faculty Status for {day}:**\n\n"
-        response += f"✅ **All {len(scheduled_faculties)} scheduled faculties are present:**\n\n"
+        response = f"**Faculty Status for {day}:**\n\n"
+        response += f"**All {len(scheduled_faculties)} scheduled faculties are present:**\n\n"
         
         for faculty in scheduled_faculties:
             periods = self.db.query(TimetableEntry)\
@@ -336,7 +336,7 @@ class SemanticChatbotService:
             period_list = ", ".join([f"Period {p.period}" for p in periods])
             response += f"• **{faculty.name}** - {period_list}\n"
         
-        response += "\n💡 *Note: To track absences, mark faculty as absent in the system.*"
+        response += "\n*Note: To track absences, mark faculty as absent in the system.*"
         return response
     
     def _get_faculty_with_class_today(self, day: str) -> str:
@@ -351,7 +351,7 @@ class SemanticChatbotService:
         if not entries:
             return f"No C Programming classes scheduled for {day}."
         
-        response = f"📚 **Faculties with classes on {day}:**\n\n"
+        response = f"**Faculties with classes on {day}:**\n\n"
         faculty_seen = set()
         
         for entry, faculty, dept in entries:
@@ -370,7 +370,7 @@ class SemanticChatbotService:
         if not program:
             return f"No lab program found for week {week_num}."
         
-        response = f"🔬 **Lab Program - Week {week_num}:**\n\n"
+        response = f"**Lab Program - Week {week_num}:**\n\n"
         response += f"**Title:** {program.program_title}\n"
         response += f"**Description:** {program.description}\n"
         
@@ -388,7 +388,7 @@ class SemanticChatbotService:
         if not session:
             return f"No session {session_num} found in syllabus."
         
-        response = f"📊 **Session {session_num}:**\n\n"
+        response = f"**Session {session_num}:**\n\n"
         response += f"**Topic:** {session.topic}\n"
         response += f"**Subtopics:** {session.subtopics}\n"
         
@@ -412,7 +412,7 @@ class SemanticChatbotService:
         
         timetable, faculty, dept = entry
         
-        response = f"👨‍🏫 **Faculty for {dept.name}:**\n\n"
+        response = f"**Faculty for {dept.name}:**\n\n"
         response += f"**Name:** {faculty.name}\n"
         response += f"**Email:** {faculty.email}\n"
         response += f"**Phone:** {faculty.phone}\n"
@@ -429,7 +429,7 @@ class SemanticChatbotService:
         if not faculties:
             return "No faculties found."
         
-        response = f"👥 **All Faculties ({len(faculties)}):**\n\n"
+        response = f"**All Faculties ({len(faculties)}):**\n\n"
         for fac in faculties:
             response += f"• **{fac.name}** ({fac.department})\n"
             response += f"  {fac.email} | {fac.phone}\n\n"
@@ -448,7 +448,7 @@ class SemanticChatbotService:
         if not entries:
             return f"No classes scheduled for {day}."
         
-        response = f"📅 **Complete Schedule for {day}:**\n\n"
+        response = f"**Complete Schedule for {day}:**\n\n"
         for entry, faculty, dept in entries:
             response += f"**Period {entry.period}** - {faculty.name} ({dept.name})\n"
         
@@ -466,7 +466,7 @@ class SemanticChatbotService:
         if not entries:
             return "No recent teaching records found."
         
-        response = f"📚 **Recent Teaching Entries:**\n\n"
+        response = f"**Recent Teaching Entries:**\n\n"
         for entry, faculty, dept in entries:
             response += f"**{entry.date.strftime('%Y-%m-%d')}** - {faculty.name} ({dept.name})\n"
             response += f"  Period: {entry.period}, Type: {entry.class_type}\n\n"
@@ -475,31 +475,31 @@ class SemanticChatbotService:
     
     def _get_help_message(self) -> str:
         """Return help message"""
-        return """🤖 **I can help you with:**
+        return """**I can help you with:**
 
-📅 **Schedule Queries:**
+**Schedule Queries:**
 • "Who has C period today?"
 • "Show today's complete schedule"
 • "Monday schedule" / "Friday schedule"
 • "Who is absent today?"
 • "When does Sathish have class?"
 
-🔬 **Lab Programs:**
+**Lab Programs:**
 • "Lab program for week 5"
 • "Show week 3 lab" / "W3 lab"
 • "Moodle link for week 2"
 
-📊 **Session Materials:**
+**Session Materials:**
 • "PPT for session 3"
 • "Show deck 5" / "Session 7 slides"
 
-👥 **Faculty Information:**
+**Faculty Information:**
 • "Who is teaching AIDS-A?"
 • "Faculty for CSE-B today"
 • "List all faculties"
 
-📚 **Teaching History:**
+**Teaching History:**
 • "What was taught recently?"
 • "Show recent classes"
 
-I understand natural language - just ask! 😊"""
+I understand natural language - just ask!"""
