@@ -205,34 +205,44 @@ def init_database():
     # Add Lab Programs - Only In-Lab Programs (Week 1-10)
     lab_programs = [
         {"program_number": 1, "program_title": "In-Lab W1: Student Marks Calculator", 
-         "description": "A student enters marks obtained in three subjects. Write a C program that: 1) Reads the student's roll number, 2) Reads marks of three subjects, 3) Calculates total marks and average marks. This problem combines input/output handling, arithmetic operators, and expression evaluation into a single application."},
+         "description": "A student enters marks obtained in three subjects. Write a C program that: 1) Reads the student's roll number, 2) Reads marks of three subjects, 3) Calculates total marks and average marks. This problem combines input/output handling, arithmetic operators, and expression evaluation into a single application.",
+         "moodle_url": "https://moodle2.kgkite.ac.in/mod/vpl/view.php?id=2739"},
         
         {"program_number": 2, "program_title": "In-Lab W2: Employee Performance Evaluation System", 
-         "description": "Design a C program for a basic employee performance evaluation system used in a company HR department. The program should: Read an employee ID, read performance scores in three criteria (Technical Skill, Communication, and Teamwork), calculate total and average score, determine the performance grade using branching rules: If any criterion score is less than 50 => Poor Performance, Else if average ≥ 75 => Outstanding, Else if average ≥ 60 => Satisfactory, Else => Needs Improvement."},
+         "description": "Design a C program for a basic employee performance evaluation system used in a company HR department. The program should: Read an employee ID, read performance scores in three criteria (Technical Skill, Communication, and Teamwork), calculate total and average score, determine the performance grade using branching rules: If any criterion score is less than 50 => Poor Performance, Else if average ≥ 75 => Outstanding, Else if average ≥ 60 => Satisfactory, Else => Needs Improvement.",
+         "moodle_url": "https://moodle2.kgkite.ac.in/mod/vpl/view.php?id=2749"},
         
         {"program_number": 3, "program_title": "In-Lab W3: FizzBuzz Analyzer", 
-         "description": "FizzBuzz looks playful, but it quietly tests deep understanding of loops, conditions, and control flow. Write a C program that processes numbers from 1 to N and applies the following rules: If the number is divisible by 3, print Fizz; If the number is divisible by 5, print Buzz; If the number is divisible by both 3 and 5, print FizzBuzz; Otherwise, print the number itself. This problem integrates for loop iteration, if-else and nested conditions, logical reasoning with operators, and clean output formatting."},
+         "description": "FizzBuzz looks playful, but it quietly tests deep understanding of loops, conditions, and control flow. Write a C program that processes numbers from 1 to N and applies the following rules: If the number is divisible by 3, print Fizz; If the number is divisible by 5, print Buzz; If the number is divisible by both 3 and 5, print FizzBuzz; Otherwise, print the number itself. This problem integrates for loop iteration, if-else and nested conditions, logical reasoning with operators, and clean output formatting.",
+         "moodle_url": "https://moodle2.kgkite.ac.in/mod/vpl/view.php?id=2751"},
         
         {"program_number": 4, "program_title": "In-Lab W4: Student Marks Analysis System", 
-         "description": "A class consists of N students, each evaluated in three subjects. Write a C program that: 1) Reads marks of all students into a 2D array (N × 3), 2) Calculates the total marks for each student, 3) Calculates the class average for each subject, 4) Displays all results neatly. This problem integrates 2D arrays, nested loops, array-based accumulation and comparison, and clean tabular output."},
+         "description": "A class consists of N students, each evaluated in three subjects. Write a C program that: 1) Reads marks of all students into a 2D array (N × 3), 2) Calculates the total marks for each student, 3) Calculates the class average for each subject, 4) Displays all results neatly. This problem integrates 2D arrays, nested loops, array-based accumulation and comparison, and clean tabular output.",
+         "moodle_url": None},
         
         {"program_number": 5, "program_title": "In-Lab W5: Username Processing System", 
-         "description": "A simple system is required to process user names entered during registration. Write a C program that: 1) Reads a user's first name and last name as strings, 2) Displays the length of each name, 3) Checks whether both names are identical, 4) Creates a username by concatenating the first name and last name. This problem combines string input/output, length calculation, string comparison, and string concatenation. All operations must use standard string functions."},
+         "description": "A simple system is required to process user names entered during registration. Write a C program that: 1) Reads a user's first name and last name as strings, 2) Displays the length of each name, 3) Checks whether both names are identical, 4) Creates a username by concatenating the first name and last name. This problem combines string input/output, length calculation, string comparison, and string concatenation. All operations must use standard string functions.",
+         "moodle_url": None},
         
         {"program_number": 6, "program_title": "In-Lab W6: Prime Factorization Using Functions", 
-         "description": "Write a C program that: Uses a function to find the prime factors of a given number n, uses an array to store the prime factors in non-decreasing order, uses a function to return the total number of prime factors found, and displays the prime factors from main(). Each task must be handled by a separate function, and the array must be passed between functions."},
+         "description": "Write a C program that: Uses a function to find the prime factors of a given number n, uses an array to store the prime factors in non-decreasing order, uses a function to return the total number of prime factors found, and displays the prime factors from main(). Each task must be handled by a separate function, and the array must be passed between functions.",
+         "moodle_url": None},
         
         {"program_number": 7, "program_title": "In-Lab W7: Binary Search Using Recursion", 
-         "description": "Write a C program that: Uses a recursive function to perform binary search on a sorted array, uses a function to read N elements into an array in ascending order, uses a recursive function to search for a given key, and displays whether the search element is found or not from main()."},
+         "description": "Write a C program that: Uses a recursive function to perform binary search on a sorted array, uses a function to read N elements into an array in ascending order, uses a recursive function to search for a given key, and displays whether the search element is found or not from main().",
+         "moodle_url": None},
         
         {"program_number": 8, "program_title": "In-Lab W8: Array Element Swap Using Pointers", 
-         "description": "Write a C program that: Uses a function to read N integers into an array, uses a function to swap two array elements using pointers, uses pointer notation to access and modify array elements, and displays the array before and after swapping from main(). The swapping operation must be performed only using pointers, not array indexing."},
+         "description": "Write a C program that: Uses a function to read N integers into an array, uses a function to swap two array elements using pointers, uses pointer notation to access and modify array elements, and displays the array before and after swapping from main(). The swapping operation must be performed only using pointers, not array indexing.",
+         "moodle_url": None},
         
         {"program_number": 9, "program_title": "In-Lab W9: Library Book Record Management System", 
-         "description": "A library maintains records of books issued to students. Each record contains: Book ID, Book title, Student details, and Issue date. Write a C program that: 1) Uses a nested structure to represent issue date, 2) Uses a structure for student details, 3) Stores multiple records using an array of structures, 4) Uses a pointer to structure to traverse and display records. This models how structured data is organized in real systems."},
+         "description": "A library maintains records of books issued to students. Each record contains: Book ID, Book title, Student details, and Issue date. Write a C program that: 1) Uses a nested structure to represent issue date, 2) Uses a structure for student details, 3) Stores multiple records using an array of structures, 4) Uses a pointer to structure to traverse and display records. This models how structured data is organized in real systems.",
+         "moodle_url": None},
         
         {"program_number": 10, "program_title": "In-Lab W10: Student Report File System", 
-         "description": "A college department wants to store student academic details in a file so that the data is not lost when the program ends. Write a C program that: 1) Writes student details to a file, 2) Appends subject marks to the same file, 3) Reads and displays the complete file content, 4) Uses a file pointer to re-read the file from the beginning."},
+         "description": "A college department wants to store student academic details in a file so that the data is not lost when the program ends. Write a C program that: 1) Writes student details to a file, 2) Appends subject marks to the same file, 3) Reads and displays the complete file content, 4) Uses a file pointer to re-read the file from the beginning.",
+         "moodle_url": None},
     ]
     
     for prog in lab_programs:
