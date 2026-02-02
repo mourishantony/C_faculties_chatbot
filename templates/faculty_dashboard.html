@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Faculty Dashboard - C Faculty Manager</title>
     <link rel="stylesheet" href="/static/css/style.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
         .class-type-badge {
             display: inline-block;
@@ -50,7 +51,7 @@
         <nav class="navbar">
             <div class="container">
                 <a href="/" class="navbar-brand">
-                    💻 C Faculty Manager
+                    <i class="material-icons" style="vertical-align: middle; margin-right: 8px;">computer</i>C Faculty Manager
                 </a>
                 <ul class="navbar-nav">
                     <li><span id="welcomeText" style="color: white;"></span></li>
@@ -64,7 +65,7 @@
             <div class="container">
                 <div class="dashboard-header">
                     <div>
-                        <h1 class="dashboard-title">📅 Today's Schedule</h1>
+                        <h1 class="dashboard-title"><i class="material-icons" style="vertical-align: middle; margin-right: 8px;">event</i>Today's Schedule</h1>
                         <p id="dateDisplay" style="color: var(--text-secondary);"></p>
                     </div>
                 </div>
@@ -81,7 +82,7 @@
         <!-- Footer -->
         <footer class="footer">
             <div class="container">
-                <p>&copy; 2026 C Programming Faculty Management System</p>
+                <p>&copy; 2026 C Programming Faculty Schedule & Syllabus Tracker</p>
             </div>
         </footer>
     </div>
@@ -90,7 +91,7 @@
     <div class="modal-overlay" id="entryModal">
         <div class="modal" style="max-width: 600px;">
             <div class="modal-header">
-                <h3 class="modal-title" id="modalTitle">📝 Fill Daily Entry</h3>
+                <h3 class="modal-title" id="modalTitle"><i class="material-icons" style="vertical-align: middle; margin-right: 6px; font-size: 20px;">edit</i>Fill Daily Entry</h3>
                 <button class="modal-close" onclick="closeModal()">&times;</button>
             </div>
             <div class="modal-body">
@@ -127,7 +128,7 @@
                         
                         <!-- Theory Class Form -->
                         <div id="theoryForm" class="form-section hidden">
-                            <div class="form-section-title">📚 Theory Class</div>
+                            <div class="form-section-title"><i class="material-icons" style="font-size: 18px; vertical-align: middle; margin-right: 6px;">menu_book</i>Theory Class</div>
                             
                             <div class="checkbox-group">
                                 <input type="checkbox" id="isOwnContent" onchange="toggleOwnContent()">
@@ -166,7 +167,7 @@
                         
                         <!-- Lab Class Form -->
                         <div id="labForm" class="form-section hidden">
-                            <div class="form-section-title">🔬 Lab Class</div>
+                            <div class="form-section-title"><i class="material-icons" style="font-size: 18px; vertical-align: middle; margin-right: 6px;">science</i>Lab Class</div>
                             
                             <div class="form-group">
                                 <label class="form-label">Select Lab Program</label>
@@ -186,7 +187,7 @@
                         
                         <!-- Mini Project Form -->
                         <div id="miniProjectForm" class="form-section hidden">
-                            <div class="form-section-title">🚀 Mini Project</div>
+                            <div class="form-section-title"><i class="material-icons" style="font-size: 18px; vertical-align: middle; margin-right: 6px;">rocket_launch</i>Mini Project</div>
                             
                             <div class="form-group">
                                 <label class="form-label">Project Progress & Activities</label>
@@ -287,7 +288,7 @@
                 
                 const pptContainer = document.getElementById('pptLinkContainer');
                 if (session.ppt_url) {
-                    pptContainer.innerHTML = `<a href="${session.ppt_url}" target="_blank" class="ppt-link">📊 Open PPT/Deck</a>`;
+                    pptContainer.innerHTML = `<a href="${session.ppt_url}" target="_blank" class="ppt-link"><i class="material-icons" style="font-size: 14px; vertical-align: middle;">slideshow</i> Open PPT/Deck</a>`;
                 } else {
                     pptContainer.innerHTML = '<span style="color: #999;">No PPT available</span>';
                 }
@@ -316,14 +317,15 @@
             try {
                 const data = await apiRequest('/api/faculty/today-schedule', 'GET', null, true);
                 
-                document.getElementById('dateDisplay').textContent = `${data.day}, ${formatDate(data.date)}`;
+                document.getElementById('dateDisplay').textContent = `${formatDate(data.date)}`;
                 
                 const container = document.getElementById('scheduleContainer');
                 
                 if (data.schedule.length === 0) {
                     container.innerHTML = `
                         <div class="card text-center">
-                            <h3>🎉 No classes scheduled for today!</h3>
+                            <h3><i class="material-icons" style="font-size: 48px; color: #10b981;">celebration</i></h3>
+                            <h3>No classes scheduled for today!</h3>
                             <p style="color: var(--text-secondary); margin-top: 10px;">Enjoy your day!</p>
                         </div>
                     `;
@@ -356,9 +358,7 @@
                     }
                     
                     const classTypeLabel = {
-                        'theory': '📚 Theory',
-                        'lab': '🔬 Lab',
-                        'mini_project': '🚀 Mini Project'
+                        
                     };
                     
                     html += `
@@ -398,14 +398,12 @@
             document.getElementById('modalDeptName').value = deptName;
             
             const classTypeLabel = {
-                'theory': '📚 Theory',
-                'lab': '🔬 Lab',
-                'mini_project': '🚀 Mini Project'
+                
             };
             document.getElementById('modalPeriodDisplay').value = `${getOrdinal(period)} Period (${getPeriodTime(period)}) - ${classTypeLabel[classType] || classType}`;
             
             // Set modal title based on class type
-            document.getElementById('modalTitle').textContent = `📝 Fill ${classTypeLabel[classType] || classType} Entry`;
+            document.getElementById('modalTitle').innerHTML = `Fill ${classTypeLabel[classType] || classType} Entry`;
             
             // Reset all forms
             document.getElementById('isAbsent').checked = false;
