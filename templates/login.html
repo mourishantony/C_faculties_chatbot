@@ -3,10 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - C Faculty Manager</title>
+    <title>C Faculty Manager</title>
     <link rel="stylesheet" href="/static/css/style.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
+        .auth-logo {
+            display: block;
+            margin: 0 auto 16px auto;
+            max-width: 120px;
+        }
         .login-type-selector {
             display: flex;
             gap: 10px;
@@ -55,15 +60,16 @@
     <div class="auth-container">
         <div class="auth-card">
             <div class="auth-header">
-                <h1><i class="material-icons" style="vertical-align: middle; margin-right: 8px;">school</i>C Faculty Manager</h1>
-                <p>Sign in to continue</p>
+                <img src="/static/images/images.png" alt="C Faculty Manager" class="auth-logo">
+                <!-- <h1><i class="material-icons" style="vertical-align: middle; margin-right: 8px;">school</i>C Faculty Manager</h1>
+                <p>Sign in to continue</p> -->
             </div>
             
             <!-- Unified Login Form -->
             <form id="loginForm" class="form-section active">
                 <div class="form-group">
                     <label class="form-label">Email Address</label>
-                    <input type="email" class="form-control" id="email" placeholder="Enter your faculty/admin email" required>
+                    <input type="email" class="form-control" id="email" placeholder="Enter your email" required>
                 </div>
                 
                 <div class="form-group">
