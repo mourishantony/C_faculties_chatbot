@@ -481,6 +481,7 @@ def init_database():
     faculties = db.query(Faculty).all()
     departments = db.query(Department).all()
     
+    
     # Mock timetable - distributing classes among faculties
     # class_type: "theory" (1 period), "lab" (3 consecutive periods), "mini_project" (1 period)
     # Each faculty handles their assigned department
