@@ -248,9 +248,9 @@ def init_database():
     for prog in lab_programs:
         db.add(LabProgram(**prog))
     
-    # Add default admin
+    # Add default admin (email-style username for unified login)
     admin = Admin(
-        username="admin",
+        username="mail-admin@gmail.com",
         password=pwd_context.hash("admin123")
     )
     db.add(admin)
