@@ -29,6 +29,20 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 # Templates
 templates = Jinja2Templates(directory="templates")
 
+# Initialize semantic chatbot service once at startup (load model only once)
+semantic_chatbot = None
+
+@app.on_event("startup")
+async def startup_event():
+    """Load semantic model on startup"""
+    global semantic_chatbot
+    print("🚀 Loading semantic chatbot model...")
+    # Create a dummy db session just to initialize the model
+    db = SessionLocal()
+    semantic_chatbot = SemanticChatbotService(db)
+    db.close()
+    print("✅ Semantic chatbot ready!")
+
 # ============ Pydantic Models ============
 class FacultyLogin(BaseModel):
     email: str
@@ -413,8 +427,9 @@ def chatbot_query(data: ChatQuery, db: Session = Depends(get_db)):
 @app.post("/api/admin/chatbot")
 def admin_chatbot_query(data: ChatQuery, db: Session = Depends(get_db)):
     """Admin-specific chatbot endpoint with semantic understanding"""
-    chatbot = SemanticChatbotService(db)
-    response = chatbot.process_question(data.query)
+    # Use pre-loaded semantic chatbot, just update db session
+    semantic_chatbot.db = db
+    response = semantic_chatbot.process_question(data.query)
     return {"response": response}
 
 # ============ HTML Page Routes ============

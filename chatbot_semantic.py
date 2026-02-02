@@ -92,6 +92,19 @@ class SemanticChatbotService:
                 ]
             },
             {
+                "intent": "get_faculty_schedule",
+                "examples": [
+                    "When does Sathish have class?",
+                    "What is Ravi's schedule?",
+                    "Show Priya's timetable",
+                    "When will Kumar teach?",
+                    "What days does Meena have classes?",
+                    "Schedule for faculty Arun",
+                    "When is teacher John's class?",
+                    "What's the timetable for professor Singh?"
+                ]
+            },
+            {
                 "intent": "list_all_faculty",
                 "examples": [
                     "List all faculties",
@@ -185,6 +198,13 @@ class SemanticChatbotService:
         best_distance = distances[0][0]
         intent = self.intent_map[best_match_idx]
         
+        # Debug: Check confidence (lower distance = better match)
+        # If distance is too high, the match is poor
+        confidence_threshold = 0.8  # Stricter threshold
+        
+        if best_distance > confidence_threshold:
+            return f"🤔 I'm not sure I understood that question.\n\n{self._get_help_message()}"
+        
         # Get today's info
         today = date.today()
         today_name = datetime.now().strftime("%A")
@@ -226,6 +246,10 @@ class SemanticChatbotService:
                     return self._get_faculty_by_department(code, today_name)
             return "Please specify a department (e.g., 'Who is teaching AIDS-A?')"
         
+        elif intent == "get_faculty_schedule":
+            # Extract faculty name from question
+            return self._get_faculty_schedule_by_name(question)
+        
         elif intent == "list_all_faculty":
             return self._list_all_faculties()
         
@@ -238,13 +262,57 @@ class SemanticChatbotService:
         elif intent == "greeting":
             return f"Hello Admin! 👋 How can I assist you today?\n\n{self._get_help_message()}"
         
-        # If confidence is too low, show help
-        if best_distance > 1.5:  # Threshold for similarity
-            return f"I'm not quite sure what you're asking. {self._get_help_message()}"
-        
         return self._get_help_message()
     
     # ==================== Database Query Methods ====================
+    
+    def _get_faculty_schedule_by_name(self, question: str) -> str:
+        """Get schedule for a specific faculty member by name"""
+        # Get all active faculties
+        faculties = self.db.query(Faculty).filter_by(is_active=True).all()
+        
+        # Find faculty whose name appears in the question
+        question_lower = question.lower()
+        matched_faculty = None
+        
+        for faculty in faculties:
+            # Check if any part of the faculty name is in the question
+            name_parts = faculty.name.lower().split()
+            if any(part in question_lower for part in name_parts if len(part) > 2):
+                matched_faculty = faculty
+                break
+        
+        if not matched_faculty:
+            return "I couldn't find that faculty member. Please check the name and try again, or type 'list all faculties' to see all faculty names."
+        
+        # Get their timetable entries
+        entries = self.db.query(TimetableEntry, Department)\
+            .join(Department, TimetableEntry.department_id == Department.id)\
+            .filter(TimetableEntry.faculty_id == matched_faculty.id)\
+            .order_by(TimetableEntry.day, TimetableEntry.period)\
+            .all()
+        
+        if not entries:
+            return f"**{matched_faculty.name}** has no scheduled classes."
+        
+        response = f"📅 **Schedule for {matched_faculty.name}:**\n\n"
+        
+        # Group by day
+        from collections import defaultdict
+        schedule_by_day = defaultdict(list)
+        
+        for entry, dept in entries:
+            schedule_by_day[entry.day].append((entry.period, dept.name))
+        
+        # Display schedule
+        days_order = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+        for day in days_order:
+            if day in schedule_by_day:
+                periods = sorted(schedule_by_day[day])
+                period_str = ", ".join([f"Period {p[0]} ({p[1]})" for p in periods])
+                response += f"**{day}:** {period_str}\n"
+        
+        return response
     
     def _get_absent_faculties(self, day: str) -> str:
         """Check which faculties are absent"""
@@ -336,7 +404,7 @@ class SemanticChatbotService:
         entry = self.db.query(TimetableEntry, Faculty, Department)\
             .join(Faculty, TimetableEntry.faculty_id == Faculty.id)\
             .join(Department, TimetableEntry.department_id == Department.id)\
-            .filter(Department.dept_code == dept_code, TimetableEntry.day == day)\
+            .filter(Department.code == dept_code, TimetableEntry.day == day)\
             .first()
         
         if not entry:
@@ -414,6 +482,7 @@ class SemanticChatbotService:
 • "Show today's complete schedule"
 • "Monday schedule" / "Friday schedule"
 • "Who is absent today?"
+• "When does Sathish have class?"
 
 🔬 **Lab Programs:**
 • "Lab program for week 5"

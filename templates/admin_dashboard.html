@@ -1248,6 +1248,9 @@
 
     <script src="/static/js/app.js"></script>
     <script>
+        // Global variables
+        let chatStarted = false;
+        
         // Check auth
         if (!isLoggedIn() || getUserType() !== 'admin') {
             window.location.href = '/admin/login';
