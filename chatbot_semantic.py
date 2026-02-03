@@ -33,7 +33,8 @@ class SemanticChatbotService:
                     "Who has class today?",
                     "Classes for today",
                     "Today's schedule",
-                    "Which faculty is teaching today?"
+                    "Which faculty is teaching today?",
+                    "What are the C programming classes today?"
                 ]
             },
             {
@@ -101,7 +102,7 @@ class SemanticChatbotService:
                     "What days does Meena have classes?",
                     "Schedule for faculty Arun",
                     "When is teacher John's class?",
-                    "What's the timetable for professor Singh?"
+                    "What's the timetable for professor Sathish?"
                 ]
             },
             {

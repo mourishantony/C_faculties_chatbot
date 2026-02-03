@@ -5,14 +5,14 @@ from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 from datetime import date, datetime, timedelta
-from typing import Optional
+from typing import Optional, List
 from pydantic import BaseModel
 
 from database import engine, get_db, SessionLocal
-from models import Base, Faculty, Admin, Department, TimetableEntry, DailyEntry, Syllabus, PeriodTiming, LabProgram
+from models import Base, Faculty, Admin, Department, TimetableEntry, DailyEntry, Syllabus, PeriodTiming, LabProgram, SuperAdmin, FAQ
 from auth import (
     verify_password, get_password_hash, create_access_token, decode_token,
-    get_current_faculty, get_current_admin
+    get_current_faculty, get_current_admin, get_current_super_admin
 )
 from chatbot import process_chatbot_query
 from chatbot_service import ChatbotService
@@ -85,6 +85,101 @@ class UnifiedLogin(BaseModel):
     email: str
     password: str
 
+# ----- Super Admin Pydantic Models -----
+class FacultyCreate(BaseModel):
+    name: str
+    email: str
+    password: str
+    phone: Optional[str] = None
+    image_url: Optional[str] = None
+    linkedin_url: Optional[str] = None
+    github_url: Optional[str] = None
+    department: Optional[str] = None
+    experience: Optional[str] = None
+    c_experience: Optional[str] = None
+    py_experience: Optional[str] = None
+    research_area: Optional[str] = None
+    personal_email: Optional[str] = None
+
+class FacultyUpdate(BaseModel):
+    name: Optional[str] = None
+    email: Optional[str] = None
+    password: Optional[str] = None
+    phone: Optional[str] = None
+    image_url: Optional[str] = None
+    linkedin_url: Optional[str] = None
+    github_url: Optional[str] = None
+    department: Optional[str] = None
+    experience: Optional[str] = None
+    c_experience: Optional[str] = None
+    py_experience: Optional[str] = None
+    research_area: Optional[str] = None
+    personal_email: Optional[str] = None
+    is_active: Optional[bool] = None
+
+class TimetableCreate(BaseModel):
+    faculty_id: int
+    department_id: int
+    day: str
+    period: int
+    subject_code: str = "24UCS271"
+    subject_name: str = "PROG C"
+    class_type: str = "theory"
+
+class TimetableUpdate(BaseModel):
+    faculty_id: Optional[int] = None
+    department_id: Optional[int] = None
+    day: Optional[str] = None
+    period: Optional[int] = None
+    subject_code: Optional[str] = None
+    subject_name: Optional[str] = None
+    class_type: Optional[str] = None
+
+class SyllabusCreate(BaseModel):
+    session_number: int
+    session_title: str
+    unit: int
+    topics: Optional[str] = None
+    ppt_url: Optional[str] = None
+
+class SyllabusUpdate(BaseModel):
+    session_number: Optional[int] = None
+    session_title: Optional[str] = None
+    unit: Optional[int] = None
+    topics: Optional[str] = None
+    ppt_url: Optional[str] = None
+
+class LabProgramCreate(BaseModel):
+    program_number: int
+    program_title: str
+    description: Optional[str] = None
+    moodle_url: Optional[str] = None
+
+class LabProgramUpdate(BaseModel):
+    program_number: Optional[int] = None
+    program_title: Optional[str] = None
+    description: Optional[str] = None
+    moodle_url: Optional[str] = None
+
+class FAQCreate(BaseModel):
+    question: str
+    answer: str
+    category: Optional[str] = "general"
+
+class FAQUpdate(BaseModel):
+    question: Optional[str] = None
+    answer: Optional[str] = None
+    category: Optional[str] = None
+    is_active: Optional[bool] = None
+
+class DepartmentCreate(BaseModel):
+    name: str
+    code: str
+
+class DepartmentUpdate(BaseModel):
+    name: Optional[str] = None
+    code: Optional[str] = None
+
 # ============ Helper Functions ============
 def get_day_name(d: date = None):
     if d is None:
@@ -122,8 +217,18 @@ def login_admin(data: AdminLogin, db: Session = Depends(get_db)):
 
 @app.post("/api/login")
 def unified_login(data: UnifiedLogin, db: Session = Depends(get_db)):
-    """Single login endpoint for both faculty and admin using email."""
-    # Try faculty first
+    """Single login endpoint for faculty, admin, and super_admin using email."""
+    # Try super_admin first
+    super_admin = db.query(SuperAdmin).filter(SuperAdmin.username == data.email).first()
+    if super_admin and verify_password(data.password, super_admin.password):
+        token = create_access_token({"sub": str(super_admin.id), "type": "super_admin"})
+        return {
+            "access_token": token,
+            "token_type": "bearer",
+            "user_type": "super_admin",
+        }
+    
+    # Try faculty
     faculty = db.query(Faculty).filter(Faculty.email == data.email).first()
     if faculty and verify_password(data.password, faculty.password):
         token = create_access_token({"sub": str(faculty.id), "type": "faculty"})
@@ -463,6 +568,515 @@ def admin_chatbot_query(data: ChatQuery, db: Session = Depends(get_db)):
     response = semantic_chatbot.process_question(data.query)
     return {"response": response}
 
+# ============ Super Admin Routes ============
+
+# ----- Faculty CRUD -----
+@app.get("/api/super-admin/faculties")
+def super_admin_get_faculties(
+    super_admin: SuperAdmin = Depends(get_current_super_admin),
+    db: Session = Depends(get_db)
+):
+    faculties = db.query(Faculty).all()
+    return [{
+        "id": f.id,
+        "name": f.name,
+        "email": f.email,
+        "phone": f.phone,
+        "is_active": f.is_active,
+        "image_url": f.image_url,
+        "linkedin_url": f.linkedin_url,
+        "github_url": f.github_url,
+        "department": f.department,
+        "experience": f.experience,
+        "c_experience": f.c_experience,
+        "py_experience": f.py_experience,
+        "research_area": f.research_area,
+        "personal_email": f.personal_email
+    } for f in faculties]
+
+@app.post("/api/super-admin/faculties")
+def super_admin_create_faculty(
+    data: FacultyCreate,
+    super_admin: SuperAdmin = Depends(get_current_super_admin),
+    db: Session = Depends(get_db)
+):
+    # Check if email already exists
+    existing = db.query(Faculty).filter(Faculty.email == data.email).first()
+    if existing:
+        raise HTTPException(status_code=400, detail="Email already exists")
+    
+    faculty = Faculty(
+        name=data.name,
+        email=data.email,
+        password=get_password_hash(data.password),
+        phone=data.phone,
+        image_url=data.image_url,
+        linkedin_url=data.linkedin_url,
+        github_url=data.github_url,
+        department=data.department,
+        experience=data.experience,
+        c_experience=data.c_experience,
+        py_experience=data.py_experience,
+        research_area=data.research_area,
+        personal_email=data.personal_email
+    )
+    db.add(faculty)
+    db.commit()
+    db.refresh(faculty)
+    return {"message": "Faculty created successfully", "id": faculty.id}
+
+@app.put("/api/super-admin/faculties/{faculty_id}")
+def super_admin_update_faculty(
+    faculty_id: int,
+    data: FacultyUpdate,
+    super_admin: SuperAdmin = Depends(get_current_super_admin),
+    db: Session = Depends(get_db)
+):
+    faculty = db.query(Faculty).filter(Faculty.id == faculty_id).first()
+    if not faculty:
+        raise HTTPException(status_code=404, detail="Faculty not found")
+    
+    if data.name is not None:
+        faculty.name = data.name
+    if data.email is not None:
+        faculty.email = data.email
+    if data.password is not None:
+        faculty.password = get_password_hash(data.password)
+    if data.phone is not None:
+        faculty.phone = data.phone
+    if data.image_url is not None:
+        faculty.image_url = data.image_url
+    if data.linkedin_url is not None:
+        faculty.linkedin_url = data.linkedin_url
+    if data.github_url is not None:
+        faculty.github_url = data.github_url
+    if data.department is not None:
+        faculty.department = data.department
+    if data.experience is not None:
+        faculty.experience = data.experience
+    if data.c_experience is not None:
+        faculty.c_experience = data.c_experience
+    if data.py_experience is not None:
+        faculty.py_experience = data.py_experience
+    if data.research_area is not None:
+        faculty.research_area = data.research_area
+    if data.personal_email is not None:
+        faculty.personal_email = data.personal_email
+    if data.is_active is not None:
+        faculty.is_active = data.is_active
+    
+    db.commit()
+    return {"message": "Faculty updated successfully"}
+
+@app.delete("/api/super-admin/faculties/{faculty_id}")
+def super_admin_delete_faculty(
+    faculty_id: int,
+    super_admin: SuperAdmin = Depends(get_current_super_admin),
+    db: Session = Depends(get_db)
+):
+    faculty = db.query(Faculty).filter(Faculty.id == faculty_id).first()
+    if not faculty:
+        raise HTTPException(status_code=404, detail="Faculty not found")
+    
+    # Delete related entries first
+    db.query(TimetableEntry).filter(TimetableEntry.faculty_id == faculty_id).delete()
+    db.query(DailyEntry).filter(DailyEntry.faculty_id == faculty_id).delete()
+    db.delete(faculty)
+    db.commit()
+    return {"message": "Faculty deleted successfully"}
+
+# ----- Timetable CRUD -----
+@app.get("/api/super-admin/timetable")
+def super_admin_get_timetable(
+    super_admin: SuperAdmin = Depends(get_current_super_admin),
+    db: Session = Depends(get_db)
+):
+    entries = db.query(TimetableEntry).all()
+    result = []
+    for e in entries:
+        faculty = db.query(Faculty).filter(Faculty.id == e.faculty_id).first()
+        dept = db.query(Department).filter(Department.id == e.department_id).first()
+        result.append({
+            "id": e.id,
+            "faculty_id": e.faculty_id,
+            "faculty_name": faculty.name if faculty else "Unknown",
+            "department_id": e.department_id,
+            "department_name": dept.name if dept else "Unknown",
+            "department_code": dept.code if dept else "Unknown",
+            "day": e.day,
+            "period": e.period,
+            "subject_code": e.subject_code,
+            "subject_name": e.subject_name,
+            "class_type": e.class_type
+        })
+    return result
+
+@app.post("/api/super-admin/timetable")
+def super_admin_create_timetable(
+    data: TimetableCreate,
+    super_admin: SuperAdmin = Depends(get_current_super_admin),
+    db: Session = Depends(get_db)
+):
+    entry = TimetableEntry(
+        faculty_id=data.faculty_id,
+        department_id=data.department_id,
+        day=data.day,
+        period=data.period,
+        subject_code=data.subject_code,
+        subject_name=data.subject_name,
+        class_type=data.class_type
+    )
+    db.add(entry)
+    db.commit()
+    db.refresh(entry)
+    return {"message": "Timetable entry created successfully", "id": entry.id}
+
+@app.put("/api/super-admin/timetable/{entry_id}")
+def super_admin_update_timetable(
+    entry_id: int,
+    data: TimetableUpdate,
+    super_admin: SuperAdmin = Depends(get_current_super_admin),
+    db: Session = Depends(get_db)
+):
+    entry = db.query(TimetableEntry).filter(TimetableEntry.id == entry_id).first()
+    if not entry:
+        raise HTTPException(status_code=404, detail="Timetable entry not found")
+    
+    if data.faculty_id is not None:
+        entry.faculty_id = data.faculty_id
+    if data.department_id is not None:
+        entry.department_id = data.department_id
+    if data.day is not None:
+        entry.day = data.day
+    if data.period is not None:
+        entry.period = data.period
+    if data.subject_code is not None:
+        entry.subject_code = data.subject_code
+    if data.subject_name is not None:
+        entry.subject_name = data.subject_name
+    if data.class_type is not None:
+        entry.class_type = data.class_type
+    
+    db.commit()
+    return {"message": "Timetable entry updated successfully"}
+
+@app.delete("/api/super-admin/timetable/{entry_id}")
+def super_admin_delete_timetable(
+    entry_id: int,
+    super_admin: SuperAdmin = Depends(get_current_super_admin),
+    db: Session = Depends(get_db)
+):
+    entry = db.query(TimetableEntry).filter(TimetableEntry.id == entry_id).first()
+    if not entry:
+        raise HTTPException(status_code=404, detail="Timetable entry not found")
+    
+    db.delete(entry)
+    db.commit()
+    return {"message": "Timetable entry deleted successfully"}
+
+# ----- Syllabus CRUD -----
+@app.get("/api/super-admin/syllabus")
+def super_admin_get_syllabus(
+    super_admin: SuperAdmin = Depends(get_current_super_admin),
+    db: Session = Depends(get_db)
+):
+    sessions = db.query(Syllabus).order_by(Syllabus.unit, Syllabus.session_number).all()
+    return [{
+        "id": s.id,
+        "session_number": s.session_number,
+        "session_title": s.session_title,
+        "unit": s.unit,
+        "topics": s.topics,
+        "ppt_url": s.ppt_url
+    } for s in sessions]
+
+@app.post("/api/super-admin/syllabus")
+def super_admin_create_syllabus(
+    data: SyllabusCreate,
+    super_admin: SuperAdmin = Depends(get_current_super_admin),
+    db: Session = Depends(get_db)
+):
+    session = Syllabus(
+        session_number=data.session_number,
+        session_title=data.session_title,
+        unit=data.unit,
+        topics=data.topics,
+        ppt_url=data.ppt_url
+    )
+    db.add(session)
+    db.commit()
+    db.refresh(session)
+    return {"message": "Syllabus session created successfully", "id": session.id}
+
+@app.put("/api/super-admin/syllabus/{session_id}")
+def super_admin_update_syllabus(
+    session_id: int,
+    data: SyllabusUpdate,
+    super_admin: SuperAdmin = Depends(get_current_super_admin),
+    db: Session = Depends(get_db)
+):
+    session = db.query(Syllabus).filter(Syllabus.id == session_id).first()
+    if not session:
+        raise HTTPException(status_code=404, detail="Syllabus session not found")
+    
+    if data.session_number is not None:
+        session.session_number = data.session_number
+    if data.session_title is not None:
+        session.session_title = data.session_title
+    if data.unit is not None:
+        session.unit = data.unit
+    if data.topics is not None:
+        session.topics = data.topics
+    if data.ppt_url is not None:
+        session.ppt_url = data.ppt_url
+    
+    db.commit()
+    return {"message": "Syllabus session updated successfully"}
+
+@app.delete("/api/super-admin/syllabus/{session_id}")
+def super_admin_delete_syllabus(
+    session_id: int,
+    super_admin: SuperAdmin = Depends(get_current_super_admin),
+    db: Session = Depends(get_db)
+):
+    session = db.query(Syllabus).filter(Syllabus.id == session_id).first()
+    if not session:
+        raise HTTPException(status_code=404, detail="Syllabus session not found")
+    
+    db.delete(session)
+    db.commit()
+    return {"message": "Syllabus session deleted successfully"}
+
+# ----- Lab Programs CRUD -----
+@app.get("/api/super-admin/lab-programs")
+def super_admin_get_lab_programs(
+    super_admin: SuperAdmin = Depends(get_current_super_admin),
+    db: Session = Depends(get_db)
+):
+    programs = db.query(LabProgram).order_by(LabProgram.program_number).all()
+    return [{
+        "id": p.id,
+        "program_number": p.program_number,
+        "program_title": p.program_title,
+        "description": p.description,
+        "moodle_url": p.moodle_url
+    } for p in programs]
+
+@app.post("/api/super-admin/lab-programs")
+def super_admin_create_lab_program(
+    data: LabProgramCreate,
+    super_admin: SuperAdmin = Depends(get_current_super_admin),
+    db: Session = Depends(get_db)
+):
+    program = LabProgram(
+        program_number=data.program_number,
+        program_title=data.program_title,
+        description=data.description,
+        moodle_url=data.moodle_url
+    )
+    db.add(program)
+    db.commit()
+    db.refresh(program)
+    return {"message": "Lab program created successfully", "id": program.id}
+
+@app.put("/api/super-admin/lab-programs/{program_id}")
+def super_admin_update_lab_program(
+    program_id: int,
+    data: LabProgramUpdate,
+    super_admin: SuperAdmin = Depends(get_current_super_admin),
+    db: Session = Depends(get_db)
+):
+    program = db.query(LabProgram).filter(LabProgram.id == program_id).first()
+    if not program:
+        raise HTTPException(status_code=404, detail="Lab program not found")
+    
+    if data.program_number is not None:
+        program.program_number = data.program_number
+    if data.program_title is not None:
+        program.program_title = data.program_title
+    if data.description is not None:
+        program.description = data.description
+    if data.moodle_url is not None:
+        program.moodle_url = data.moodle_url
+    
+    db.commit()
+    return {"message": "Lab program updated successfully"}
+
+@app.delete("/api/super-admin/lab-programs/{program_id}")
+def super_admin_delete_lab_program(
+    program_id: int,
+    super_admin: SuperAdmin = Depends(get_current_super_admin),
+    db: Session = Depends(get_db)
+):
+    program = db.query(LabProgram).filter(LabProgram.id == program_id).first()
+    if not program:
+        raise HTTPException(status_code=404, detail="Lab program not found")
+    
+    db.delete(program)
+    db.commit()
+    return {"message": "Lab program deleted successfully"}
+
+# ----- FAQ CRUD -----
+@app.get("/api/super-admin/faqs")
+def super_admin_get_faqs(
+    super_admin: SuperAdmin = Depends(get_current_super_admin),
+    db: Session = Depends(get_db)
+):
+    faqs = db.query(FAQ).order_by(FAQ.category, FAQ.id).all()
+    return [{
+        "id": f.id,
+        "question": f.question,
+        "answer": f.answer,
+        "category": f.category,
+        "is_active": f.is_active,
+        "created_at": f.created_at.isoformat() if f.created_at else None,
+        "updated_at": f.updated_at.isoformat() if f.updated_at else None
+    } for f in faqs]
+
+@app.get("/api/faqs")
+def get_active_faqs(db: Session = Depends(get_db)):
+    """Public endpoint for getting active FAQs"""
+    faqs = db.query(FAQ).filter(FAQ.is_active == True).order_by(FAQ.category, FAQ.id).all()
+    return [{
+        "id": f.id,
+        "question": f.question,
+        "answer": f.answer,
+        "category": f.category
+    } for f in faqs]
+
+@app.post("/api/super-admin/faqs")
+def super_admin_create_faq(
+    data: FAQCreate,
+    super_admin: SuperAdmin = Depends(get_current_super_admin),
+    db: Session = Depends(get_db)
+):
+    faq = FAQ(
+        question=data.question,
+        answer=data.answer,
+        category=data.category
+    )
+    db.add(faq)
+    db.commit()
+    db.refresh(faq)
+    return {"message": "FAQ created successfully", "id": faq.id}
+
+@app.put("/api/super-admin/faqs/{faq_id}")
+def super_admin_update_faq(
+    faq_id: int,
+    data: FAQUpdate,
+    super_admin: SuperAdmin = Depends(get_current_super_admin),
+    db: Session = Depends(get_db)
+):
+    faq = db.query(FAQ).filter(FAQ.id == faq_id).first()
+    if not faq:
+        raise HTTPException(status_code=404, detail="FAQ not found")
+    
+    if data.question is not None:
+        faq.question = data.question
+    if data.answer is not None:
+        faq.answer = data.answer
+    if data.category is not None:
+        faq.category = data.category
+    if data.is_active is not None:
+        faq.is_active = data.is_active
+    
+    db.commit()
+    return {"message": "FAQ updated successfully"}
+
+@app.delete("/api/super-admin/faqs/{faq_id}")
+def super_admin_delete_faq(
+    faq_id: int,
+    super_admin: SuperAdmin = Depends(get_current_super_admin),
+    db: Session = Depends(get_db)
+):
+    faq = db.query(FAQ).filter(FAQ.id == faq_id).first()
+    if not faq:
+        raise HTTPException(status_code=404, detail="FAQ not found")
+    
+    db.delete(faq)
+    db.commit()
+    return {"message": "FAQ deleted successfully"}
+
+# ----- Departments CRUD -----
+@app.get("/api/super-admin/departments")
+def super_admin_get_departments(
+    super_admin: SuperAdmin = Depends(get_current_super_admin),
+    db: Session = Depends(get_db)
+):
+    departments = db.query(Department).all()
+    return [{"id": d.id, "name": d.name, "code": d.code} for d in departments]
+
+@app.post("/api/super-admin/departments")
+def super_admin_create_department(
+    data: DepartmentCreate,
+    super_admin: SuperAdmin = Depends(get_current_super_admin),
+    db: Session = Depends(get_db)
+):
+    existing = db.query(Department).filter(Department.code == data.code).first()
+    if existing:
+        raise HTTPException(status_code=400, detail="Department code already exists")
+    
+    dept = Department(name=data.name, code=data.code)
+    db.add(dept)
+    db.commit()
+    db.refresh(dept)
+    return {"message": "Department created successfully", "id": dept.id}
+
+@app.put("/api/super-admin/departments/{dept_id}")
+def super_admin_update_department(
+    dept_id: int,
+    data: DepartmentUpdate,
+    super_admin: SuperAdmin = Depends(get_current_super_admin),
+    db: Session = Depends(get_db)
+):
+    dept = db.query(Department).filter(Department.id == dept_id).first()
+    if not dept:
+        raise HTTPException(status_code=404, detail="Department not found")
+    
+    if data.name is not None:
+        dept.name = data.name
+    if data.code is not None:
+        dept.code = data.code
+    
+    db.commit()
+    return {"message": "Department updated successfully"}
+
+@app.delete("/api/super-admin/departments/{dept_id}")
+def super_admin_delete_department(
+    dept_id: int,
+    super_admin: SuperAdmin = Depends(get_current_super_admin),
+    db: Session = Depends(get_db)
+):
+    dept = db.query(Department).filter(Department.id == dept_id).first()
+    if not dept:
+        raise HTTPException(status_code=404, detail="Department not found")
+    
+    # Check if department is used in timetable
+    in_use = db.query(TimetableEntry).filter(TimetableEntry.department_id == dept_id).first()
+    if in_use:
+        raise HTTPException(status_code=400, detail="Department is in use in timetable entries")
+    
+    db.delete(dept)
+    db.commit()
+    return {"message": "Department deleted successfully"}
+
+# ----- Super Admin Dashboard Stats -----
+@app.get("/api/super-admin/stats")
+def super_admin_get_stats(
+    super_admin: SuperAdmin = Depends(get_current_super_admin),
+    db: Session = Depends(get_db)
+):
+    return {
+        "total_faculties": db.query(Faculty).count(),
+        "active_faculties": db.query(Faculty).filter(Faculty.is_active == True).count(),
+        "total_departments": db.query(Department).count(),
+        "total_timetable_entries": db.query(TimetableEntry).count(),
+        "total_syllabus_sessions": db.query(Syllabus).count(),
+        "total_lab_programs": db.query(LabProgram).count(),
+        "total_faqs": db.query(FAQ).count(),
+        "active_faqs": db.query(FAQ).filter(FAQ.is_active == True).count()
+    }
+
 # ============ HTML Page Routes ============
 @app.get("/", response_class=HTMLResponse)
 def login_page(request: Request):
@@ -475,6 +1089,10 @@ def faculty_dashboard_page(request: Request):
 @app.get("/admin/dashboard", response_class=HTMLResponse)
 def admin_dashboard_page(request: Request):
     return templates.TemplateResponse("admin_dashboard.html", {"request": request})
+
+@app.get("/super-admin/dashboard", response_class=HTMLResponse)
+def super_admin_dashboard_page(request: Request):
+    return templates.TemplateResponse("super_admin_dashboard.html", {"request": request})
 
 if __name__ == "__main__":
     import uvicorn

@@ -6,7 +6,7 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
 from database import get_db
-from models import Faculty, Admin
+from models import Faculty, Admin, SuperAdmin
 
 SECRET_KEY = "c_faculties_secret_key_2026_programming"
 ALGORITHM = "HS256"
@@ -103,3 +103,36 @@ async def get_current_admin(
         )
     
     return admin
+
+async def get_current_super_admin(
+    credentials: HTTPAuthorizationCredentials = Depends(security),
+    db: Session = Depends(get_db)
+):
+    if not credentials:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Not authenticated"
+        )
+    
+    payload = decode_token(credentials.credentials)
+    if not payload:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid token"
+        )
+    
+    if payload.get("type") != "super_admin":
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid token type"
+        )
+    
+    super_admin_id = payload.get("sub")
+    super_admin = db.query(SuperAdmin).filter(SuperAdmin.id == int(super_admin_id)).first()
+    if not super_admin:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Super Admin not found"
+        )
+    
+    return super_admin

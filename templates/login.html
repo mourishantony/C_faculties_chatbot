@@ -112,11 +112,15 @@
 
                 localStorage.setItem('token', result.access_token);
                 localStorage.setItem('userType', result.user_type);
-                localStorage.setItem('userName', result.user_type === 'faculty' ? result.faculty_name : 'Admin');
-
-                if (result.user_type === 'admin') {
+                
+                if (result.user_type === 'super_admin') {
+                    localStorage.setItem('userName', 'Super Admin');
+                    window.location.href = '/super-admin/dashboard';
+                } else if (result.user_type === 'admin') {
+                    localStorage.setItem('userName', 'Admin');
                     window.location.href = '/admin/dashboard';
                 } else {
+                    localStorage.setItem('userName', result.faculty_name);
                     window.location.href = '/faculty/dashboard';
                 }
             } catch (error) {

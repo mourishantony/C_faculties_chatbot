@@ -1,19 +1,81 @@
 from database import engine, SessionLocal
-from models import Base, Department, Syllabus, Admin, Faculty, TimetableEntry, PeriodTiming, LabProgram
+from models import Base, Department, Syllabus, Admin, Faculty, TimetableEntry, PeriodTiming, LabProgram, SuperAdmin, FAQ
 from passlib.context import CryptContext
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 def init_database():
+    """Initialize database with all tables and seed data.
+    
+    This function handles both:
+    1. Fresh database initialization (all tables and data)
+    2. Adding missing tables/data to existing database (e.g., SuperAdmin, FAQ)
+    """
+    # Create all tables (won't affect existing tables)
     Base.metadata.create_all(bind=engine)
     db = SessionLocal()
     
-    # Check if data already exists
-    if db.query(Department).first():
-        print("Database already initialized!")
-        db.close()
-        return
+    # Check if this is a fresh database or existing one
+    is_fresh_db = db.query(Department).first() is None
     
+    if is_fresh_db:
+        print("Initializing fresh database...")
+        _init_all_data(db)
+    else:
+        print("Database exists. Checking for missing data...")
+        _add_missing_data(db)
+    
+    db.close()
+
+def _add_missing_data(db):
+    """Add missing tables/data to existing database (e.g., SuperAdmin, FAQ)"""
+    added_something = False
+    
+    # Check and add SuperAdmin if missing
+    if not db.query(SuperAdmin).first():
+        super_admin = SuperAdmin(
+            username="super_admin@gmail.com",
+            password=pwd_context.hash("superadmin123")
+        )
+        db.add(super_admin)
+        db.commit()
+        print("✓ Super Admin added: super_admin@gmail.com / superadmin123")
+        added_something = True
+    else:
+        print("✓ Super Admin already exists")
+    
+    # Check and add FAQs if missing
+    if not db.query(FAQ).first():
+        _add_default_faqs(db)
+        print("✓ Default FAQs added")
+        added_something = True
+    else:
+        print("✓ FAQs already exist")
+    
+    if not added_something:
+        print("All data is up to date!")
+
+def _add_default_faqs(db):
+    """Add default FAQ entries"""
+    default_faqs = [
+        {"question": "What are the C programming classes today?", "answer": "Check the schedule section for today's C programming classes.", "category": "schedule"},
+        {"question": "Who is teaching C programming?", "answer": "We have 14 dedicated faculty members teaching C programming across different departments.", "category": "faculty"},
+        {"question": "What topics are covered in Unit 1?", "answer": "Unit 1 covers Basics of C Programming including Introduction, Compilation Process, Tokens, Variables, Operators, and Control Flow.", "category": "topics"},
+        {"question": "How can I access the PPT materials?", "answer": "PPT materials are available through the syllabus section. Each session has a corresponding PPT link.", "category": "general"},
+        {"question": "What lab programs are available?", "answer": "There are 10 lab programs covering topics from basic calculations to file handling.", "category": "topics"},
+    ]
+    
+    for faq_data in default_faqs:
+        faq = FAQ(
+            question=faq_data["question"],
+            answer=faq_data["answer"],
+            category=faq_data["category"]
+        )
+        db.add(faq)
+    db.commit()
+
+def _init_all_data(db):
+    """Initialize all data for a fresh database"""
     # Add Departments
     departments = [
         {"name": "B.Tech AI&DS - A", "code": "AIDS-A"},
@@ -254,6 +316,16 @@ def init_database():
         password=pwd_context.hash("admin123")
     )
     db.add(admin)
+    
+    # Add default super admin
+    super_admin = SuperAdmin(
+        username="super_admin@gmail.com",
+        password=pwd_context.hash("superadmin123")
+    )
+    db.add(super_admin)
+    
+    # Add default FAQs
+    _add_default_faqs(db)
     
     # Add faculties (14 faculties from DATAS.TXT)
     # Images should be stored in static/images/ folder with filenames like: faculty1.jpg, faculty2.jpg, etc.
@@ -663,8 +735,11 @@ def init_database():
         db.add(timetable)
     
     db.commit()
-    db.close()
-    print("Database initialized successfully!")
+    print("✓ Database initialized successfully!")
+    print("\nLogin Credentials:")
+    print("  Super Admin: super_admin@gmail.com / superadmin123")
+    print("  Admin: mail-admin@gmail.com / admin123")
+    print("  Faculty: <email> / password123")
 
 if __name__ == "__main__":
     init_database()

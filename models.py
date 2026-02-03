@@ -34,6 +34,25 @@ class Admin(Base):
     password = Column(String(255), nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
 
+class SuperAdmin(Base):
+    __tablename__ = "super_admins"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    username = Column(String(100), unique=True, index=True, nullable=False)
+    password = Column(String(255), nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+class FAQ(Base):
+    __tablename__ = "faqs"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    question = Column(String(500), nullable=False)
+    answer = Column(Text, nullable=False)
+    category = Column(String(100), nullable=True)  # schedule, faculty, topics, general
+    is_active = Column(Boolean, default=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
 class Department(Base):
     __tablename__ = "departments"
     
