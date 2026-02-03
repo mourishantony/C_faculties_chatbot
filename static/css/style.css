@@ -1,16 +1,19 @@
 /* ============ CSS Variables ============ */
 :root {
-    --primary-color: #1e3a5f;
-    --primary-dark: #152a45;
-    --secondary-color: #64748b;
+    --primary-color: #4e5166;
+    --primary-dark: #3d3f52;
+    --primary-light: #6d7189;
+    --accent-color: #c89f7e;
+    --accent-light: #d9b89a;
+    --secondary-color: #6b7280;
     --success-color: #22c55e;
     --danger-color: #ef4444;
     --warning-color: #f59e0b;
-    --background-color: #f1f5f9;
+    --background-color: #f5f6f8;
     --card-background: #ffffff;
-    --text-primary: #1e293b;
-    --text-secondary: #64748b;
-    --border-color: #e2e8f0;
+    --text-primary: #1e1b4b;
+    --text-secondary: #6b7280;
+    --border-color: #d1d4db;
     --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
     --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
 }
@@ -75,7 +78,7 @@ a:hover {
 
 /* ============ Header/Navbar ============ */
 .navbar {
-       background: linear-gradient(135deg, #1e3a5f, #2d5a87);
+    background: linear-gradient(135deg, #4e5166, #5d6178);
     color: white;
     padding: 15px 0;
     box-shadow: var(--shadow);
@@ -135,7 +138,7 @@ a:hover {
 
 /* ============ Hero Section ============ */
 .hero {
-    background: linear-gradient(135deg, var(--primary-color), #7c3aed);
+    background: linear-gradient(135deg, #4e5166, #6d7189);
     color: white;
     padding: 80px 0;
     text-align: center;
@@ -814,7 +817,7 @@ textarea.form-control {
 
 /* ============ Footer ============ */
 .footer {
-    background: #1e293b;
+    background: linear-gradient(135deg, #4e5166, #5d6178);
     color: white;
     padding: 30px 0;
     text-align: center;
