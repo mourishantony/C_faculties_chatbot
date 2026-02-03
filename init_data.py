@@ -58,11 +58,43 @@ def _add_missing_data(db):
 def _add_default_faqs(db):
     """Add default FAQ entries"""
     default_faqs = [
-        {"question": "What are the C programming classes today?", "answer": "Check the schedule section for today's C programming classes.", "category": "schedule"},
-        {"question": "Who is teaching C programming?", "answer": "We have 14 dedicated faculty members teaching C programming across different departments.", "category": "faculty"},
-        {"question": "What topics are covered in Unit 1?", "answer": "Unit 1 covers Basics of C Programming including Introduction, Compilation Process, Tokens, Variables, Operators, and Control Flow.", "category": "topics"},
-        {"question": "How can I access the PPT materials?", "answer": "PPT materials are available through the syllabus section. Each session has a corresponding PPT link.", "category": "general"},
-        {"question": "What lab programs are available?", "answer": "There are 10 lab programs covering topics from basic calculations to file handling.", "category": "topics"},
+        # Class Schedule & Timing FAQs - General guidance only (dynamic queries handle specifics)
+        {"question": "What are today's C programming classes?", "answer": "Type 'show schedule' or 'today classes' to see today's C programming classes with faculty and periods.", "category": "schedule"},
+        {"question": "Who has class in a specific period?", "answer": "Type 'period [number]' (e.g., 'period 3', 'period 4', '5th period') to see who has class in that period.", "category": "schedule"},
+        {"question": "When is the C programming class for a department?", "answer": "Type the department code (e.g., 'AIDS-A', 'CSE-B', 'IT-A') to see their C programming schedule.", "category": "schedule"},
+        {"question": "What time does the 1st period start?", "answer": "The 1st period starts at 08:00 AM and ends at 08:45 AM.", "category": "schedule"},
+        {"question": "Show me the complete timetable for a day", "answer": "Type the day name (e.g., 'Monday', 'Tuesday schedule', 'Wednesday classes') to see the complete schedule for that day.", "category": "schedule"},
+        {"question": "Which faculty is teaching a department?", "answer": "Type the department code (e.g., 'CSE-B', 'AIDS-A') to see which faculty is assigned.", "category": "schedule"},
+        {"question": "Is there any lab class today?", "answer": "Lab classes are typically scheduled for 2-3 consecutive periods. Check today's schedule to see lab sessions.", "category": "schedule"},
+        {"question": "What are the theory class timings?", "answer": "Theory classes are 45 minutes each. Periods: 1(8:00-8:45), 2(8:45-9:30), 3(9:45-10:30), 4(10:30-11:15), 5(11:15-12:00), 6(1:00-1:45), 7(1:45-2:30), 8(2:30-3:15), 9(3:30-4:15).", "category": "schedule"},
+        {"question": "How many periods are there in a day?", "answer": "There are 9 periods in a day. Morning: Periods 1-5 (8:00 AM - 12:00 PM), Afternoon: Periods 6-9 (1:00 PM - 4:15 PM).", "category": "schedule"},
+        {"question": "When does the college start and end?", "answer": "College starts at 8:00 AM (1st period) and ends at 4:15 PM (9th period).", "category": "schedule"},
+        {"question": "Is there class on Saturday?", "answer": "Saturday classes depend on the timetable. Type 'Saturday' to check if there are any C programming classes.", "category": "schedule"},
+        {"question": "What is the lunch break timing?", "answer": "Lunch break is from 12:00 PM to 1:00 PM (between 5th and 6th periods).", "category": "schedule"},
+        {"question": "Show me all classes for this week", "answer": "Type the day name (Monday, Tuesday, etc.) to see classes for that day, or 'show schedule' for today.", "category": "schedule"},
+        {"question": "Which departments have C programming today?", "answer": "Type 'show schedule' to see all departments that have C programming classes today.", "category": "schedule"},
+        {"question": "What classes are scheduled after lunch break?", "answer": "After lunch (1:00 PM onwards), periods 6-9 have classes. Type 'period 6' or 'period 7' etc. to see specific classes.", "category": "schedule"},
+        {"question": "What are the topics to be covered?", "answer": "Topics covered depend on the syllabus session. Type 'session [number]' (e.g., 'session 5') to see specific topic details.", "category": "schedule"},
+        {"question": "Which class is handling lab today?", "answer": "Lab sessions are marked as 'lab' type in the timetable. Type 'show schedule' to identify lab classes.", "category": "schedule"},
+        
+        # Faculty FAQs
+        {"question": "Who is teaching C programming?", "answer": "We have 14 dedicated faculty members teaching C programming across different departments. Type 'list all faculty' to see them.", "category": "faculty"},
+        {"question": "List all faculty members", "answer": "Type 'list all faculty' to see all 14 faculty members with their departments.", "category": "faculty"},
+        {"question": "Who teaches AIDS-A?", "answer": "Type 'AIDS-A' to see the faculty assigned to AIDS-A department for C programming.", "category": "faculty"},
+        
+        # Topics & Syllabus FAQs
+        {"question": "What topics are covered in Unit 1?", "answer": "Unit 1 covers Basics of C Programming: Introduction to C, History, Features, Structure of C program, Compilation Process, Tokens, Keywords, Identifiers, Variables, Data Types, Operators, and Control Flow.", "category": "topics"},
+        {"question": "What topics are covered in Unit 2?", "answer": "Unit 2 covers Arrays and Strings: One-dimensional arrays, Multi-dimensional arrays, String handling, String functions, Array operations.", "category": "topics"},
+        {"question": "What topics are covered in Unit 3?", "answer": "Unit 3 covers Functions: Function declaration, definition, calling, recursion, storage classes, and scope rules.", "category": "topics"},
+        {"question": "What topics are covered in Unit 4?", "answer": "Unit 4 covers Pointers: Pointer basics, pointer arithmetic, pointers with arrays, pointers with functions, dynamic memory allocation.", "category": "topics"},
+        {"question": "What topics are covered in Unit 5?", "answer": "Unit 5 covers Structures and File Handling: Structures, Unions, Typedef, File operations, file pointers, reading and writing files.", "category": "topics"},
+        {"question": "How can I access the PPT materials?", "answer": "Type 'session [number] ppt' (e.g., 'session 3 ppt') to get the PPT link for that session.", "category": "topics"},
+        {"question": "What lab programs are available?", "answer": "There are 10 lab programs. Type 'week [number] lab' (e.g., 'week 3 lab') to see specific lab program details.", "category": "topics"},
+        
+        # General FAQs
+        {"question": "What is the course code?", "answer": "The course code for C Programming is 24UCS271 (PROG C).", "category": "general"},
+        {"question": "How to use this chatbot?", "answer": "You can ask about: faculty schedules (e.g., 'Sathish today'), department classes (e.g., 'CSE-A'), lab programs (e.g., 'week 3 lab'), or PPT materials (e.g., 'session 5 ppt'). Type 'help' for more commands.", "category": "general"},
+        {"question": "Who is absent today?", "answer": "Check the 'Absent Today' section in the dashboard to see which faculty members are absent today.", "category": "general"},
     ]
     
     for faq_data in default_faqs:
