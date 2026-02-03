@@ -407,7 +407,7 @@ def get_admin_report(
     entries = db.query(DailyEntry).filter(
         DailyEntry.date >= start,
         DailyEntry.date <= end
-    ).order_by(DailyEntry.date, DailyEntry.period).all()
+    ).order_by(DailyEntry.date.desc(), DailyEntry.period.desc()).all()
     
     result = []
     for entry in entries:
