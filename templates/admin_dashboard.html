@@ -249,6 +249,23 @@
         </div>
     </div>
 
+    <!-- Modal for viewing resources and summaries -->
+    <div id="detailModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 10000; align-items: center; justify-content: center;">
+        <div style="background: white; border-radius: 12px; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto; box-shadow: 0 4px 20px rgba(0,0,0,0.3);">
+            <div style="padding: 20px; border-bottom: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center; background: linear-gradient(135deg, #2563eb, #1e40af); color: white; border-radius: 12px 12px 0 0;">
+                <h3 style="margin: 0; font-size: 18px; display: flex; align-items: center;">
+                    <i class="material-icons" style="margin-right: 8px; font-size: 20px;">info</i>
+                    <span id="modalTitle">Details</span>
+                </h3>
+                <button onclick="closeDetailModal()" style="background: none; border: none; color: white; cursor: pointer; font-size: 24px; padding: 0; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;">
+                    <i class="material-icons">close</i>
+                </button>
+            </div>
+            <div id="modalContent" style="padding: 20px; line-height: 1.6; color: #334155; white-space: pre-wrap; word-wrap: break-word;">
+            </div>
+        </div>
+    </div>
+
     <style>
         /* ========== Material Icons Styling ========== */
         .material-icons {
@@ -1565,7 +1582,7 @@
                 
                 let html = `<p style="margin-bottom: 15px;"><strong>Total Entries: ${data.total}</strong></p>`;
                 html += '<table class="schedule-table"><thead><tr>' +
-                    '<th>Date</th><th>Period</th><th>Faculty</th><th>Department</th><th>Topic</th><th>PPT</th><th>Status</th><th>Summary</th>' +
+                    '<th>Date</th><th>Period</th><th>Faculty</th><th>Department</th><th>Topic</th><th>Resources</th><th>Status</th><th>Summary</th>' +
                     '</tr></thead><tbody>';
                 
                 data.entries.forEach(entry => {
@@ -1580,8 +1597,23 @@
                         statusClass = 'swapped';
                     }
                     
-                    const pptLink = entry.ppt_url 
-                        ? `<a href="${entry.ppt_url}" target="_blank" class="ppt-link" title="Open PPT"><i class="material-icons" style="font-size: 14px; vertical-align: middle;">slideshow</i> View</a>` 
+                    // Determine resource content based on class type
+                    let resourceContent = '';
+                    if (entry.class_type === 'theory' && entry.ppt_url) {
+                        resourceContent = `<a href="${entry.ppt_url}" target="_blank" class="ppt-link" title="Open PPT"><i class="material-icons" style="font-size: 14px; vertical-align: middle;">slideshow</i> View</a>`;
+                    } else if (entry.class_type === 'lab' && entry.moodle_url) {
+                        resourceContent = `<a href="${entry.moodle_url}" target="_blank" class="ppt-link" title="Open Moodle"><i class="material-icons" style="font-size: 14px; vertical-align: middle;">language</i> View</a>`;
+                    } else if (entry.class_type === 'lab' && entry.lab_work_done) {
+                        resourceContent = `<button onclick='showDetailModal("Lab Work Done", ${JSON.stringify(entry.lab_work_done)})' class="ppt-link" style="border: none; background: none; cursor: pointer; color: #2563eb; text-decoration: none;"><i class="material-icons" style="font-size: 14px; vertical-align: middle;">description</i> View</button>`;
+                    } else if (entry.class_type === 'mini_project' && entry.mini_project_progress) {
+                        resourceContent = `<button onclick='showDetailModal("Mini Project Progress", ${JSON.stringify(entry.mini_project_progress)})' class="ppt-link" style="border: none; background: none; cursor: pointer; color: #2563eb; text-decoration: none;"><i class="material-icons" style="font-size: 14px; vertical-align: middle;">assignment</i> View</button>`;
+                    } else {
+                        resourceContent = '-';
+                    }
+                    
+                    // Summary column with View button if summary exists
+                    const summaryContent = entry.summary 
+                        ? `<button onclick='showDetailModal("Summary", ${JSON.stringify(entry.summary)})' class="ppt-link" style="border: none; background: none; cursor: pointer; color: #2563eb; text-decoration: none;"><i class="material-icons" style="font-size: 14px; vertical-align: middle;">notes</i> View</button>` 
                         : '-';
                     
                     html += `
@@ -1591,9 +1623,9 @@
                             <td><strong>${entry.faculty_name}</strong></td>
                             <td>${entry.department_name}</td>
                             <td>${entry.topic}</td>
-                            <td>${pptLink}</td>
+                            <td>${resourceContent}</td>
                             <td><span class="status-badge ${statusClass}">${status}</span></td>
-                            <td>${entry.summary || '-'}</td>
+                            <td>${summaryContent}</td>
                         </tr>
                     `;
                 });
@@ -1607,6 +1639,28 @@
                 document.getElementById('reportContainer').innerHTML = '<div class="alert alert-error">Failed to load report</div>';
             }
         }
+        
+        // Modal functions for viewing details
+        function showDetailModal(title, content) {
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('modalContent').textContent = content;
+            const modal = document.getElementById('detailModal');
+            modal.style.display = 'flex';
+        }
+        
+        function closeDetailModal() {
+            document.getElementById('detailModal').style.display = 'none';
+        }
+        
+        // Close modal when clicking outside
+        document.addEventListener('DOMContentLoaded', () => {
+            const modal = document.getElementById('detailModal');
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    closeDetailModal();
+                }
+            });
+        });
         
         // Store loaded classes data globally for day filtering
         let currentClassesData = null;

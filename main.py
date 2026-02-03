@@ -447,7 +447,8 @@ def get_admin_report(
             "is_swapped": entry.is_swapped,
             "swapped_with": entry.swapped_with,
             "summary": entry.summary,
-            "ppt_url": syllabus.ppt_url if syllabus else None
+            "ppt_url": syllabus.ppt_url if syllabus else None,
+            "moodle_url": lab_program.moodle_url if lab_program else None
         })
     
     return {"entries": result, "total": len(result)}
