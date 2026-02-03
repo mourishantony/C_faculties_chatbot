@@ -15,8 +15,6 @@ from auth import (
     get_current_faculty, get_current_admin, get_current_super_admin
 )
 from chatbot import process_chatbot_query
-from chatbot_service import ChatbotService
-from chatbot_semantic import SemanticChatbotService
 
 # Create tables
 Base.metadata.create_all(bind=engine)
@@ -28,20 +26,6 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # Templates
 templates = Jinja2Templates(directory="templates")
-
-# Initialize semantic chatbot service once at startup (load model only once)
-semantic_chatbot = None
-
-@app.on_event("startup")
-async def startup_event():
-    """Load semantic model on startup"""
-    global semantic_chatbot
-    print(" Loading semantic chatbot model...")
-    # Create a dummy db session just to initialize the model
-    db = SessionLocal()
-    semantic_chatbot = SemanticChatbotService(db)
-    db.close()
-    print(" Semantic chatbot ready!")
 
 # ============ Pydantic Models ============
 class FacultyLogin(BaseModel):
@@ -549,15 +533,14 @@ def get_classes_by_type(class_type: str, db: Session = Depends(get_db)):
 # ----- Chatbot Route -----
 @app.post("/api/chatbot")
 def chatbot_query(data: ChatQuery, db: Session = Depends(get_db)):
+    """Chatbot endpoint using FAQ-based responses"""
     response = process_chatbot_query(data.query, db)
     return {"response": response}
 
 @app.post("/api/admin/chatbot")
 def admin_chatbot_query(data: ChatQuery, db: Session = Depends(get_db)):
-    """Admin-specific chatbot endpoint with semantic understanding"""
-    # Use pre-loaded semantic chatbot, just update db session
-    semantic_chatbot.db = db
-    response = semantic_chatbot.process_question(data.query)
+    """Admin chatbot endpoint (same as regular chatbot)"""
+    response = process_chatbot_query(data.query, db)
     return {"response": response}
 
 # ============ Super Admin Routes ============
