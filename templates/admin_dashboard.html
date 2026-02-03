@@ -37,13 +37,13 @@
                         <div class="filter-group" style="display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 20px;">
                             <div style="flex: 1; min-width: 200px;">
                                 <label for="classTypeFilter" style="display: block; margin-bottom: 8px; font-weight: 600; color: #334155;">
-                                    Select Class Type:
+                                    Select View:
                                 </label>
                                 <select id="classTypeFilter" class="form-control" onchange="loadClassesByType()" style="padding: 10px; font-size: 14px;">
-                                    <option value="">-- Select Type --</option>
-                                    <option value="theory">Theory Classes</option>
-                                    <option value="lab">Lab Classes</option>
-                                    <option value="mini_project">Mini Project Classes</option>
+                                    <option value="">-- Today's Schedule --</option>
+                                    <option value="theory">Theory Classes (All Days)</option>
+                                    <option value="lab">Lab Classes (All Days)</option>
+                                    <option value="mini_project">Mini Project Classes (All Days)</option>
                                 </select>
                             </div>
                             
@@ -66,7 +66,7 @@
                         
                         <div id="classesByTypeContainer" style="margin-top: 20px;">
                             <p class="text-center" style="padding: 20px; color: #64748b;">
-                                Select a class type from the dropdown above to view scheduled classes
+                                Loading today's classes...
                             </p>
                         </div>
                     </div>
@@ -1412,6 +1412,7 @@
             await loadSummary();
             await loadFaculties();
             await loadReport();
+            await loadTodayClasses(); // Load today's classes by default
             
             // Add touch support for flip cards on mobile
             setupFlipCardTouch();
@@ -1605,6 +1606,168 @@
         // Store loaded classes data globally for day filtering
         let currentClassesData = null;
         
+        async function loadTodayClasses() {
+            const container = document.getElementById('classesByTypeContainer');
+            const dayFilterContainer = document.getElementById('dayFilterContainer');
+            
+            try {
+                container.innerHTML = '<p class="text-center" style="padding: 20px;">Loading today\'s classes...</p>';
+                
+                const data = await apiRequest('/api/admin/today-classes');
+                
+                if (data.classes.length === 0) {
+                    container.innerHTML = `<p class="text-center" style="padding: 20px; color: #64748b;">No classes scheduled for today (${data.day}).</p>`;
+                    dayFilterContainer.style.display = 'none';
+                    return;
+                }
+                
+                // Store data for potential filtering
+                currentClassesData = {
+                    classType: 'all',
+                    classes: data.classes,
+                    totalClasses: data.total_classes,
+                    isToday: true,
+                    date: data.date,
+                    day: data.day
+                };
+                
+                // Hide day filter for today view
+                dayFilterContainer.style.display = 'none';
+                
+                // Render today's classes
+                renderTodayClasses(data);
+                
+            } catch (error) {
+                console.error('Error loading today\'s classes:', error);
+                container.innerHTML = '<div class="alert alert-error">Failed to load today\'s classes. Please try again.</div>';
+                dayFilterContainer.style.display = 'none';
+            }
+        }
+        
+        function renderTodayClasses(data) {
+            const container = document.getElementById('classesByTypeContainer');
+            const { classes, day, date } = data;
+            
+            // Group by class type for better organization
+            const groupedByType = {
+                'theory': [],
+                'lab': [],
+                'mini_project': []
+            };
+            
+            classes.forEach(cls => {
+                if (groupedByType[cls.class_type]) {
+                    groupedByType[cls.class_type].push(cls);
+                }
+            });
+            
+            // Sort each group by period
+            Object.keys(groupedByType).forEach(type => {
+                groupedByType[type].sort((a, b) => a.period - b.period);
+            });
+            
+            const typeIcons = {
+                'theory': '<i class=\"material-icons\" style=\"font-size: 24px; vertical-align: middle;\">book</i>',
+                'lab': '<i class=\"material-icons\" style=\"font-size: 24px; vertical-align: middle;\">science</i>',
+                'mini_project': '<i class=\"material-icons\" style=\"font-size: 24px; vertical-align: middle;\">lightbulb</i>'
+            };
+            
+            const typeNames = {
+                'theory': 'Theory',
+                'lab': 'Lab',
+                'mini_project': 'Mini Project'
+            };
+            
+            let html = `
+                <div style=\"background: linear-gradient(135deg, #2563eb, #1e40af); color: white; padding: 15px; border-radius: 10px; margin-bottom: 20px;\">
+                    <h3 style=\"margin: 0 0 5px 0; display: flex; align-items: center; gap: 10px;\">
+                        <span style=\"font-size: 28px;\">   </span>
+                        <span>Today's Schedule - ${day}</span>
+                    </h3>
+                    <p style=\"margin: 0; opacity: 0.9; font-size: 14px;\">
+                        ${classes.length} class${classes.length !== 1 ? 'es' : ''} scheduled for ${date}
+                    </p>
+                </div>
+            `;
+            
+            // Render each class type section
+            Object.keys(groupedByType).forEach(type => {
+                const typeClasses = groupedByType[type];
+                if (typeClasses.length === 0) return;
+                
+                html += `
+                    <div style=\"margin-bottom: 25px;\">
+                        <h4 style=\"background: #f1f5f9; padding: 10px 15px; border-radius: 8px; color: #1e293b; margin: 0 0 12px 0; display: flex; align-items: center; gap: 8px;\">
+                            ${typeIcons[type]}
+                            <span>${typeNames[type]} Classes</span>
+                            <span style=\"margin-left: auto; background: #2563eb; color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: normal;\">
+                                ${typeClasses.length} class${typeClasses.length !== 1 ? 'es' : ''}
+                            </span>
+                        </h4>
+                        <div class=\"classes-grid\">
+                `;
+                
+                typeClasses.forEach(cls => {
+                    const statusBadge = getStatusBadge(cls.status);
+                    
+                    html += `
+                        <div class=\"class-card\">
+                            <div class=\"class-card-header\">
+                                <span class=\"period-badge-large\">${getOrdinal(cls.period)} Period</span>
+                                ${statusBadge}
+                            </div>
+                            <div class=\"class-card-body\">
+                                <div class=\"class-info-row\">
+                                    <span class=\"info-icon\"><i class=\"material-icons\">school</i></span>
+                                    <div class=\"info-content\">
+                                        <div class=\"info-label\">Faculty</div>
+                                        <div class=\"info-value\">${cls.faculty_name}</div>
+                                    </div>
+                                </div>
+                                <div class=\"class-info-row\">
+                                    <span class=\"info-icon\"><i class=\"material-icons\">business</i></span>
+                                    <div class=\"info-content\">
+                                        <div class=\"info-label\">Department</div>
+                                        <div class=\"info-value\">${cls.department_name} (${cls.department_code})</div>
+                                    </div>
+                                </div>
+                                <div class=\"class-info-row\">
+                                    <span class=\"info-icon\"><i class=\"material-icons\">menu_book</i></span>
+                                    <div class=\"info-content\">
+                                        <div class=\"info-label\">Subject</div>
+                                        <div class=\"info-value\">${cls.subject_name} (${cls.subject_code})</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class=\"class-card-footer\">
+                                <a href=\"mailto:${cls.faculty_email}\" class=\"contact-btn\">
+                                    <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"currentColor\"><path d=\"M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z\"/></svg>
+                                    Contact Faculty
+                                </a>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                html += `
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+        
+        function getStatusBadge(status) {
+            const badges = {
+                'filled': '<span class=\"class-type-badge\" style=\"background: #10b981; color: white;\"><i class=\"material-icons\" style=\"font-size: 16px;\">check_circle</i> Completed</span>',
+                'pending': '<span class=\"class-type-badge\" style=\"background: #f59e0b; color: white;\"><i class=\"material-icons\" style=\"font-size: 16px;\">schedule</i> Pending</span>',
+                'absent': '<span class=\"class-type-badge\" style=\"background: #ef4444; color: white;\"><i class=\"material-icons\" style=\"font-size: 16px;\">cancel</i> Absent</span>',
+                'scheduled': '<span class=\"class-type-badge\" style=\"background: #2563eb; color: white;\"><i class=\"material-icons\" style=\"font-size: 16px;\">event</i> Scheduled</span>'
+            };
+            return badges[status] || badges['scheduled'];
+        }
+        
         async function loadClassesByType() {
             const classType = document.getElementById('classTypeFilter').value;
             const container = document.getElementById('classesByTypeContainer');
@@ -1615,16 +1778,16 @@
             dayFilter.value = '';
             
             if (!classType) {
-                container.innerHTML = '<p class="text-center" style="padding: 20px; color: #64748b;">Select a class type from the dropdown above to view scheduled classes</p>';
-                dayFilterContainer.style.display = 'none';
-                currentClassesData = null;
+                // Load today's classes
+                await loadTodayClasses();
                 return;
             }
             
             try {
                 container.innerHTML = '<p class="text-center" style="padding: 20px;">Loading...</p>';
                 
-                const data = await apiRequest(`/api/admin/classes-by-type?class_type=${classType}`);
+                // Always filter by today's classes only
+                const data = await apiRequest(`/api/admin/classes-by-type?class_type=${classType}&today_only=true`);
                 
                 if (data.classes.length === 0) {
                     const typeNames = {
@@ -1632,24 +1795,17 @@
                         'lab': 'Lab',
                         'mini_project': 'Mini Project'
                     };
-                    container.innerHTML = `<p class="text-center" style="padding: 20px; color: #64748b;">No ${typeNames[classType]} classes found in the timetable.</p>`;
+                    container.innerHTML = `<p class="text-center" style="padding: 20px; color: #64748b;">No ${typeNames[classType]} classes scheduled for today.</p>`;
                     dayFilterContainer.style.display = 'none';
                     currentClassesData = null;
                     return;
                 }
                 
-                // Store data globally for day filtering
-                currentClassesData = {
-                    classType: classType,
-                    classes: data.classes,
-                    totalClasses: data.total_classes
-                };
+                // Hide day filter since we're only showing today
+                dayFilterContainer.style.display = 'none';
                 
-                // Show day filter
-                dayFilterContainer.style.display = 'block';
-                
-                // Render all classes (no day filter applied)
-                renderClasses();
+                // Render today's filtered classes
+                renderTodayFilteredClasses(data);
                 
             } catch (error) {
                 console.error('Error loading classes by type:', error);
@@ -1662,6 +1818,86 @@
         function filterByDay() {
             if (!currentClassesData) return;
             renderClasses();
+        }
+        
+        function renderTodayFilteredClasses(data) {
+            const container = document.getElementById('classesByTypeContainer');
+            const { class_type, classes } = data;
+            
+            // Sort by period
+            const sortedClasses = [...classes].sort((a, b) => a.period - b.period);
+            
+            const typeIcons = {
+                'theory': '<i class="material-icons" style="font-size: 24px; vertical-align: middle;">book</i>',
+                'lab': '<i class="material-icons" style="font-size: 24px; vertical-align: middle;">science</i>',
+                'mini_project': '<i class="material-icons" style="font-size: 24px; vertical-align: middle;">lightbulb</i>'
+            };
+            
+            const typeNames = {
+                'theory': 'Theory Classes',
+                'lab': 'Lab Classes',
+                'mini_project': 'Mini Project Classes'
+            };
+            
+            const headerIconName = class_type === 'theory' ? 'book' : class_type === 'lab' ? 'science' : 'lightbulb';
+            
+            let html = `
+                <div style="background: linear-gradient(135deg, #2563eb, #1e40af); color: white; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+                    <h3 style="margin: 0 0 5px 0; display: flex; align-items: center; gap: 10px;">
+                        <i class="material-icons" style="font-size: 28px;">${headerIconName}</i>
+                        <span>${typeNames[class_type]} - Today</span>
+                    </h3>
+                    <p style="margin: 0; opacity: 0.9; font-size: 14px;">
+                        ${sortedClasses.length} class${sortedClasses.length !== 1 ? 'es' : ''} scheduled for ${sortedClasses[0]?.day || 'today'}
+                    </p>
+                </div>
+                <div class="classes-grid">
+            `;
+            
+            sortedClasses.forEach(cls => {
+                const statusBadge = getStatusBadge(cls.status);
+                
+                html += `
+                    <div class="class-card">
+                        <div class="class-card-header">
+                            <span class="period-badge-large">${getOrdinal(cls.period)} Period</span>
+                            ${statusBadge}
+                        </div>
+                        <div class="class-card-body">
+                            <div class="class-info-row">
+                                <span class="info-icon"><i class="material-icons">school</i></span>
+                                <div class="info-content">
+                                    <div class="info-label">Faculty</div>
+                                    <div class="info-value">${cls.faculty_name}</div>
+                                </div>
+                            </div>
+                            <div class="class-info-row">
+                                <span class="info-icon"><i class="material-icons">business</i></span>
+                                <div class="info-content">
+                                    <div class="info-label">Department</div>
+                                    <div class="info-value">${cls.department_name} (${cls.department_code})</div>
+                                </div>
+                            </div>
+                            <div class="class-info-row">
+                                <span class="info-icon"><i class="material-icons">menu_book</i></span>
+                                <div class="info-content">
+                                    <div class="info-label">Subject</div>
+                                    <div class="info-value">${cls.subject_name} (${cls.subject_code})</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="class-card-footer">
+                            <a href="mailto:${cls.faculty_email}" class="contact-btn">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+                                Contact Faculty
+                            </a>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            html += '</div>';
+            container.innerHTML = html;
         }
         
         function renderClasses() {
@@ -1711,10 +1947,12 @@
                 'mini_project':'Mini Project Classes'
             };
             
+            const headerIconName = classType === 'theory' ? 'book' : classType === 'lab' ? 'science' : 'lightbulb';
+            
             let html = `
-                <div style="background: linear-gradient(135deg, #2563eb); color: white; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+                <div style="background: linear-gradient(135deg, #2563eb, #1e40af); color: white; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
                     <h3 style="margin: 0 0 5px 0; display: flex; align-items: center; gap: 10px;">
-                        <span style="font-size: 28px;"></span>
+                        <i class="material-icons" style="font-size: 28px;">${headerIconName}</i>
                         <span>${typeNames[classType]}</span>
                     </h3>
                     <p style="margin: 0; opacity: 0.9; font-size: 14px;">
@@ -1743,12 +1981,15 @@
                 `;
                 
                 classes.forEach(cls => {
-                        html += `
-                            <div class="class-card">
-                                <div class="class-card-header">
-                                    <span class="period-badge-large">${getOrdinal(cls.period)} Period</span>
-                                    <span class="class-type-badge ${classType}">${typeIcons[classType]} ${classType.replace('_', ' ').toUpperCase()}</span>
-                                </div>
+                    const statusBadge = cls.is_today ? getStatusBadge(cls.status) : 
+                        `<span class="class-type-badge ${classType}">${typeIcons[classType]} ${classType.replace('_', ' ').toUpperCase()}</span>`;
+                    
+                    html += `
+                        <div class="class-card">
+                            <div class="class-card-header">
+                                <span class="period-badge-large">${getOrdinal(cls.period)} Period</span>
+                                ${statusBadge}
+                            </div>
                                 <div class="class-card-body">
                                     <div class="class-info-row">
                                         <span class="info-icon"><i class="material-icons">school</i></span>

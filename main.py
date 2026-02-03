@@ -497,18 +497,36 @@ def get_today_summary(db: Session = Depends(get_db)):
         "swapped": swapped
     }
 
-@app.get("/api/admin/classes-by-type")
-def get_classes_by_type(class_type: str, db: Session = Depends(get_db)):
-    """Get all classes filtered by type (theory, lab, mini_project)"""
-    # Get all timetable entries of this type
+@app.get("/api/admin/today-classes")
+def get_today_classes(db: Session = Depends(get_db)):
+    """Get all classes scheduled for today with their status"""
+    today = date.today()
+    day_name = get_day_name(today)
+    
+    # Get all timetable entries for today
     entries = db.query(TimetableEntry).filter(
-        TimetableEntry.class_type == class_type
-    ).order_by(TimetableEntry.day, TimetableEntry.period).all()
+        TimetableEntry.day == day_name
+    ).order_by(TimetableEntry.period).all()
     
     result = []
     for entry in entries:
         faculty = db.query(Faculty).filter(Faculty.id == entry.faculty_id).first()
         dept = db.query(Department).filter(Department.id == entry.department_id).first()
+        
+        # Check if daily entry exists for today
+        daily_entry = db.query(DailyEntry).filter(
+            DailyEntry.faculty_id == entry.faculty_id,
+            DailyEntry.department_id == entry.department_id,
+            DailyEntry.date == today,
+            DailyEntry.period == entry.period
+        ).first()
+        
+        status = "pending"
+        if daily_entry:
+            if daily_entry.is_absent:
+                status = "absent"
+            else:
+                status = "filled"
         
         result.append({
             "id": entry.id,
@@ -522,7 +540,71 @@ def get_classes_by_type(class_type: str, db: Session = Depends(get_db)):
             "period": entry.period,
             "subject_code": entry.subject_code,
             "subject_name": entry.subject_name,
-            "class_type": entry.class_type
+            "class_type": entry.class_type,
+            "status": status,
+            "has_entry": daily_entry is not None
+        })
+    
+    return {
+        "date": today.isoformat(),
+        "day": day_name,
+        "total_classes": len(result),
+        "classes": result
+    }
+
+@app.get("/api/admin/classes-by-type")
+def get_classes_by_type(class_type: str, today_only: bool = True, db: Session = Depends(get_db)):
+    """Get classes filtered by type (theory, lab, mini_project)"""
+    today = date.today()
+    day_name = get_day_name(today)
+    
+    # Build query
+    query = db.query(TimetableEntry).filter(TimetableEntry.class_type == class_type)
+    
+    # Filter by today if requested
+    if today_only:
+        query = query.filter(TimetableEntry.day == day_name)
+    
+    entries = query.order_by(TimetableEntry.day, TimetableEntry.period).all()
+    
+    result = []
+    for entry in entries:
+        faculty = db.query(Faculty).filter(Faculty.id == entry.faculty_id).first()
+        dept = db.query(Department).filter(Department.id == entry.department_id).first()
+        
+        # Check if daily entry exists for today for this class
+        status = "scheduled"
+        if entry.day == get_day_name(today):
+            daily_entry = db.query(DailyEntry).filter(
+                DailyEntry.faculty_id == entry.faculty_id,
+                DailyEntry.department_id == entry.department_id,
+                DailyEntry.date == today,
+                DailyEntry.period == entry.period
+            ).first()
+            
+            if daily_entry:
+                if daily_entry.is_absent:
+                    status = "absent"
+                else:
+                    status = "filled"
+            else:
+                status = "pending"
+        
+        result.append({
+            "id": entry.id,
+            "faculty_id": entry.faculty_id,
+            "faculty_name": faculty.name if faculty else "Unknown",
+            "faculty_email": faculty.email if faculty else None,
+            "department_id": entry.department_id,
+            "department_name": dept.name if dept else "Unknown",
+            "department_code": dept.code if dept else "Unknown",
+            "day": entry.day,
+            "period": entry.period,
+            "subject_code": entry.subject_code,
+            "subject_name": entry.subject_name,
+            "class_type": entry.class_type,
+            "status": status,
+            "is_today": entry.day == get_day_name(today)
         })
     
     return {
