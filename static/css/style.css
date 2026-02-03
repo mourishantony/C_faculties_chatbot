@@ -1,8 +1,8 @@
 /* ============ CSS Variables ============ */
 :root {
-    --primary-color: #1e40af;
-    --primary-dark: #1e3a8a;
-    --primary-light: #3b82f6;
+    --primary-color: #0f172a;
+    --primary-dark: #020617;
+    --primary-light: #1e3a8a;
     --accent-color: #c89f7e;
     --accent-light: #d9b89a;
     --secondary-color: #6b7280;
@@ -78,7 +78,7 @@ a:hover {
 
 /* ============ Header/Navbar ============ */
 .navbar {
-    background: linear-gradient(135deg, #1e40af, #3b82f6);
+    background: linear-gradient(135deg, #0f172a, #1e3a8a);
     color: white;
     padding: 15px 0;
     box-shadow: var(--shadow);
@@ -138,7 +138,7 @@ a:hover {
 
 /* ============ Hero Section ============ */
 .hero {
-    background: linear-gradient(135deg, #1e40af, #3b82f6);
+    background: linear-gradient(135deg, #0f172a, #1e3a8a);
     color: white;
     padding: 80px 0;
     text-align: center;
@@ -456,8 +456,8 @@ textarea.form-control {
 }
 
 .status-badge.swapped {
-    background: #dbeafe;
-    color: #1e40af;
+    background: #e0e7ff;
+    color: #0f172a;
 }
 
 /* PPT Link */
@@ -466,7 +466,7 @@ textarea.form-control {
     align-items: center;
     gap: 4px;
     padding: 4px 10px;
-    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    background: linear-gradient(135deg, #1e3a8a, #0f172a);
     color: white;
     text-decoration: none;
     border-radius: 6px;
@@ -476,9 +476,9 @@ textarea.form-control {
 }
 
 .ppt-link:hover {
-    background: linear-gradient(135deg, #2563eb, #1e40af);
+    background: linear-gradient(135deg, #1e40af, #1e3a8a);
     transform: translateY(-1px);
-    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.4);
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.5);
 }
 
 /* ============ Modal ============ */
@@ -817,7 +817,7 @@ textarea.form-control {
 
 /* ============ Footer ============ */
 .footer {
-    background: linear-gradient(135deg, #1e40af, #3b82f6);
+    background: linear-gradient(135deg, #0f172a, #1e3a8a);
     color: white;
     padding: 30px 0;
     text-align: center;
