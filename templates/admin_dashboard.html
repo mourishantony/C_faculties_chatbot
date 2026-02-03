@@ -44,7 +44,7 @@
                             </div>
                             
                             <div id="dateToggleContainer" style="display: flex; gap: 8px;">
-                                <button id="todayBtn" class="btn btn-primary" onclick="switchToToday()" style="padding: 10px 20px; background: #2563eb; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">
+                                <button id="todayBtn" class="btn btn-primary" onclick="switchToToday()" style="padding: 10px 20px; background: #1e3a5f; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">
                                     Today
                                 </button>
                                 <button id="tomorrowBtn" class="btn" onclick="switchToTomorrow()" style="padding: 10px 20px; background: #f1f5f9; color: #334155; border: 1px solid #e2e8f0; border-radius: 6px; cursor: pointer; font-weight: 600;">
@@ -1204,17 +1204,17 @@
         
         .quick-tags button {
             padding: 8px 14px;
-            background: #dbeafe;
+            background: #e8eef5;
             border: none;
             border-radius: 20px;
             font-size: 12px;
             cursor: pointer;
             transition: all 0.2s;
-            color: #1e40af;
+            color: #1e3a5f;
         }
         
         .quick-tags button:hover {
-            background: #bfdbfe;
+            background: #d4dde8;
         }
         
         /* Chat Messages */
@@ -1262,15 +1262,15 @@
         }
         
         .chat-message.bot .chat-msg-avatar {
-            background: #dbeafe;
+            background: #e8eef5;
         }
         
         .chat-message.bot .chat-msg-avatar .material-icons {
-            color: #2563eb;
+            color: #1e3a5f;
         }
         
         .chat-message.user .chat-msg-avatar {
-            background: #2563eb;
+            background: #1e3a5f;
         }
         
         .chat-message.user .chat-msg-avatar .material-icons {
@@ -1292,7 +1292,7 @@
         }
         
         .chat-message.user .chat-msg-content {
-            background: #2563eb;
+            background: #1e3a5f;
             color: white;
             border-radius: 16px 16px 4px 16px;
         }
@@ -1355,14 +1355,14 @@
         }
         
         .chatbot-input-area input:focus {
-            border-color: #2563eb;
+            border-color: #1e3a5f;
         }
         
         .chatbot-input-area button {
             width: 44px;
             height: 44px;
             border-radius: 50%;
-            background: #2563eb;
+            background: #1e3a5f;
             border: none;
             color: white;
             cursor: pointer;
@@ -1374,7 +1374,7 @@
         }
         
         .chatbot-input-area button:hover {
-            background: #1d4ed8;
+            background: #2d5a87;
         }
         
         /* Typing Indicator */
@@ -1598,22 +1598,22 @@
                     if (entry.is_own_content && (entry.own_content_title || entry.own_content_summary)) {
                         // Faculty taught their own content - show both title and summary
                         const ownContentDetails = `Title: ${entry.own_content_title || 'N/A'}\n\nContent Summary:\n${entry.own_content_summary || 'N/A'}`;
-                        resourceContent = `<button onclick='showDetailModal("Own Content Details", ${JSON.stringify(ownContentDetails)})' class="ppt-link" style="border: none; background: none; cursor: pointer; color: #2563eb; text-decoration: none;"><i class="material-icons" style="font-size: 14px; vertical-align: middle;">edit_note</i> View</button>`;
+                        resourceContent = `<button onclick='showDetailModal("Own Content Details", ${JSON.stringify(ownContentDetails)})' class="ppt-link" style="border: none; background: none; cursor: pointer; color: #1e3a5f; text-decoration: none;"><i class="material-icons" style="font-size: 14px; vertical-align: middle;">edit_note</i> View</button>`;
                     } else if (entry.class_type === 'theory' && entry.ppt_url) {
                         resourceContent = `<a href="${entry.ppt_url}" target="_blank" class="ppt-link" title="Open PPT"><i class="material-icons" style="font-size: 14px; vertical-align: middle;">slideshow</i> View</a>`;
                     } else if (entry.class_type === 'lab' && entry.moodle_url) {
                         resourceContent = `<a href="${entry.moodle_url}" target="_blank" class="ppt-link" title="Open Moodle"><i class="material-icons" style="font-size: 14px; vertical-align: middle;">language</i> View</a>`;
                     } else if (entry.class_type === 'lab' && entry.lab_work_done) {
-                        resourceContent = `<button onclick='showDetailModal("Lab Work Done", ${JSON.stringify(entry.lab_work_done)})' class="ppt-link" style="border: none; background: none; cursor: pointer; color: #2563eb; text-decoration: none;"><i class="material-icons" style="font-size: 14px; vertical-align: middle;">description</i> View</button>`;
+                        resourceContent = `<button onclick='showDetailModal("Lab Work Done", ${JSON.stringify(entry.lab_work_done)})' class="ppt-link" style="border: none; background: none; cursor: pointer; color: #1e3a5f; text-decoration: none;"><i class="material-icons" style="font-size: 14px; vertical-align: middle;">description</i> View</button>`;
                     } else if (entry.class_type === 'mini_project' && entry.mini_project_progress) {
-                        resourceContent = `<button onclick='showDetailModal("Mini Project Progress", ${JSON.stringify(entry.mini_project_progress)})' class="ppt-link" style="border: none; background: none; cursor: pointer; color: #2563eb; text-decoration: none;"><i class="material-icons" style="font-size: 14px; vertical-align: middle;">assignment</i> View</button>`;
+                        resourceContent = `<button onclick='showDetailModal("Mini Project Progress", ${JSON.stringify(entry.mini_project_progress)})' class="ppt-link" style="border: none; background: none; cursor: pointer; color: #1e3a5f; text-decoration: none;"><i class="material-icons" style="font-size: 14px; vertical-align: middle;">assignment</i> View</button>`;
                     } else {
                         resourceContent = '-';
                     }
                     
                     // Summary column with View button if summary exists
                     const summaryContent = entry.summary 
-                        ? `<button onclick='showDetailModal("Summary", ${JSON.stringify(entry.summary)})' class="ppt-link" style="border: none; background: none; cursor: pointer; color: #2563eb; text-decoration: none;"><i class="material-icons" style="font-size: 14px; vertical-align: middle;">notes</i> View</button>` 
+                        ? `<button onclick='showDetailModal("Summary", ${JSON.stringify(entry.summary)})' class="ppt-link" style="border: none; background: none; cursor: pointer; color: #1e3a5f; text-decoration: none;"><i class="material-icons" style="font-size: 14px; vertical-align: middle;">notes</i> View</button>` 
                         : '-';
                     
                     html += `
@@ -1683,7 +1683,7 @@
             const tomorrowBtn = document.getElementById('tomorrowBtn');
             
             if (currentDateOffset === 0) {
-                todayBtn.style.background = '#2563eb';
+                todayBtn.style.background = '#1e3a5f';
                 todayBtn.style.color = 'white';
                 todayBtn.style.border = 'none';
                 tomorrowBtn.style.background = '#f1f5f9';
@@ -1693,7 +1693,7 @@
                 todayBtn.style.background = '#f1f5f9';
                 todayBtn.style.color = '#334155';
                 todayBtn.style.border = '1px solid #e2e8f0';
-                tomorrowBtn.style.background = '#2563eb';
+                tomorrowBtn.style.background = '#1e3a5f';
                 tomorrowBtn.style.color = 'white';
                 tomorrowBtn.style.border = 'none';
             }
@@ -1783,7 +1783,7 @@
             const scheduleLabel = currentDateOffset === 0 ? 'Today\'s Schedule' : 'Tomorrow\'s Schedule';
             
             let html = `
-                <div style=\"background: linear-gradient(135deg, #2563eb, #1e40af); color: white; padding: 15px; border-radius: 10px; margin-bottom: 20px;\">
+                <div style=\"background: linear-gradient(135deg, #1e3a5f, #2d5a87); color: white; padding: 15px; border-radius: 10px; margin-bottom: 20px;\">
                     <h3 style=\"margin: 0 0 5px 0; display: flex; align-items: center; gap: 10px;\">
                         <i class=\"material-icons\" style=\"font-size: 28px;\">event</i>
                         <span>${scheduleLabel} - ${day}</span>
@@ -1804,7 +1804,7 @@
                         <h4 style=\"background: #f1f5f9; padding: 10px 15px; border-radius: 8px; color: #1e293b; margin: 0 0 12px 0; display: flex; align-items: center; gap: 8px;\">
                             ${typeIcons[type]}
                             <span>${typeNames[type]} Classes</span>
-                            <span style=\"margin-left: auto; background: #2563eb; color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: normal;\">
+                            <span style=\"margin-left: auto; background: #1e3a5f; color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: normal;\">
                                 ${typeClasses.length} class${typeClasses.length !== 1 ? 'es' : ''}
                             </span>
                         </h4>
@@ -1867,7 +1867,7 @@
                 'filled': '<span class=\"class-type-badge\" style=\"background: #10b981; color: white;\"><i class=\"material-icons\" style=\"font-size: 16px;\">check_circle</i> Completed</span>',
                 'pending': '<span class=\"class-type-badge\" style=\"background: #f59e0b; color: white;\"><i class=\"material-icons\" style=\"font-size: 16px;\">schedule</i> Pending</span>',
                 'absent': '<span class=\"class-type-badge\" style=\"background: #ef4444; color: white;\"><i class=\"material-icons\" style=\"font-size: 16px;\">cancel</i> Absent</span>',
-                'scheduled': '<span class=\"class-type-badge\" style=\"background: #2563eb; color: white;\"><i class=\"material-icons\" style=\"font-size: 16px;\">event</i> Scheduled</span>'
+                'scheduled': '<span class=\"class-type-badge\" style=\"background: #1e3a5f; color: white;\"><i class=\"material-icons\" style=\"font-size: 16px;\">event</i> Scheduled</span>'
             };
             return badges[status] || badges['scheduled'];
         }
@@ -1948,7 +1948,7 @@
             const dateLabel = currentDateOffset === 0 ? 'Today' : 'Tomorrow';
             
             let html = `
-                <div style="background: linear-gradient(135deg, #2563eb, #1e40af); color: white; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+                <div style="background: linear-gradient(135deg, #1e3a5f, #2d5a87); color: white; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
                     <h3 style="margin: 0 0 5px 0; display: flex; align-items: center; gap: 10px;">
                         <i class="material-icons" style="font-size: 28px;">${headerIconName}</i>
                         <span>${typeNames[class_type]} - ${dateLabel}</span>
