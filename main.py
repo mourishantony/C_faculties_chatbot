@@ -498,9 +498,11 @@ def get_today_summary(db: Session = Depends(get_db)):
     }
 
 @app.get("/api/admin/today-classes")
-def get_today_classes(db: Session = Depends(get_db)):
-    """Get all classes scheduled for today with their status"""
-    today = date.today()
+def get_today_classes(date_offset: int = 0, db: Session = Depends(get_db)):
+    """Get all classes scheduled for a specific date with their status
+    date_offset: 0 for today, 1 for tomorrow, -1 for yesterday, etc.
+    """
+    today = date.today() + timedelta(days=date_offset)
     day_name = get_day_name(today)
     
     # Get all timetable entries for today
@@ -553,42 +555,40 @@ def get_today_classes(db: Session = Depends(get_db)):
     }
 
 @app.get("/api/admin/classes-by-type")
-def get_classes_by_type(class_type: str, today_only: bool = True, db: Session = Depends(get_db)):
-    """Get classes filtered by type (theory, lab, mini_project)"""
-    today = date.today()
-    day_name = get_day_name(today)
+def get_classes_by_type(class_type: str, date_offset: int = 0, db: Session = Depends(get_db)):
+    """Get classes filtered by type for a specific date
+    date_offset: 0 for today, 1 for tomorrow
+    """
+    target_date = date.today() + timedelta(days=date_offset)
+    day_name = get_day_name(target_date)
     
-    # Build query
-    query = db.query(TimetableEntry).filter(TimetableEntry.class_type == class_type)
-    
-    # Filter by today if requested
-    if today_only:
-        query = query.filter(TimetableEntry.day == day_name)
-    
-    entries = query.order_by(TimetableEntry.day, TimetableEntry.period).all()
+    # Get entries for the target day
+    entries = db.query(TimetableEntry).filter(
+        TimetableEntry.class_type == class_type,
+        TimetableEntry.day == day_name
+    ).order_by(TimetableEntry.period).all()
     
     result = []
     for entry in entries:
         faculty = db.query(Faculty).filter(Faculty.id == entry.faculty_id).first()
         dept = db.query(Department).filter(Department.id == entry.department_id).first()
         
-        # Check if daily entry exists for today for this class
+        # Check if daily entry exists for target date
+        daily_entry = db.query(DailyEntry).filter(
+            DailyEntry.faculty_id == entry.faculty_id,
+            DailyEntry.department_id == entry.department_id,
+            DailyEntry.date == target_date,
+            DailyEntry.period == entry.period
+        ).first()
+        
         status = "scheduled"
-        if entry.day == get_day_name(today):
-            daily_entry = db.query(DailyEntry).filter(
-                DailyEntry.faculty_id == entry.faculty_id,
-                DailyEntry.department_id == entry.department_id,
-                DailyEntry.date == today,
-                DailyEntry.period == entry.period
-            ).first()
-            
-            if daily_entry:
-                if daily_entry.is_absent:
-                    status = "absent"
-                else:
-                    status = "filled"
+        if daily_entry:
+            if daily_entry.is_absent:
+                status = "absent"
             else:
-                status = "pending"
+                status = "filled"
+        else:
+            status = "pending"
         
         result.append({
             "id": entry.id,
@@ -604,13 +604,15 @@ def get_classes_by_type(class_type: str, today_only: bool = True, db: Session = 
             "subject_name": entry.subject_name,
             "class_type": entry.class_type,
             "status": status,
-            "is_today": entry.day == get_day_name(today)
+            "is_today": entry.day == day_name
         })
     
     return {
         "class_type": class_type,
         "total_classes": len(result),
-        "classes": result
+        "classes": result,
+        "date": target_date.isoformat(),
+        "day": day_name
     }
 
 # ----- Chatbot Route -----

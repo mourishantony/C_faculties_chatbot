@@ -30,17 +30,26 @@
                         <h3 class="card-title"><i class="material-icons" style="vertical-align: middle; margin-right: 6px; font-size: 20px;"></i>Classes by Type</h3>
                     </div>
                     <div style="padding: 20px;">
-                        <div class="filter-group" style="display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 20px;">
+                        <div class="filter-group" style="display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 20px; align-items: flex-end;">
                             <div style="flex: 1; min-width: 200px;">
                                 <label for="classTypeFilter" style="display: block; margin-bottom: 8px; font-weight: 600; color: #334155;">
                                     Select View:
                                 </label>
                                 <select id="classTypeFilter" class="form-control" onchange="loadClassesByType()" style="padding: 10px; font-size: 14px;">
                                     <option value="">-- Today's Schedule --</option>
-                                    <option value="theory">Theory Classes (All Days)</option>
-                                    <option value="lab">Lab Classes (All Days)</option>
-                                    <option value="mini_project">Mini Project Classes (All Days)</option>
+                                    <option value="theory">Theory Classes (Today)</option>
+                                    <option value="lab">Lab Classes (Today)</option>
+                                    <option value="mini_project">Mini Project Classes (Today)</option>
                                 </select>
+                            </div>
+                            
+                            <div id="dateToggleContainer" style="display: flex; gap: 8px;">
+                                <button id="todayBtn" class="btn btn-primary" onclick="switchToToday()" style="padding: 10px 20px; background: #2563eb; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">
+                                    Today
+                                </button>
+                                <button id="tomorrowBtn" class="btn" onclick="switchToTomorrow()" style="padding: 10px 20px; background: #f1f5f9; color: #334155; border: 1px solid #e2e8f0; border-radius: 6px; cursor: pointer; font-weight: 600;">
+                                    Tomorrow
+                                </button>
                             </div>
                             
                             <div id="dayFilterContainer" style="flex: 1; min-width: 200px; display: none;">
@@ -1601,18 +1610,60 @@
         
         // Store loaded classes data globally for day filtering
         let currentClassesData = null;
+        let currentDateOffset = 0; // 0 = today, 1 = tomorrow
+        
+        function switchToToday() {
+            currentDateOffset = 0;
+            updateDateButtons();
+            loadClassesByDate();
+        }
+        
+        function switchToTomorrow() {
+            currentDateOffset = 1;
+            updateDateButtons();
+            loadClassesByDate();
+        }
+        
+        function updateDateButtons() {
+            const todayBtn = document.getElementById('todayBtn');
+            const tomorrowBtn = document.getElementById('tomorrowBtn');
+            
+            if (currentDateOffset === 0) {
+                todayBtn.style.background = '#2563eb';
+                todayBtn.style.color = 'white';
+                todayBtn.style.border = 'none';
+                tomorrowBtn.style.background = '#f1f5f9';
+                tomorrowBtn.style.color = '#334155';
+                tomorrowBtn.style.border = '1px solid #e2e8f0';
+            } else {
+                todayBtn.style.background = '#f1f5f9';
+                todayBtn.style.color = '#334155';
+                todayBtn.style.border = '1px solid #e2e8f0';
+                tomorrowBtn.style.background = '#2563eb';
+                tomorrowBtn.style.color = 'white';
+                tomorrowBtn.style.border = 'none';
+            }
+        }
+        
+        async function loadClassesByDate() {
+            const classTypeFilter = document.getElementById('classTypeFilter');
+            classTypeFilter.value = ''; // Reset type filter
+            await loadTodayClasses();
+        }
         
         async function loadTodayClasses() {
             const container = document.getElementById('classesByTypeContainer');
             const dayFilterContainer = document.getElementById('dayFilterContainer');
             
             try {
-                container.innerHTML = '<p class="text-center" style="padding: 20px;">Loading today\'s classes...</p>';
+                const dateLabel = currentDateOffset === 0 ? 'today\'s' : 'tomorrow\'s';
+                container.innerHTML = `<p class="text-center" style="padding: 20px;">Loading ${dateLabel} classes...</p>`;
                 
-                const data = await apiRequest('/api/admin/today-classes');
+                const data = await apiRequest(`/api/admin/today-classes?date_offset=${currentDateOffset}`);
                 
+                const dayLabel = currentDateOffset === 0 ? 'today' : 'tomorrow';
                 if (data.classes.length === 0) {
-                    container.innerHTML = `<p class="text-center" style="padding: 20px; color: #64748b;">No classes scheduled for today (${data.day}).</p>`;
+                    container.innerHTML = `<p class="text-center" style="padding: 20px; color: #64748b;">No classes scheduled for ${dayLabel} (${data.day}).</p>`;
                     dayFilterContainer.style.display = 'none';
                     return;
                 }
@@ -1622,9 +1673,10 @@
                     classType: 'all',
                     classes: data.classes,
                     totalClasses: data.total_classes,
-                    isToday: true,
+                    isToday: currentDateOffset === 0,
                     date: data.date,
-                    day: data.day
+                    day: data.day,
+                    dateOffset: currentDateOffset
                 };
                 
                 // Hide day filter for today view
@@ -1674,11 +1726,13 @@
                 'mini_project': 'Mini Project'
             };
             
+            const scheduleLabel = currentDateOffset === 0 ? 'Today\'s Schedule' : 'Tomorrow\'s Schedule';
+            
             let html = `
                 <div style=\"background: linear-gradient(135deg, #2563eb, #1e40af); color: white; padding: 15px; border-radius: 10px; margin-bottom: 20px;\">
                     <h3 style=\"margin: 0 0 5px 0; display: flex; align-items: center; gap: 10px;\">
-                        <span style=\"font-size: 28px;\">   </span>
-                        <span>Today's Schedule - ${day}</span>
+                        <i class=\"material-icons\" style=\"font-size: 28px;\">event</i>
+                        <span>${scheduleLabel} - ${day}</span>
                     </h3>
                     <p style=\"margin: 0; opacity: 0.9; font-size: 14px;\">
                         ${classes.length} class${classes.length !== 1 ? 'es' : ''} scheduled for ${date}
@@ -1782,16 +1836,17 @@
             try {
                 container.innerHTML = '<p class="text-center" style="padding: 20px;">Loading...</p>';
                 
-                // Always filter by today's classes only
-                const data = await apiRequest(`/api/admin/classes-by-type?class_type=${classType}&today_only=true`);
+                // Filter by current date (today or tomorrow)
+                const data = await apiRequest(`/api/admin/classes-by-type?class_type=${classType}&date_offset=${currentDateOffset}`);
                 
+                const dayLabel = currentDateOffset === 0 ? 'today' : 'tomorrow';
                 if (data.classes.length === 0) {
                     const typeNames = {
                         'theory': 'Theory',
                         'lab': 'Lab',
                         'mini_project': 'Mini Project'
                     };
-                    container.innerHTML = `<p class="text-center" style="padding: 20px; color: #64748b;">No ${typeNames[classType]} classes scheduled for today.</p>`;
+                    container.innerHTML = `<p class="text-center" style="padding: 20px; color: #64748b;">No ${typeNames[classType]} classes scheduled for ${dayLabel}.</p>`;
                     dayFilterContainer.style.display = 'none';
                     currentClassesData = null;
                     return;
@@ -1836,15 +1891,16 @@
             };
             
             const headerIconName = class_type === 'theory' ? 'book' : class_type === 'lab' ? 'science' : 'lightbulb';
+            const dateLabel = currentDateOffset === 0 ? 'Today' : 'Tomorrow';
             
             let html = `
                 <div style="background: linear-gradient(135deg, #2563eb, #1e40af); color: white; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
                     <h3 style="margin: 0 0 5px 0; display: flex; align-items: center; gap: 10px;">
                         <i class="material-icons" style="font-size: 28px;">${headerIconName}</i>
-                        <span>${typeNames[class_type]} - Today</span>
+                        <span>${typeNames[class_type]} - ${dateLabel}</span>
                     </h3>
                     <p style="margin: 0; opacity: 0.9; font-size: 14px;">
-                        ${sortedClasses.length} class${sortedClasses.length !== 1 ? 'es' : ''} scheduled for ${sortedClasses[0]?.day || 'today'}
+                        ${sortedClasses.length} class${sortedClasses.length !== 1 ? 'es' : ''} scheduled for ${data.day || sortedClasses[0]?.day || dateLabel.toLowerCase()}
                     </p>
                 </div>
                 <div class="classes-grid">
