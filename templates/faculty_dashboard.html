@@ -15,7 +15,7 @@
             font-weight: 600;
             text-transform: uppercase;
         }
-        .class-type-theory { background: #e3f2fd; color: #1565c0; }
+        .class-type-theory { background: #e0e7ff; color: #0f172a; }
         .class-type-lab { background: #fce4ec; color: #c62828; }
         .class-type-mini_project { background: #e8f5e9; color: #2e7d32; }
         
@@ -36,13 +36,13 @@
             display: inline-block;
             margin-top: 5px;
             padding: 5px 10px;
-            background: #e3f2fd;
-            color: #1565c0;
+            background: #e0e7ff;
+            color: #0f172a;
             border-radius: 5px;
             text-decoration: none;
             font-size: 0.85rem;
         }
-        .ppt-link:hover { background: #bbdefb; }
+        .ppt-link:hover { background: #c7d2fe; }
         
         /* Mobile Responsive Styles */
         @media (max-width: 768px) {
@@ -167,7 +167,7 @@
                         <p id="dateDisplay" style="color: var(--text-secondary);"></p>
                     </div>
                     <div style="display: flex; gap: 10px;">
-                        <button id="todayBtn" class="btn btn-primary" onclick="switchToToday()" style="background: linear-gradient(135deg, #2563eb, #1e40af); color: white; padding: 8px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: 500;">
+                        <button id="todayBtn" class="btn btn-primary" onclick="switchToToday()" style="background: linear-gradient(135deg, #0f172a, #1e3a8a); color: white; padding: 8px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: 500;">
                             <i class="material-icons" style="font-size: 16px; vertical-align: middle; margin-right: 4px;">today</i>Today
                         </button>
                         <button id="tomorrowBtn" class="btn" onclick="switchToTomorrow()" style="background: #e5e7eb; color: #374151; padding: 8px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: 500;">
@@ -356,7 +356,7 @@
             const title = document.getElementById('scheduleTitle');
             
             if (currentDateOffset === 0) {
-                todayBtn.style.background = 'linear-gradient(135deg, #2563eb, #1e40af)';
+                todayBtn.style.background = 'linear-gradient(135deg, #0f172a, #1e3a8a)';
                 todayBtn.style.color = 'white';
                 tomorrowBtn.style.background = '#e5e7eb';
                 tomorrowBtn.style.color = '#374151';
@@ -364,7 +364,7 @@
             } else {
                 todayBtn.style.background = '#e5e7eb';
                 todayBtn.style.color = '#374151';
-                tomorrowBtn.style.background = 'linear-gradient(135deg, #2563eb, #1e40af)';
+                tomorrowBtn.style.background = 'linear-gradient(135deg, #0f172a, #1e3a8a)';
                 tomorrowBtn.style.color = 'white';
                 title.innerHTML = '<i class="material-icons" style="vertical-align: middle; margin-right: 8px;">event</i>Tomorrow\'s Schedule';
             }

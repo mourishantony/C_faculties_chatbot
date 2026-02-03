@@ -177,12 +177,12 @@ a:hover {
 }
 
 .btn-primary {
-    background: var(--primary-color);
+    background: linear-gradient(135deg, #1e3a8a, #334155);
     color: white;
 }
 
 .btn-primary:hover {
-    background: var(--primary-dark);
+    background: linear-gradient(135deg, #0f172a, #1e3a8a);
     color: white;
     transform: translateY(-2px);
 }
@@ -425,11 +425,12 @@ textarea.form-control {
 .period-badge {
     display: inline-block;
     padding: 4px 12px;
-    background: var(--primary-color);
+    background: linear-gradient(135deg, #0f172a, #1e3a8a);
     color: white;
     border-radius: 20px;
     font-size: 0.85rem;
     font-weight: 600;
+    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.4);
 }
 
 .status-badge {

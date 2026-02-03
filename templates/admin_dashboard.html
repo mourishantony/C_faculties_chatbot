@@ -44,7 +44,7 @@
                             </div>
                             
                             <div id="dateToggleContainer" style="display: flex; gap: 8px;">
-                                <button id="todayBtn" class="btn btn-primary" onclick="switchToToday()" style="padding: 10px 20px; background: #0f172a; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">
+                                <button id="todayBtn" class="btn btn-primary" onclick="switchToToday()" style="padding: 10px 20px; background: linear-gradient(135deg, #1e3a8a, #334155); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">
                                     Today
                                 </button>
                                 <button id="tomorrowBtn" class="btn" onclick="switchToTomorrow()" style="padding: 10px 20px; background: #f1f5f9; color: #334155; border: 1px solid #e2e8f0; border-radius: 6px; cursor: pointer; font-weight: 600;">
@@ -555,7 +555,7 @@
             align-items: center;
             gap: 8px;
             padding: 8px 16px;
-            background: #0f172a;
+            background: linear-gradient(135deg, #1e3a8a, #334155);
             color: white;
             border: none;
             border-radius: 8px;
@@ -567,7 +567,7 @@
         }
         
         .contact-btn:hover {
-            background: #1e3a8a;
+            background: linear-gradient(135deg, #0f172a, #1e3a8a);
             transform: translateX(2px);
         }
         
@@ -1045,7 +1045,7 @@
             width: 60px;
             height: 60px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #0f172a, #1e3a8a);
+            background: linear-gradient(135deg, #1e3a8a, #334155);
             border: none;
             cursor: pointer;
             box-shadow: 0 4px 15px rgba(15, 23, 42, 0.55);
@@ -1057,6 +1057,7 @@
         }
         
         .chatbot-toggle-btn:hover {
+            background: linear-gradient(135deg, #0f172a, #1e3a8a);
             transform: scale(1.1);
             box-shadow: 0 6px 20px rgba(15, 23, 42, 0.65);
         }
@@ -1810,7 +1811,7 @@
             const tomorrowBtn = document.getElementById('tomorrowBtn');
             
             if (currentDateOffset === 0) {
-                todayBtn.style.background = '#0f172a';
+                todayBtn.style.background = 'linear-gradient(135deg, #1e3a8a, #334155)';
                 todayBtn.style.color = 'white';
                 todayBtn.style.border = 'none';
                 tomorrowBtn.style.background = '#f9fafb';
@@ -1820,7 +1821,7 @@
                 todayBtn.style.background = '#f9fafb';
                 todayBtn.style.color = '#374151';
                 todayBtn.style.border = '1px solid #e5e7eb';
-                tomorrowBtn.style.background = '#0f172a';
+                tomorrowBtn.style.background = 'linear-gradient(135deg, #1e3a8a, #334155)';
                 tomorrowBtn.style.color = 'white';
                 tomorrowBtn.style.border = 'none';
             }
@@ -1931,7 +1932,7 @@
                         <h4 style=\"background: #e0e7ff; padding: 10px 15px; border-radius: 8px; color: #0f172a; margin: 0 0 12px 0; display: flex; align-items: center; gap: 8px;\">
                             ${typeIcons[type]}
                             <span>${typeNames[type]} Classes</span>
-                            <span style=\"margin-left: auto; background: #0f172a; color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: normal;\">
+                            <span style=\"margin-left: auto; background: linear-gradient(135deg, #1e3a8a, #334155); color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: normal; box-shadow: 0 2px 6px rgba(15, 23, 42, 0.4);\">
                                 ${typeClasses.length} class${typeClasses.length !== 1 ? 'es' : ''}
                             </span>
                         </h4>
@@ -2206,7 +2207,7 @@
                         <h4 style="background: #e0e7ff; padding: 10px 15px; border-radius: 8px; color: #0f172a; margin: 0 0 12px 0; display: flex; align-items: center; gap: 8px;">
                             <i class="material-icons" style="font-size: 20px;">event</i>
                             <span>${day}</span>
-                            <span style="margin-left: auto; background: #0f172a; color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: normal;">
+                            <span style="margin-left: auto; background: linear-gradient(135deg, #1e3a8a, #334155); color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: normal; box-shadow: 0 2px 6px rgba(15, 23, 42, 0.4);">
                                 ${classes.length} class${classes.length !== 1 ? 'es' : ''}
                             </span>
                         </h4>
