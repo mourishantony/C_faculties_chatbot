@@ -4,8 +4,6 @@ __pycache__/
 *.pyo
 *.pyd
 .Python
-*.db
-*.sqlite
 *.log
 .DS_Store
 .env
@@ -15,5 +13,4 @@ __pycache__/
 chatbot_index.faiss
 chatbot_intents.pkl
 .idea/
-requirements.txt
 env310/

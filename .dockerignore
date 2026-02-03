@@ -8,11 +8,7 @@ venv/
 env/
 ENV/
 
-# Database
-*.db
-*.sqlite
-
-# Semantic search cache
+# Semantic search cache (removed - no longer used)
 *.faiss
 *.pkl
 
