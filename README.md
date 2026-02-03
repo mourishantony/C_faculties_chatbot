@@ -2,33 +2,33 @@
 
 A comprehensive web application for managing C Programming faculty schedules, tracking daily class entries, and providing an FAQ-based chatbot for quick information.
 
-## 🌟 Features
+##  Features
 
-### 👨‍🏫 Faculty Portal
+###  Faculty Portal
 - Secure login for 14 faculty members
 - Fill daily class schedules (Theory, Lab, Mini Project)
 - Track syllabus progress
 - View personal timetable
 
-### 📊 Admin Dashboard (Public View)
+###  Admin Dashboard (Public View)
 - View all faculty information
 - See today's schedule at a glance
 - AI chatbot for quick queries
 - No login required (secret URL access)
 
-### 👑 Super Admin Dashboard
+###  Super Admin Dashboard
 - Full CRUD operations for all database tables
 - Manage Faculties, Timetable, Syllabus, Lab Programs
 - Manage FAQs for chatbot
 - View system statistics
 
-### 🤖 FAQ-Based Chatbot
+###  FAQ-Based Chatbot
 - Answer questions using FAQs stored in database
 - Query today's schedule
 - Get faculty information
 - Access lab programs and session materials
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 - **Backend**: FastAPI (Python 3.10+)
 - **Database**: SQLite with SQLAlchemy ORM
@@ -36,7 +36,7 @@ A comprehensive web application for managing C Programming faculty schedules, tr
 - **Authentication**: JWT Tokens with bcrypt password hashing
 - **Chatbot**: FAQ-based keyword matching
 
-## 📦 Installation
+##  Installation
 
 ### Prerequisites
 - Python 3.10 or higher
@@ -82,9 +82,9 @@ A comprehensive web application for managing C Programming faculty schedules, tr
 docker-compose up --build
 ```
 
-## 🔐 Access URLs
+##  Access URLs
 
-> ⚠️ **Important**: All URLs are secret. Do not share with unauthorized users.
+>  **Important**: All URLs are secret. Do not share with unauthorized users.
 
 | Page | URL | Access |
 |------|-----|--------|
@@ -94,8 +94,7 @@ docker-compose up --build
 | Super Admin Dashboard | `/cprog_super_dash_z9y3` | After login |
 
 **Common URLs return 404:** `/`, `/login`, `/admin`, `/faculty/dashboard`
-
-## 🔑 Login Credentials
+##  Login Credentials
 
 ### Super Admin
 - **Email**: `super_admin@gmail.com`
@@ -122,7 +121,7 @@ docker-compose up --build
 | 13 | Pradeep G | MECH | pradeep.g@kgkite.ac.in |
 | 14 | Madhan S | RA | madhan.s@kgkite.ac.in |
 
-## 📁 Project Structure
+##  Project Structure
 
 ```
 C_faculties_chatbot/
@@ -146,7 +145,7 @@ C_faculties_chatbot/
     └── super_admin_dashboard.html  # Super admin CRUD
 ```
 
-## 🗄️ Database Schema
+##  Database Schema
 
 | Table | Description |
 |-------|-------------|
@@ -161,7 +160,7 @@ C_faculties_chatbot/
 | `faqs` | Chatbot FAQ data |
 | `admins` | Legacy admin table |
 
-## 🤖 Chatbot Commands
+##  Chatbot Commands
 
 The chatbot responds to natural language queries:
 
@@ -187,7 +186,7 @@ The chatbot responds to natural language queries:
 - "help" - Show all commands
 - Any FAQ question from database
 
-## 🔧 API Endpoints
+##  API Endpoints
 
 ### Public APIs
 | Method | Endpoint | Description |
@@ -218,11 +217,11 @@ The chatbot responds to natural language queries:
 | GET/POST | `/api/super-admin/departments` | Manage departments |
 | GET | `/api/super-admin/stats` | System statistics |
 
-## 📝 License
+##  License
 
 This project is for educational purposes.
 
-## 👨‍💻 Author
+##  Author
 
 C Programming Faculty Management System - KG College of Arts and Science
 
