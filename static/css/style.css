@@ -1,8 +1,8 @@
 /* ============ CSS Variables ============ */
 :root {
-    --primary-color: #4e5166;
-    --primary-dark: #3d3f52;
-    --primary-light: #6d7189;
+    --primary-color: #1e40af;
+    --primary-dark: #1e3a8a;
+    --primary-light: #3b82f6;
     --accent-color: #c89f7e;
     --accent-light: #d9b89a;
     --secondary-color: #6b7280;
@@ -78,7 +78,7 @@ a:hover {
 
 /* ============ Header/Navbar ============ */
 .navbar {
-    background: linear-gradient(135deg, #4e5166, #5d6178);
+    background: linear-gradient(135deg, #1e40af, #3b82f6);
     color: white;
     padding: 15px 0;
     box-shadow: var(--shadow);
@@ -138,7 +138,7 @@ a:hover {
 
 /* ============ Hero Section ============ */
 .hero {
-    background: linear-gradient(135deg, #4e5166, #6d7189);
+    background: linear-gradient(135deg, #1e40af, #3b82f6);
     color: white;
     padding: 80px 0;
     text-align: center;
@@ -817,7 +817,7 @@ textarea.form-control {
 
 /* ============ Footer ============ */
 .footer {
-    background: linear-gradient(135deg, #4e5166, #5d6178);
+    background: linear-gradient(135deg, #1e40af, #3b82f6);
     color: white;
     padding: 30px 0;
     text-align: center;
