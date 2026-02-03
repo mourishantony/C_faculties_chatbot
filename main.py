@@ -173,6 +173,12 @@ def get_day_name(d: date = None):
 
 # ============ API Routes ============
 
+# ----- Health Check -----
+@app.get("/")
+@app.head("/")
+async def health_check():
+    return {"status": "ok", "message": "C EDUMANAGE"}
+
 # ----- Period Timings -----
 @app.get("/api/period-timings")
 def get_period_timings(db: Session = Depends(get_db)):
