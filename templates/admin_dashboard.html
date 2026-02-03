@@ -320,73 +320,193 @@
         .classes-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 16px;
+            gap: 20px;
         }
         
         .class-card {
-            background: #e2e8f0;
+            background: #ffffff;
             border: 1px solid #e2e8f0;
-            border-radius: 12px;
+            border-radius: 16px;
             overflow: hidden;
             transition: all 0.3s ease;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
         }
         
         .class-card:hover {
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-            transform: translateY(-2px);
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+            transform: translateY(-4px);
+            border-color: #cbd5e1;
         }
         
         .class-card-header {
-            background: linear-gradient(135deg,#e2e8f0);
-            padding: 12px 16px;
+            background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+            padding: 14px 18px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             border-bottom: 2px solid #e2e8f0;
         }
         
-        /* .period-badge-large {
-            background: #6590ec;
+        .period-badge-large {
+            background: linear-gradient(135deg, #1e3a5f, #2d5a87);
             color: white;
-            padding: 6px 14px;
-            border-radius: 20px;
+            padding: 8px 16px;
+            border-radius: 25px;
             font-size: 13px;
             font-weight: 600;
+            letter-spacing: 0.3px;
+            box-shadow: 0 2px 8px rgba(30, 58, 95, 0.25);
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .period-badge {
+            background: linear-gradient(135deg, #1e3a5f, #2d5a87);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 600;
+            box-shadow: 0 2px 6px rgba(30, 58, 95, 0.2);
+            display: inline-block;
         }
         
         .class-type-badge {
-            padding: 4px 12px;
-            border-radius: 16px;
+            padding: 6px 14px;
+            border-radius: 20px;
             font-size: 11px;
             font-weight: 600;
             text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+            transition: all 0.2s ease;
         }
         
-        .class-type-badge.theory {
-            background: #dbeafe;
-            color: #1e40af;
-        } */
+        .class-type-badge:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
         
-        /* .class-type-badge.lab {
-            background: #dcfce7;
-            color: #15803d;
+        /* Status-specific badge styles */
+        .class-type-badge.status-completed {
+            background: linear-gradient(135deg, #059669, #10b981);
+            color: white;
+        }
+        
+        .class-type-badge.status-pending {
+            background: linear-gradient(135deg, #d97706, #f59e0b);
+            color: white;
+        }
+        
+        .class-type-badge.status-absent {
+            background: linear-gradient(135deg, #dc2626, #ef4444);
+            color: white;
+        }
+        
+        .class-type-badge.status-scheduled {
+            background: linear-gradient(135deg, #1e3a5f, #2d5a87);
+            color: white;
+        }
+        
+        /* Class type badges */
+        .class-type-badge.theory {
+            background: linear-gradient(135deg, #e0e7ff, #c7d2fe);
+            color: #3730a3;
+            box-shadow: 0 2px 6px rgba(99, 102, 241, 0.2);
+        }
+        
+        .class-type-badge.lab {
+            background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+            color: #065f46;
+            box-shadow: 0 2px 6px rgba(16, 185, 129, 0.2);
         }
         
         .class-type-badge.mini_project {
-            background: #fef3c7;
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
             color: #92400e;
-        } */
+            box-shadow: 0 2px 6px rgba(245, 158, 11, 0.2);
+        }
+        
+        /* Status badges for report table */
+        .status-badge {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+        }
+        
+        .status-badge.filled {
+            background: linear-gradient(135deg, #059669, #10b981);
+            color: white;
+        }
+        
+        .status-badge.absent {
+            background: linear-gradient(135deg, #dc2626, #ef4444);
+            color: white;
+        }
+        
+        .status-badge.swapped {
+            background: linear-gradient(135deg, #7c3aed, #8b5cf6);
+            color: white;
+        }
+        
+        /* Enhanced View Button */
+        .view-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 6px 14px;
+            background: linear-gradient(135deg, #1e3a5f, #2d5a87);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            box-shadow: 0 2px 6px rgba(30, 58, 95, 0.25);
+            transition: all 0.2s ease;
+        }
+        
+        .view-btn:hover {
+            background: linear-gradient(135deg, #2d5a87, #3d6a97);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px rgba(30, 58, 95, 0.35);
+            color: white;
+        }
+        
+        .view-btn .material-icons {
+            font-size: 14px;
+        }
         
         .class-card-body {
-            padding: 16px;
+            padding: 18px;
+            background: #ffffff;
         }
         
         .class-info-row {
             display: flex;
             align-items: flex-start;
-            gap: 12px;
-            margin-bottom: 14px;
+            gap: 14px;
+            margin-bottom: 16px;
+            padding: 8px 10px;
+            border-radius: 10px;
+            background: #f8fafc;
+            transition: background 0.2s ease;
+        }
+        
+        .class-info-row:hover {
+            background: #f1f5f9;
         }
         
         .class-info-row:last-child {
@@ -395,8 +515,14 @@
         
         .info-icon {
             font-size: 20px;
-            min-width: 24px;
-            text-align: center;
+            min-width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #1e3a5f, #2d5a87);
+            color: white;
+            border-radius: 8px;
         }
         
         .info-content {
@@ -404,22 +530,23 @@
         }
         
         .info-label {
-            font-size: 11px;
+            font-size: 10px;
             color: #64748b;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 2px;
+            letter-spacing: 0.8px;
+            margin-bottom: 3px;
+            font-weight: 600;
         }
         
         .info-value {
             font-size: 14px;
             color: #1e293b;
-            font-weight: 500;
+            font-weight: 600;
         }
         
         .class-card-footer {
-            padding: 12px 16px;
-            background:#e2e8f0;
+            padding: 14px 18px;
+            background: linear-gradient(135deg, #f8fafc, #f1f5f9);
             border-top: 1px solid #e2e8f0;
         }
         
@@ -1598,22 +1725,22 @@
                     if (entry.is_own_content && (entry.own_content_title || entry.own_content_summary)) {
                         // Faculty taught their own content - show both title and summary
                         const ownContentDetails = `Title: ${entry.own_content_title || 'N/A'}\n\nContent Summary:\n${entry.own_content_summary || 'N/A'}`;
-                        resourceContent = `<button onclick='showDetailModal("Own Content Details", ${JSON.stringify(ownContentDetails)})' class="ppt-link" style="border: none; background: none; cursor: pointer; color: #1e3a5f; text-decoration: none;"><i class="material-icons" style="font-size: 14px; vertical-align: middle;">edit_note</i> View</button>`;
+                        resourceContent = `<button onclick='showDetailModal("Own Content Details", ${JSON.stringify(ownContentDetails)})' class="view-btn"><i class="material-icons">edit_note</i> View</button>`;
                     } else if (entry.class_type === 'theory' && entry.ppt_url) {
-                        resourceContent = `<a href="${entry.ppt_url}" target="_blank" class="ppt-link" title="Open PPT"><i class="material-icons" style="font-size: 14px; vertical-align: middle;">slideshow</i> View</a>`;
+                        resourceContent = `<a href="${entry.ppt_url}" target="_blank" class="view-btn" title="Open PPT"><i class="material-icons">slideshow</i> View</a>`;
                     } else if (entry.class_type === 'lab' && entry.moodle_url) {
-                        resourceContent = `<a href="${entry.moodle_url}" target="_blank" class="ppt-link" title="Open Moodle"><i class="material-icons" style="font-size: 14px; vertical-align: middle;">language</i> View</a>`;
+                        resourceContent = `<a href="${entry.moodle_url}" target="_blank" class="view-btn" title="Open Moodle"><i class="material-icons">language</i> View</a>`;
                     } else if (entry.class_type === 'lab' && entry.lab_work_done) {
-                        resourceContent = `<button onclick='showDetailModal("Lab Work Done", ${JSON.stringify(entry.lab_work_done)})' class="ppt-link" style="border: none; background: none; cursor: pointer; color: #1e3a5f; text-decoration: none;"><i class="material-icons" style="font-size: 14px; vertical-align: middle;">description</i> View</button>`;
+                        resourceContent = `<button onclick='showDetailModal("Lab Work Done", ${JSON.stringify(entry.lab_work_done)})' class="view-btn"><i class="material-icons">description</i> View</button>`;
                     } else if (entry.class_type === 'mini_project' && entry.mini_project_progress) {
-                        resourceContent = `<button onclick='showDetailModal("Mini Project Progress", ${JSON.stringify(entry.mini_project_progress)})' class="ppt-link" style="border: none; background: none; cursor: pointer; color: #1e3a5f; text-decoration: none;"><i class="material-icons" style="font-size: 14px; vertical-align: middle;">assignment</i> View</button>`;
+                        resourceContent = `<button onclick='showDetailModal("Mini Project Progress", ${JSON.stringify(entry.mini_project_progress)})' class="view-btn"><i class="material-icons">assignment</i> View</button>`;
                     } else {
                         resourceContent = '-';
                     }
                     
                     // Summary column with View button if summary exists
                     const summaryContent = entry.summary 
-                        ? `<button onclick='showDetailModal("Summary", ${JSON.stringify(entry.summary)})' class="ppt-link" style="border: none; background: none; cursor: pointer; color: #1e3a5f; text-decoration: none;"><i class="material-icons" style="font-size: 14px; vertical-align: middle;">notes</i> View</button>` 
+                        ? `<button onclick='showDetailModal("Summary", ${JSON.stringify(entry.summary)})' class="view-btn"><i class="material-icons">notes</i> View</button>` 
                         : '-';
                     
                     html += `
@@ -1864,10 +1991,10 @@
         
         function getStatusBadge(status) {
             const badges = {
-                'filled': '<span class=\"class-type-badge\" style=\"background: #10b981; color: white;\"><i class=\"material-icons\" style=\"font-size: 16px;\">check_circle</i> Completed</span>',
-                'pending': '<span class=\"class-type-badge\" style=\"background: #f59e0b; color: white;\"><i class=\"material-icons\" style=\"font-size: 16px;\">schedule</i> Pending</span>',
-                'absent': '<span class=\"class-type-badge\" style=\"background: #ef4444; color: white;\"><i class=\"material-icons\" style=\"font-size: 16px;\">cancel</i> Absent</span>',
-                'scheduled': '<span class=\"class-type-badge\" style=\"background: #1e3a5f; color: white;\"><i class=\"material-icons\" style=\"font-size: 16px;\">event</i> Scheduled</span>'
+                'filled': '<span class="class-type-badge status-completed"><i class="material-icons" style="font-size: 14px;">check_circle</i> Completed</span>',
+                'pending': '<span class="class-type-badge status-pending"><i class="material-icons" style="font-size: 14px;">schedule</i> Pending</span>',
+                'absent': '<span class="class-type-badge status-absent"><i class="material-icons" style="font-size: 14px;">cancel</i> Absent</span>',
+                'scheduled': '<span class="class-type-badge status-scheduled"><i class="material-icons" style="font-size: 14px;">event</i> Scheduled</span>'
             };
             return badges[status] || badges['scheduled'];
         }
