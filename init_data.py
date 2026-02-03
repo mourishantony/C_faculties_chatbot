@@ -291,7 +291,7 @@ def init_database():
             "email": "raakesh.m@kgkite.ac.in",
             "phone": "9360758406",
             "dept": "AIML-A",
-            "image": None,
+            "image": "faculty3.jpg",
             "linkedin": "https://www.linkedin.com/in/raakesh-muthuvel",
             "github": "https://github.com/Raa96",
             "experience": "0.2",
@@ -480,11 +480,8 @@ def init_database():
     # Get faculty and department IDs
     faculties = db.query(Faculty).all()
     departments = db.query(Department).all()
-    
-    
-    # Mock timetable - distributing classes among faculties
+        
     # class_type: "theory" (1 period), "lab" (3 consecutive periods), "mini_project" (1 period)
-    # Each faculty handles their assigned department
     mock_timetable = [
         # Faculty 1 - Mr. Sathish R handles AIDS-A
         # Tuesday: Theory (1 period)
@@ -496,6 +493,7 @@ def init_database():
         {"faculty_id": 1, "dept_code": "AIDS-A", "day": "Wednesday", "period": 8, "class_type": "lab"},
         # Thursday: Theory(2 periods)
         {"faculty_id": 1, "dept_code": "AIDS-A", "day": "Thursday", "period": 8, "class_type": "theory"},
+        {"faculty_id": 1, "dept_code": "AIDS-A", "day": "Thursday", "period": 9, "class_type": "theory"},
         # Friday: Theory
         {"faculty_id": 1, "dept_code": "AIDS-A", "day": "Friday", "period": 5, "class_type": "theory"},
         # Saturday: Theory
@@ -512,7 +510,7 @@ def init_database():
         {"faculty_id": 2, "dept_code": "AIDS-B", "day": "Friday", "period": 4, "class_type": "theory"},
         {"faculty_id": 2, "dept_code": "AIDS-B", "day": "Saturday", "period": 5, "class_type": "theory"},
         
-        # Faculty 3 - Dr. Anitha M handles AIML-A
+        # Faculty 3 - Mr. Raakesh M handles AIML-A
         {"faculty_id": 3, "dept_code": "AIML-A", "day": "Monday", "period": 5, "class_type": "theory"},
         {"faculty_id": 3, "dept_code": "AIML-A", "day": "Tuesday", "period": 7, "class_type": "theory"},
         {"faculty_id": 3, "dept_code": "AIML-A", "day": "Thursday", "period": 2, "class_type": "mini_project"},
