@@ -238,11 +238,14 @@ def get_faculty_profile(faculty: Faculty = Depends(get_current_faculty)):
     }
 
 @app.get("/api/faculty/today-schedule")
-def get_today_schedule(faculty: Faculty = Depends(get_current_faculty), db: Session = Depends(get_db)):
-    today = date.today()
-    day_name = get_day_name(today)
+def get_today_schedule(date_offset: int = 0, faculty: Faculty = Depends(get_current_faculty), db: Session = Depends(get_db)):
+    """Get faculty schedule for a specific date
+    date_offset: 0 for today, 1 for tomorrow
+    """
+    target_date = date.today() + timedelta(days=date_offset)
+    day_name = get_day_name(target_date)
     
-    # Get timetable entries for today
+    # Get timetable entries for the target date
     entries = db.query(TimetableEntry).filter(
         TimetableEntry.faculty_id == faculty.id,
         TimetableEntry.day == day_name
@@ -256,7 +259,7 @@ def get_today_schedule(faculty: Faculty = Depends(get_current_faculty), db: Sess
         daily = db.query(DailyEntry).filter(
             DailyEntry.faculty_id == faculty.id,
             DailyEntry.department_id == entry.department_id,
-            DailyEntry.date == today,
+            DailyEntry.date == target_date,
             DailyEntry.period == entry.period
         ).first()
         
@@ -287,7 +290,7 @@ def get_today_schedule(faculty: Faculty = Depends(get_current_faculty), db: Sess
         })
     
     return {
-        "date": today.isoformat(),
+        "date": target_date.isoformat(),
         "day": day_name,
         "schedule": result
     }
@@ -323,16 +326,23 @@ def get_lab_programs(db: Session = Depends(get_db)):
 @app.post("/api/faculty/daily-entry")
 def submit_daily_entry(
     entry: DailyEntryCreate,
+    entry_date: Optional[str] = None,
     faculty: Faculty = Depends(get_current_faculty),
     db: Session = Depends(get_db)
 ):
-    today = date.today()
+    """Submit daily entry for a specific date
+    entry_date: ISO format date string (YYYY-MM-DD), defaults to today
+    """
+    if entry_date:
+        target_date = datetime.strptime(entry_date, "%Y-%m-%d").date()
+    else:
+        target_date = date.today()
     
     # Check if entry already exists
     existing = db.query(DailyEntry).filter(
         DailyEntry.faculty_id == faculty.id,
         DailyEntry.department_id == entry.department_id,
-        DailyEntry.date == today,
+        DailyEntry.date == target_date,
         DailyEntry.period == entry.period
     ).first()
     
@@ -357,7 +367,7 @@ def submit_daily_entry(
     daily_entry = DailyEntry(
         faculty_id=faculty.id,
         department_id=entry.department_id,
-        date=today,
+        date=target_date,
         period=entry.period,
         class_type=entry.class_type,
         syllabus_id=entry.syllabus_id,

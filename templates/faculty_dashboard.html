@@ -163,8 +163,16 @@
             <div class="container">
                 <div class="dashboard-header">
                     <div>
-                        <h1 class="dashboard-title"><i class="material-icons" style="vertical-align: middle; margin-right: 8px;">event</i>Today's Schedule</h1>
+                        <h1 class="dashboard-title" id="scheduleTitle"><i class="material-icons" style="vertical-align: middle; margin-right: 8px;">event</i>Today's Schedule</h1>
                         <p id="dateDisplay" style="color: var(--text-secondary);"></p>
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <button id="todayBtn" class="btn btn-primary" onclick="switchToToday()" style="background: linear-gradient(135deg, #2563eb, #1e40af); color: white; padding: 8px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: 500;">
+                            <i class="material-icons" style="font-size: 16px; vertical-align: middle; margin-right: 4px;">today</i>Today
+                        </button>
+                        <button id="tomorrowBtn" class="btn" onclick="switchToTomorrow()" style="background: #e5e7eb; color: #374151; padding: 8px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: 500;">
+                            <i class="material-icons" style="font-size: 16px; vertical-align: middle; margin-right: 4px;">event</i>Tomorrow
+                        </button>
                     </div>
                 </div>
 
@@ -313,6 +321,8 @@
     <script>
         let syllabusData = [];
         let labProgramsData = [];
+        let currentDateOffset = 0; // 0 = today, 1 = tomorrow
+        let currentScheduleDate = null; // Store the date we're viewing
         
         // Check auth
         if (!isLoggedIn() || getUserType() !== 'faculty') {
@@ -327,6 +337,38 @@
             await Promise.all([loadSyllabus(), loadLabPrograms()]);
             await loadSchedule();
         });
+        
+        function switchToToday() {
+            currentDateOffset = 0;
+            updateDateButtons();
+            loadSchedule();
+        }
+        
+        function switchToTomorrow() {
+            currentDateOffset = 1;
+            updateDateButtons();
+            loadSchedule();
+        }
+        
+        function updateDateButtons() {
+            const todayBtn = document.getElementById('todayBtn');
+            const tomorrowBtn = document.getElementById('tomorrowBtn');
+            const title = document.getElementById('scheduleTitle');
+            
+            if (currentDateOffset === 0) {
+                todayBtn.style.background = 'linear-gradient(135deg, #2563eb, #1e40af)';
+                todayBtn.style.color = 'white';
+                tomorrowBtn.style.background = '#e5e7eb';
+                tomorrowBtn.style.color = '#374151';
+                title.innerHTML = '<i class="material-icons" style="vertical-align: middle; margin-right: 8px;">event</i>Today\'s Schedule';
+            } else {
+                todayBtn.style.background = '#e5e7eb';
+                todayBtn.style.color = '#374151';
+                tomorrowBtn.style.background = 'linear-gradient(135deg, #2563eb, #1e40af)';
+                tomorrowBtn.style.color = 'white';
+                title.innerHTML = '<i class="material-icons" style="vertical-align: middle; margin-right: 8px;">event</i>Tomorrow\'s Schedule';
+            }
+        }
         
         async function loadSyllabus() {
             try {
@@ -422,7 +464,10 @@
         
         async function loadSchedule() {
             try {
-                const data = await apiRequest('/api/faculty/today-schedule', 'GET', null, true);
+                const data = await apiRequest(`/api/faculty/today-schedule?date_offset=${currentDateOffset}`, 'GET', null, true);
+                
+                // Store the date we're viewing for entry submission
+                currentScheduleDate = data.date;
                 
                 document.getElementById('dateDisplay').textContent = `${formatDate(data.date)}`;
                 
@@ -631,7 +676,8 @@
                 class_type: classType,
                 is_absent: document.getElementById('isAbsent').checked,
                 is_swapped: document.getElementById('isSwapped').checked,
-                swapped_with: document.getElementById('swappedWith').value || null
+                swapped_with: document.getElementById('swappedWith').value || null,
+                entry_date: currentScheduleDate // Include the date we're viewing
             };
             
             // Add class-type specific data
