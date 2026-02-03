@@ -83,16 +83,14 @@
                         <h3 class="card-title"><i class="material-icons" style="vertical-align: middle; margin-right: 6px; font-size: 20px;"></i>Daily Reports</h3>
                     </div>
                     
-                    <div class="report-filters">
-                        <div class="filter-group">
-                            <label>Start Date</label>
-                            <input type="date" id="startDate" class="form-control">
+                    <div class="report-filters" style="display: flex; gap: 15px; align-items: flex-end; flex-wrap: wrap;">
+                        <div class="filter-group" style="flex: 1; min-width: 200px; max-width: 300px;">
+                            <label style="display: block; margin-bottom: 8px; color: #64748b; font-weight: 500;">Select Date</label>
+                            <input type="date" id="reportDate" class="form-control" style="width: 100%;">
                         </div>
-                        <div class="filter-group">
-                            <label>End Date</label>
-                            <input type="date" id="endDate" class="form-control">
-                        </div>
-                        <button class="btn btn-primary" onclick="loadReport()">Load Report</button>
+                        <button class="btn btn-primary" onclick="loadReport()" style="padding: 10px 24px; white-space: nowrap;">
+                            <i class="material-icons" style="font-size: 18px; vertical-align: middle; margin-right: 6px;">search</i>Load Report
+                        </button>
                     </div>
                     
                     <div id="reportContainer">
@@ -1426,8 +1424,7 @@
         
         // Set default dates
         const today = new Date().toISOString().split('T')[0];
-        document.getElementById('startDate').value = today;
-        document.getElementById('endDate').value = today;
+        document.getElementById('reportDate').value = today;
         
         // Load data on page load
         document.addEventListener('DOMContentLoaded', async () => {
@@ -1560,17 +1557,16 @@
         }
         
         async function loadReport() {
-            const startDate = document.getElementById('startDate').value;
-            const endDate = document.getElementById('endDate').value;
+            const reportDate = document.getElementById('reportDate').value;
             
-            if (!startDate || !endDate) {
-                alert('Please select date range');
+            if (!reportDate) {
+                alert('Please select a date');
                 return;
             }
             
             try {
                 showLoading();
-                const data = await apiRequest(`/api/admin/report?start_date=${startDate}&end_date=${endDate}`);
+                const data = await apiRequest(`/api/admin/report?start_date=${reportDate}&end_date=${reportDate}`);
                 hideLoading();
                 
                 const container = document.getElementById('reportContainer');
@@ -1599,7 +1595,11 @@
                     
                     // Determine resource content based on class type
                     let resourceContent = '';
-                    if (entry.class_type === 'theory' && entry.ppt_url) {
+                    if (entry.is_own_content && (entry.own_content_title || entry.own_content_summary)) {
+                        // Faculty taught their own content - show both title and summary
+                        const ownContentDetails = `Title: ${entry.own_content_title || 'N/A'}\n\nContent Summary:\n${entry.own_content_summary || 'N/A'}`;
+                        resourceContent = `<button onclick='showDetailModal("Own Content Details", ${JSON.stringify(ownContentDetails)})' class="ppt-link" style="border: none; background: none; cursor: pointer; color: #2563eb; text-decoration: none;"><i class="material-icons" style="font-size: 14px; vertical-align: middle;">edit_note</i> View</button>`;
+                    } else if (entry.class_type === 'theory' && entry.ppt_url) {
                         resourceContent = `<a href="${entry.ppt_url}" target="_blank" class="ppt-link" title="Open PPT"><i class="material-icons" style="font-size: 14px; vertical-align: middle;">slideshow</i> View</a>`;
                     } else if (entry.class_type === 'lab' && entry.moodle_url) {
                         resourceContent = `<a href="${entry.moodle_url}" target="_blank" class="ppt-link" title="Open Moodle"><i class="material-icons" style="font-size: 14px; vertical-align: middle;">language</i> View</a>`;
