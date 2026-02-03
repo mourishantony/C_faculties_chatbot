@@ -316,7 +316,8 @@ def get_lab_programs(db: Session = Depends(get_db)):
         "id": p.id,
         "program_number": p.program_number,
         "program_title": p.program_title,
-        "description": p.description
+        "description": p.description,
+        "moodle_url": p.moodle_url
     } for p in programs]
 
 @app.post("/api/faculty/daily-entry")
