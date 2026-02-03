@@ -148,10 +148,10 @@ class FAQChatbot:
             .all()
         
         if not entries:
-            return f"📅 No C Programming classes in **Period {period}** on **{day_name}**."
+            return f"No C Programming classes in **Period {period}** on **{day_name}**."
         
         period_time = get_period_time(period, self.db)
-        response = f"📅 **Period {period} ({period_time}) - {day_name}:**\n\n"
+        response = f"**Period {period} ({period_time}) - {day_name}:**\n\n"
         
         for entry, faculty, dept in entries:
             response += f"• **{faculty.name}** - {dept.code} ({entry.class_type})\n"
@@ -181,9 +181,9 @@ class FAQChatbot:
             .all()
         
         if not entries:
-            return f"📅 No C Programming classes scheduled for **{day_name}**."
+            return f"No C Programming classes scheduled for **{day_name}**."
         
-        response = f"📅 **C Programming Classes for {day_name}:**\n\n"
+        response = f"**C Programming Classes for {day_name}:**\n\n"
         
         # Group by period
         from collections import defaultdict
@@ -225,9 +225,9 @@ class FAQChatbot:
             .all()
         
         if not entries:
-            return f"📅 **{faculty.name}** has no classes scheduled for **{day_name}**."
+            return f"**{faculty.name}** has no classes scheduled for **{day_name}**."
         
-        response = f"📅 **{faculty.name}'s Schedule for {day_name}:**\n\n"
+        response = f"**{faculty.name}'s Schedule for {day_name}:**\n\n"
         
         for entry, dept in entries:
             period_time = get_period_time(entry.period, self.db)
@@ -273,9 +273,9 @@ class FAQChatbot:
             .all()
         
         if not entries:
-            return f"📅 No C Programming classes for **{dept_code}** on **{day_name}**."
+            return f"No C Programming classes for **{dept_code}** on **{day_name}**."
         
-        response = f"📅 **{dept_code} Schedule for {day_name}:**\n\n"
+        response = f"**{dept_code} Schedule for {day_name}:**\n\n"
         
         for entry, faculty, dept in entries:
             period_time = get_period_time(entry.period, self.db)
@@ -316,13 +316,12 @@ class FAQChatbot:
             .order_by(TimetableEntry.period)\
             .all()
         
-        type_emoji = "🔬" if class_type == "lab" else "📖" if class_type == "theory" else "📝"
         type_title = class_type.replace("_", " ").title()
         
         if not entries:
-            return f"{type_emoji} No **{type_title}** classes scheduled for **{day_name}**."
+            return f"No **{type_title}** classes scheduled for **{day_name}**."
         
-        response = f"{type_emoji} **{type_title} Classes for {day_name}:**\n\n"
+        response = f"**{type_title} Classes for {day_name}:**\n\n"
         
         # Group by period
         from collections import defaultdict
@@ -375,7 +374,7 @@ class FAQChatbot:
             .all()
         
         if not absent_entries:
-            return f"✅ **No absentees today ({day_name})!**\n\nAll faculty members are present."
+            return f"**No absentees today ({day_name})!**\n\nAll faculty members are present."
         
         # Get unique faculty who are absent
         absent_faculty = {}
@@ -383,7 +382,7 @@ class FAQChatbot:
             if faculty.id not in absent_faculty:
                 absent_faculty[faculty.id] = faculty
         
-        response = f"🚫 **Absent Faculty on {day_name}:**\n\n"
+        response = f"**Absent Faculty on {day_name}:**\n\n"
         for faculty in absent_faculty.values():
             dept_code = faculty.department if faculty.department else "N/A"
             response += f"• **{faculty.name}** ({dept_code})\n"
@@ -421,7 +420,7 @@ class FAQChatbot:
         depts_with_classes = self.db.query(TimetableEntry.department_id)\
             .filter(TimetableEntry.day == day_name).distinct().count()
         
-        response = f"📊 **Today's Summary ({day_name}):**\n\n"
+        response = f"**Today's Summary ({day_name}):**\n\n"
         response += f"**Classes:**\n"
         response += f"• Total Classes: **{total_entries}**\n"
         response += f"• Theory Classes: **{theory_count}**\n"
@@ -463,7 +462,7 @@ class FAQChatbot:
             # No daily entries yet, show syllabus overview
             syllabus = self.db.query(Syllabus).order_by(Syllabus.session_number).limit(5).all()
             if syllabus:
-                response = f"📚 **Topics Overview (No entries for {day_name} yet):**\n\n"
+                response = f"**Topics Overview (No entries for {day_name} yet):**\n\n"
                 response += "Faculty members haven't logged their sessions yet. Here are upcoming topics:\n\n"
                 for s in syllabus:
                     response += f"• **Session {s.session_number}:** {s.session_title}\n"
@@ -471,7 +470,7 @@ class FAQChatbot:
                 return response
             return "No syllabus information available."
         
-        response = f"📚 **Topics Covered on {day_name}:**\n\n"
+        response = f"**Topics Covered on {day_name}:**\n\n"
         
         for entry, faculty, dept, syllabus in entries:
             response += f"• **{faculty.name}** ({dept.code}):\n"
@@ -496,7 +495,7 @@ class FAQChatbot:
     
     def _greeting_response(self) -> str:
         """Return greeting message"""
-        return """👋 **Hello! Welcome to C Programming Assistant!**
+        return """**Hello! Welcome to C Programming Assistant!**
 
 I can help you with:
 • Today's class schedule
@@ -509,7 +508,7 @@ Type **help** to see all commands!"""
     
     def _help_response(self) -> str:
         """Return help message"""
-        return """📚 **C Programming Chatbot - Help**
+        return """**C Programming Chatbot - Help**
 
 **Schedule Queries:**
 • "Who has class today?"
@@ -544,7 +543,7 @@ Type **help** to see all commands!"""
     
     def _default_response(self) -> str:
         """Return default response when no match found"""
-        return """🤔 I couldn't find an answer to that question.
+        return """I couldn't find an answer to that question.
 
 Try asking about:
 • Today's schedule
@@ -564,9 +563,9 @@ Or type **help** for more options!"""
             .all()
         
         if not entries:
-            return f"📅 No C Programming classes scheduled for **{day_name}**."
+            return f"No C Programming classes scheduled for **{day_name}**."
         
-        response = f"📅 **C Programming Classes for {day_name}:**\n\n"
+        response = f"**C Programming Classes for {day_name}:**\n\n"
         
         faculty_seen = set()
         for entry, faculty, dept in entries:
@@ -615,7 +614,7 @@ Or type **help** for more options!"""
         
         _, faculty, dept = entry
         
-        response = f"👨‍🏫 **Faculty for {dept.name}:**\n\n"
+        response = f"**Faculty for {dept.name}:**\n\n"
         response += f"**Name:** {faculty.name}\n"
         response += f"**Email:** {faculty.email}\n"
         response += f"**Phone:** {faculty.phone}\n"
@@ -635,7 +634,7 @@ Or type **help** for more options!"""
         if not entries:
             return f"**{faculty.name}** has no scheduled classes."
         
-        response = f"👨‍🏫 **Schedule for {faculty.name}:**\n\n"
+        response = f"**Schedule for {faculty.name}:**\n\n"
         
         from collections import defaultdict
         schedule_by_day = defaultdict(list)
@@ -659,7 +658,7 @@ Or type **help** for more options!"""
         if not faculties:
             return "No faculties found."
         
-        response = f"👥 **All Faculties ({len(faculties)}):**\n\n"
+        response = f"**All Faculties ({len(faculties)}):**\n\n"
         for i, fac in enumerate(faculties, 1):
             response += f"{i}. **{fac.name}** - {fac.department or 'N/A'}\n"
         
@@ -672,7 +671,7 @@ Or type **help** for more options!"""
         if not program:
             return f"No lab program found for week {week_num}."
         
-        response = f"🔬 **Lab Program - Week {week_num}:**\n\n"
+        response = f"**Lab Program - Week {week_num}:**\n\n"
         response += f"**Title:** {program.program_title}\n"
         if program.description:
             response += f"**Description:** {program.description}\n"
@@ -688,7 +687,7 @@ Or type **help** for more options!"""
         if not session:
             return f"No session {session_num} found."
         
-        response = f"📊 **Session {session_num}:**\n\n"
+        response = f"**Session {session_num}:**\n\n"
         response += f"**Topic:** {session.session_title}\n"
         response += f"**Unit:** {session.unit}\n"
         if session.topics:
@@ -751,7 +750,7 @@ Or type **help** for more options!"""
         
         # Return if we have a reasonable match
         if best_match and best_score >= 10:
-            return f"💡 **{best_match.question}**\n\n{best_match.answer}"
+            return f"**{best_match.question}**\n\n{best_match.answer}"
         
         return None
 
