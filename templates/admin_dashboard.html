@@ -16,8 +16,7 @@
                     <i class="material-icons">computer</i> C Faculty Manager
                 </a>
                 <ul class="navbar-nav">
-                    <li><span style="color: white; display: flex; align-items: center; gap: 6px;"><i class="material-icons" style="font-size: 20px;">person</i> Admin</span></li>
-                    <li><a href="#" onclick="logout()" class="nav-btn">Logout</a></li>
+                    <li><span style="color: white; display: flex; align-items: center; gap: 6px;"><i class="material-icons" style="font-size: 20px;">visibility</i> Public View</span></li>
                 </ul>
             </div>
         </nav>
@@ -1401,10 +1400,7 @@
         // Global variables
         let chatStarted = false;
         
-        // Check auth
-        if (!isLoggedIn() || getUserType() !== 'admin') {
-            window.location.href = '/';
-        }
+        // No authentication required for admin dashboard - public access
         
         // Set default dates
         const today = new Date().toISOString().split('T')[0];

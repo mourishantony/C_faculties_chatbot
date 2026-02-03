@@ -542,7 +542,7 @@
         const userType = localStorage.getItem('userType');
         
         if (!token || userType !== 'super_admin') {
-            window.location.href = '/';
+            window.location.href = '/cprog_portal_m2p8';
         }
 
         // Data storage
@@ -570,7 +570,7 @@
             const response = await fetch(endpoint, options);
             if (response.status === 401) {
                 localStorage.clear();
-                window.location.href = '/';
+                window.location.href = '/cprog_portal_m2p8';
                 return;
             }
             

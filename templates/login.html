@@ -99,7 +99,7 @@
         localStorage.removeItem('userType');
         localStorage.removeItem('userName');
         
-        // Unified Login Handler
+        // Unified Login Handler (Faculty and Super Admin only - Admin is public)
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
@@ -115,13 +115,10 @@
                 
                 if (result.user_type === 'super_admin') {
                     localStorage.setItem('userName', 'Super Admin');
-                    window.location.href = '/super-admin/dashboard';
-                } else if (result.user_type === 'admin') {
-                    localStorage.setItem('userName', 'Admin');
-                    window.location.href = '/admin/dashboard';
+                    window.location.href = '/cprog_super_dash_z9y3';
                 } else {
                     localStorage.setItem('userName', result.faculty_name);
-                    window.location.href = '/faculty/dashboard';
+                    window.location.href = '/cprog_faculty_dash_q4w1';
                 }
             } catch (error) {
                 hideLoading();

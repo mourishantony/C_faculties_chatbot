@@ -217,7 +217,9 @@ def login_admin(data: AdminLogin, db: Session = Depends(get_db)):
 
 @app.post("/api/login")
 def unified_login(data: UnifiedLogin, db: Session = Depends(get_db)):
-    """Single login endpoint for faculty, admin, and super_admin using email."""
+    """Single login endpoint for faculty and super_admin using email.
+    Note: Admin dashboard is publicly accessible, no login required.
+    """
     # Try super_admin first
     super_admin = db.query(SuperAdmin).filter(SuperAdmin.username == data.email).first()
     if super_admin and verify_password(data.password, super_admin.password):
@@ -237,16 +239,6 @@ def unified_login(data: UnifiedLogin, db: Session = Depends(get_db)):
             "token_type": "bearer",
             "user_type": "faculty",
             "faculty_name": faculty.name,
-        }
-
-    # Then try admin (username stores admin email)
-    admin = db.query(Admin).filter(Admin.username == data.email).first()
-    if admin and verify_password(data.password, admin.password):
-        token = create_access_token({"sub": str(admin.id), "type": "admin"})
-        return {
-            "access_token": token,
-            "token_type": "bearer",
-            "user_type": "admin",
         }
 
     raise HTTPException(status_code=401, detail="Invalid credentials")
@@ -1077,22 +1069,38 @@ def super_admin_get_stats(
         "active_faqs": db.query(FAQ).filter(FAQ.is_active == True).count()
     }
 
-# ============ HTML Page Routes ============
-@app.get("/", response_class=HTMLResponse)
+# ============ HTML Page Routes (Secret URLs) ============
+# Secret Login Page for Faculty & Super Admin
+@app.get("/cprog_portal_m2p8", response_class=HTMLResponse)
 def login_page(request: Request):
     return templates.TemplateResponse("login.html", {"request": request})
 
-@app.get("/faculty/dashboard", response_class=HTMLResponse)
+# Secret Faculty Dashboard
+@app.get("/cprog_faculty_dash_q4w1", response_class=HTMLResponse)
 def faculty_dashboard_page(request: Request):
     return templates.TemplateResponse("faculty_dashboard.html", {"request": request})
 
-@app.get("/admin/dashboard", response_class=HTMLResponse)
+# Secret Admin Dashboard (Public View)
+@app.get("/cprog_admin_view_x7k9", response_class=HTMLResponse)
 def admin_dashboard_page(request: Request):
     return templates.TemplateResponse("admin_dashboard.html", {"request": request})
 
-@app.get("/super-admin/dashboard", response_class=HTMLResponse)
+# Secret Super Admin Dashboard
+@app.get("/cprog_super_dash_z9y3", response_class=HTMLResponse)
 def super_admin_dashboard_page(request: Request):
     return templates.TemplateResponse("super_admin_dashboard.html", {"request": request})
+
+# ============ 404 for Old/Common URLs ============
+@app.get("/", response_class=HTMLResponse)
+@app.get("/login", response_class=HTMLResponse)
+@app.get("/admin", response_class=HTMLResponse)
+@app.get("/admin/dashboard", response_class=HTMLResponse)
+@app.get("/faculty/dashboard", response_class=HTMLResponse)
+@app.get("/super-admin/dashboard", response_class=HTMLResponse)
+@app.get("/faculty/login", response_class=HTMLResponse)
+@app.get("/admin/login", response_class=HTMLResponse)
+def return_404(request: Request):
+    raise HTTPException(status_code=404, detail="Not Found")
 
 if __name__ == "__main__":
     import uvicorn

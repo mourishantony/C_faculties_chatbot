@@ -9,7 +9,7 @@ async function apiRequest(endpoint, method = 'GET', data = null, requireAuth = f
     if (requireAuth) {
         const token = localStorage.getItem('token');
         if (!token) {
-            window.location.href = '/faculty/login';
+            window.location.href = '/cprog_portal_m2p8';
             return;
         }
         headers['Authorization'] = `Bearer ${token}`;
@@ -36,8 +36,7 @@ async function apiRequest(endpoint, method = 'GET', data = null, requireAuth = f
                 localStorage.removeItem('token');
                 localStorage.removeItem('userType');
                 localStorage.removeItem('userName');
-                const userType = localStorage.getItem('userType');
-                window.location.href = userType === 'admin' ? '/admin/login' : '/faculty/login';
+                window.location.href = '/cprog_portal_m2p8';
                 return;
             }
             throw new Error(result.detail || 'Invalid credentials');
@@ -101,7 +100,7 @@ function logout() {
     localStorage.removeItem('token');
     localStorage.removeItem('userType');
     localStorage.removeItem('userName');
-    window.location.href = '/';
+    window.location.href = '/cprog_portal_m2p8';
 }
 
 // ============ Format Functions ============
