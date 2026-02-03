@@ -564,7 +564,7 @@ def _init_all_data(db):
         faculty = Faculty(
             name=faculty_data["name"],
             email=faculty_data["email"],
-            password=pwd_context.hash("password123"),  # Default password
+            password=pwd_context.hash("Kgisl@12345"),  # Default password
             phone=faculty_data["phone"],
             image_url=f"/static/images/{faculty_data['image']}",
             linkedin_url=faculty_data["linkedin"],
@@ -783,7 +783,7 @@ def _init_all_data(db):
     print("Login Credentials:")
     print("="*50)
     print("  Super Admin: super_admin@gmail.com / superadmin123")
-    print("  Faculty: <email> / password123")
+    print("  Faculty: <email> / Kgisl@12345")
     print("\n⚠️  Old URLs (/, /login, /admin, etc.) return 404!")
 
 if __name__ == "__main__":
