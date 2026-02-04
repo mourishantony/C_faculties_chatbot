@@ -43,13 +43,14 @@
                                 </select>
                             </div>
                             
-                            <div id="dateToggleContainer" style="display: flex; gap: 8px;">
-                                <button id="todayBtn" class="btn btn-primary" onclick="switchToToday()" style="padding: 10px 20px; background: linear-gradient(135deg, #1e3a8a, #334155); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">
-                                    Today
-                                </button>
-                                <button id="tomorrowBtn" class="btn" onclick="switchToTomorrow()" style="padding: 10px 20px; background: #f1f5f9; color: #334155; border: 1px solid #e2e8f0; border-radius: 6px; cursor: pointer; font-weight: 600;">
-                                    Tomorrow
-                                </button>
+                            <div id="dateToggleContainer" class="day-buttons-container">
+                                <button id="sunBtn" class="day-btn" data-day="0" onclick="switchToDay(0)">Sun</button>
+                                <button id="monBtn" class="day-btn" data-day="1" onclick="switchToDay(1)">Mon</button>
+                                <button id="tueBtn" class="day-btn" data-day="2" onclick="switchToDay(2)">Tue</button>
+                                <button id="wedBtn" class="day-btn" data-day="3" onclick="switchToDay(3)">Wed</button>
+                                <button id="thuBtn" class="day-btn" data-day="4" onclick="switchToDay(4)">Thu</button>
+                                <button id="friBtn" class="day-btn" data-day="5" onclick="switchToDay(5)">Fri</button>
+                                <button id="satBtn" class="day-btn" data-day="6" onclick="switchToDay(6)">Sat</button>
                             </div>
                             
                             <div id="dayFilterContainer" style="flex: 1; min-width: 200px; display: none;">
@@ -316,11 +317,155 @@
             font-size: 24px;
         }
         
+        /* ========== Day Buttons ========== */
+        .day-buttons-container {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .day-btn {
+            padding: 10px 14px;
+            background: #f1f5f9;
+            color: #334155;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            transition: all 0.2s ease;
+            min-width: 50px;
+        }
+        
+        .day-btn:hover {
+            background: #e2e8f0;
+            border-color: #cbd5e1;
+        }
+        
+        .day-btn.active {
+            background: linear-gradient(135deg, #1e3a8a, #334155);
+            color: white;
+            border: none;
+            box-shadow: 0 2px 8px rgba(30, 58, 138, 0.4);
+        }
+        
         /* ========== Classes Grid ========== */
         .classes-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
             gap: 20px;
+            justify-content: center;
+            justify-items: center;
+        }
+        
+        /* ========== Filter Group Mobile ========== */
+        .filter-group {
+            width: 100%;
+        }
+        
+        /* ========== Mobile Responsive for Admin ========== */
+        @media (max-width: 768px) {
+            .filter-group {
+                flex-direction: column !important;
+                align-items: stretch !important;
+            }
+            
+            .filter-group > div {
+                width: 100% !important;
+                min-width: unset !important;
+                max-width: 100% !important;
+            }
+            
+            .day-buttons-container {
+                justify-content: center;
+                width: 100%;
+                padding: 10px 0;
+            }
+            
+            .day-btn {
+                padding: 8px 10px;
+                font-size: 12px;
+                min-width: 42px;
+            }
+            
+            .classes-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+                padding: 0 5px;
+            }
+            
+            .class-card {
+                width: 100%;
+                max-width: 100%;
+            }
+            
+            .class-card-header {
+                flex-direction: column;
+                gap: 10px;
+                align-items: flex-start;
+                padding: 12px 14px;
+            }
+            
+            .period-badge-large {
+                padding: 6px 12px;
+                font-size: 12px;
+            }
+            
+            .class-type-badge {
+                padding: 5px 10px;
+                font-size: 10px;
+            }
+            
+            .class-card-body {
+                padding: 14px;
+            }
+            
+            .class-info-row {
+                padding: 6px 8px;
+                margin-bottom: 10px;
+            }
+            
+            .info-value {
+                font-size: 13px;
+            }
+            
+            .info-label {
+                font-size: 9px;
+            }
+            
+            .contact-btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .day-buttons-container {
+                gap: 4px;
+            }
+            
+            .day-btn {
+                padding: 6px 8px;
+                font-size: 11px;
+                min-width: 38px;
+            }
+            
+            .classes-grid {
+                padding: 0;
+            }
+            
+            .class-card-header {
+                padding: 10px 12px;
+            }
+            
+            .class-card-body {
+                padding: 12px;
+            }
+            
+            .class-card-footer {
+                padding: 12px;
+            }
         }
         
         .class-card {
@@ -1559,6 +1704,9 @@
             await loadSummary();
             await loadFaculties();
             await loadReport();
+            
+            // Initialize day buttons with today selected
+            initializeDayButtons();
             await loadTodayClasses(); // Load today's classes by default
             
             // Add touch support for flip cards on mobile
@@ -1792,39 +1940,55 @@
         
         // Store loaded classes data globally for day filtering
         let currentClassesData = null;
-        let currentDateOffset = 0; // 0 = today, 1 = tomorrow
+        let currentDateOffset = 0; // Offset from today (0 = today)
+        let currentSelectedDayOfWeek = new Date().getDay(); // 0 = Sunday, 6 = Saturday
         
-        function switchToToday() {
-            currentDateOffset = 0;
-            updateDateButtons();
-            loadClassesByDate();
-        }
+        const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        const dayBtnIds = ['sunBtn', 'monBtn', 'tueBtn', 'wedBtn', 'thuBtn', 'friBtn', 'satBtn'];
         
-        function switchToTomorrow() {
-            currentDateOffset = 1;
-            updateDateButtons();
-            loadClassesByDate();
-        }
-        
-        function updateDateButtons() {
-            const todayBtn = document.getElementById('todayBtn');
-            const tomorrowBtn = document.getElementById('tomorrowBtn');
-            
-            if (currentDateOffset === 0) {
-                todayBtn.style.background = 'linear-gradient(135deg, #1e3a8a, #334155)';
-                todayBtn.style.color = 'white';
-                todayBtn.style.border = 'none';
-                tomorrowBtn.style.background = '#f9fafb';
-                tomorrowBtn.style.color = '#374151';
-                tomorrowBtn.style.border = '1px solid #e5e7eb';
-            } else {
-                todayBtn.style.background = '#f9fafb';
-                todayBtn.style.color = '#374151';
-                todayBtn.style.border = '1px solid #e5e7eb';
-                tomorrowBtn.style.background = 'linear-gradient(135deg, #1e3a8a, #334155)';
-                tomorrowBtn.style.color = 'white';
-                tomorrowBtn.style.border = 'none';
+        // Calculate date offset from today based on selected day of week
+        function calculateDateOffset(targetDayOfWeek) {
+            const today = new Date();
+            const todayDay = today.getDay();
+            let diff = targetDayOfWeek - todayDay;
+            // If the target day has passed this week, go to next week
+            if (diff < 0) {
+                diff += 7;
             }
+            return diff;
+        }
+        
+        function switchToDay(dayOfWeek) {
+            currentSelectedDayOfWeek = dayOfWeek;
+            currentDateOffset = calculateDateOffset(dayOfWeek);
+            updateDayButtons();
+            loadClassesByDate();
+        }
+        
+        function updateDayButtons() {
+            // Remove active class from all buttons
+            dayBtnIds.forEach((btnId, index) => {
+                const btn = document.getElementById(btnId);
+                if (btn) {
+                    btn.classList.remove('active');
+                }
+            });
+            
+            // Add active class to selected button
+            const selectedBtnId = dayBtnIds[currentSelectedDayOfWeek];
+            const selectedBtn = document.getElementById(selectedBtnId);
+            if (selectedBtn) {
+                selectedBtn.classList.add('active');
+            }
+        }
+        
+        // Initialize with today's day selected on page load
+        function initializeDayButtons() {
+            const today = new Date();
+            const todayDay = today.getDay();
+            currentSelectedDayOfWeek = todayDay;
+            currentDateOffset = 0;
+            updateDayButtons();
         }
         
         async function loadClassesByDate() {
@@ -1838,14 +2002,13 @@
             const dayFilterContainer = document.getElementById('dayFilterContainer');
             
             try {
-                const dateLabel = currentDateOffset === 0 ? 'today\'s' : 'tomorrow\'s';
-                container.innerHTML = `<p class="text-center" style="padding: 20px;">Loading ${dateLabel} classes...</p>`;
+                const dayLabel = dayNames[currentSelectedDayOfWeek];
+                container.innerHTML = `<p class="text-center" style="padding: 20px;">Loading ${dayLabel}'s classes...</p>`;
                 
                 const data = await apiRequest(`/api/admin/today-classes?date_offset=${currentDateOffset}`);
                 
-                const dayLabel = currentDateOffset === 0 ? 'today' : 'tomorrow';
                 if (data.classes.length === 0) {
-                    container.innerHTML = `<p class="text-center" style="padding: 20px; color: #64748b;">No classes scheduled for ${dayLabel} (${data.day}).</p>`;
+                    container.innerHTML = `<p class="text-center" style="padding: 20px; color: #64748b;">No classes scheduled for ${dayLabel} (${data.date}).</p>`;
                     dayFilterContainer.style.display = 'none';
                     return;
                 }
@@ -1868,8 +2031,8 @@
                 renderTodayClasses(data);
                 
             } catch (error) {
-                console.error('Error loading today\'s classes:', error);
-                container.innerHTML = '<div class="alert alert-error">Failed to load today\'s classes. Please try again.</div>';
+                console.error('Error loading classes:', error);
+                container.innerHTML = '<div class="alert alert-error">Failed to load classes. Please try again.</div>';
                 dayFilterContainer.style.display = 'none';
             }
         }
@@ -1908,13 +2071,13 @@
                 'mini_project': 'Mini Project'
             };
             
-            const scheduleLabel = currentDateOffset === 0 ? 'Today\'s Schedule' : 'Tomorrow\'s Schedule';
+            const scheduleLabel = currentDateOffset === 0 ? 'Today\'s Schedule' : `${dayNames[currentSelectedDayOfWeek]}'s Schedule`;
             
             let html = `
                 <div style=\"background: linear-gradient(135deg, #0f172a, #1e3a8a); color: white; padding: 15px; border-radius: 10px; margin-bottom: 20px;\">
                     <h3 style=\"margin: 0 0 5px 0; display: flex; align-items: center; gap: 10px;\">
                         <i class=\"material-icons\" style=\"font-size: 28px;\">event</i>
-                        <span>${scheduleLabel} - ${day}</span>
+                        <span>${scheduleLabel}</span>
                     </h3>
                     <p style=\"margin: 0; opacity: 0.9; font-size: 14px;\">
                         ${classes.length} class${classes.length !== 1 ? 'es' : ''} scheduled for ${date}
@@ -2021,7 +2184,7 @@
                 // Filter by current date (today or tomorrow)
                 const data = await apiRequest(`/api/admin/classes-by-type?class_type=${classType}&date_offset=${currentDateOffset}`);
                 
-                const dayLabel = currentDateOffset === 0 ? 'today' : 'tomorrow';
+                const dayLabel = currentDateOffset === 0 ? 'today' : dayNames[currentSelectedDayOfWeek];
                 if (data.classes.length === 0) {
                     const typeNames = {
                         'theory': 'Theory',
@@ -2073,7 +2236,7 @@
             };
             
             const headerIconName = class_type === 'theory' ? 'book' : class_type === 'lab' ? 'science' : 'lightbulb';
-            const dateLabel = currentDateOffset === 0 ? 'Today' : 'Tomorrow';
+            const dateLabel = currentDateOffset === 0 ? 'Today' : dayNames[currentSelectedDayOfWeek];
             
             let html = `
                 <div style="background: linear-gradient(135deg, #0f172a, #1e3a8a); color: white; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
