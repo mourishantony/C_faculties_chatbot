@@ -469,6 +469,7 @@
                 
                 // Store the date we're viewing for entry submission
                 currentScheduleDate = data.date;
+                console.log('Schedule loaded for date:', currentScheduleDate, 'offset:', currentDateOffset);
                 
                 document.getElementById('dateDisplay').textContent = `${formatDate(data.date)}`;
                 
@@ -701,11 +702,15 @@
             
             try {
                 showLoading();
-                await apiRequest(`/api/faculty/daily-entry?entry_date=${currentScheduleDate}`, 'POST', data, true);
+                // Ensure we pass the correct session date
+                const sessionDate = currentScheduleDate || new Date().toISOString().split('T')[0];
+                console.log('Submitting entry for session date:', sessionDate);
+                const response = await apiRequest(`/api/faculty/daily-entry?entry_date=${sessionDate}`, 'POST', data, true);
                 hideLoading();
                 closeModal();
                 await loadSchedule();
-                alert('Entry saved successfully!');
+                console.log('Entry saved for session date:', response.session_date);
+                alert(`Entry saved successfully for session date: ${response.session_date || sessionDate}`);
             } catch (error) {
                 hideLoading();
                 alert('Error: ' + error.message);

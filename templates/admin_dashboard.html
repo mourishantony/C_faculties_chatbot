@@ -87,12 +87,9 @@
                     
                     <div class="report-filters" style="display: flex; gap: 15px; align-items: flex-end; flex-wrap: wrap;">
                         <div class="filter-group" style="flex: 1; min-width: 200px; max-width: 300px;">
-                            <label style="display: block; margin-bottom: 8px; color: #64748b; font-weight: 500;">Select Date</label>
-                            <input type="date" id="reportDate" class="form-control" style="width: 100%;">
+                            <label style="display: block; margin-bottom: 8px; color: #64748b; font-weight: 500;">Select Session Date</label>
+                            <input type="date" id="reportDate" class="form-control" style="width: 100%;" onchange="loadReport()">
                         </div>
-                        <button class="btn btn-primary" onclick="loadReport()" style="padding: 10px 24px; white-space: nowrap;">
-                            <i class="material-icons" style="font-size: 18px; vertical-align: middle; margin-right: 6px;">search</i>Load Report
-                        </button>
                     </div>
                     
                     <div id="reportContainer">
@@ -1837,7 +1834,7 @@
             const reportDate = document.getElementById('reportDate').value;
             
             if (!reportDate) {
-                alert('Please select a date');
+                document.getElementById('reportContainer').innerHTML = '<p class="text-center" style="padding: 20px; color: #64748b;">Select a date to view the report.</p>';
                 return;
             }
             
@@ -1855,7 +1852,7 @@
                 
                 let html = `<p style="margin-bottom: 15px;"><strong>Total Entries: ${data.total}</strong></p>`;
                 html += '<table class="schedule-table"><thead><tr>' +
-                    '<th>Date</th><th>Period</th><th>Faculty</th><th>Department</th><th>Topic</th><th>Resources</th><th>Status</th><th>Summary</th>' +
+                    '<th>Session Date</th><th>Period</th><th>Faculty</th><th>Department</th><th>Topic</th><th>Resources</th><th>Status</th><th>Summary</th>' +
                     '</tr></thead><tbody>';
                 
                 data.entries.forEach(entry => {

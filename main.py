@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends, HTTPException, status, Request, Form
+from fastapi import FastAPI, Depends, HTTPException, status, Request, Form, Query
 from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -333,18 +333,30 @@ def get_lab_programs(db: Session = Depends(get_db)):
 @app.post("/api/faculty/daily-entry")
 def submit_daily_entry(
     entry: DailyEntryCreate,
-    entry_date: Optional[str] = None,
+    entry_date: Optional[str] = Query(None, description="Session date in YYYY-MM-DD format"),
     faculty: Faculty = Depends(get_current_faculty),
     db: Session = Depends(get_db)
 ):
     """Submit daily entry for a specific date
     entry_date: ISO format date string (YYYY-MM-DD), defaults to today
     """
-    resolved_entry_date = entry_date or entry.entry_date
+    # Priority: query param > body field > today
+    resolved_entry_date = None
+    if entry_date and entry_date not in ['null', 'undefined', '']:
+        resolved_entry_date = entry_date
+    elif entry.entry_date and entry.entry_date not in ['null', 'undefined', '']:
+        resolved_entry_date = entry.entry_date
+    
     if resolved_entry_date:
         target_date = datetime.strptime(resolved_entry_date, "%Y-%m-%d").date()
     else:
         target_date = date.today()
+    
+    # Debug logging
+    print(f"[DEBUG] Daily Entry - Query param entry_date: {entry_date}")
+    print(f"[DEBUG] Daily Entry - Body entry_date: {entry.entry_date}")
+    print(f"[DEBUG] Daily Entry - Resolved target_date: {target_date}")
+    print(f"[DEBUG] Daily Entry - Today's date: {date.today()}")
     
     # Check if entry already exists
     existing = db.query(DailyEntry).filter(
@@ -369,7 +381,11 @@ def submit_daily_entry(
         existing.is_swapped = entry.is_swapped
         existing.swapped_with = entry.swapped_with
         db.commit()
-        return {"message": "Entry updated successfully", "entry_id": existing.id}
+        return {
+            "message": "Entry updated successfully", 
+            "entry_id": existing.id,
+            "session_date": target_date.isoformat()
+        }
     
     # Create new entry
     daily_entry = DailyEntry(
@@ -392,6 +408,13 @@ def submit_daily_entry(
     )
     db.add(daily_entry)
     db.commit()
+    db.refresh(daily_entry)
+    
+    return {
+        "message": "Entry submitted successfully", 
+        "entry_id": daily_entry.id,
+        "session_date": target_date.isoformat()
+    }
     db.refresh(daily_entry)
     
     return {"message": "Entry submitted successfully", "entry_id": daily_entry.id}
