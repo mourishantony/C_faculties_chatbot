@@ -82,20 +82,20 @@ def _add_missing_data(db):
 def _update_department_room_numbers(db):
     """Update existing departments with room numbers"""
     room_numbers = {
-        "AIDS-A": "315",
-        "AIDS-B": "316",
-        "AIML-A": "414",
-        "AIML-B": "415",
-        "CSBS": "416",
-        "CSE-A": "411A",
-        "CSE-B": "412",
-        "CYS": "301",
-        "ECE-A": "312",
-        "ECE-B": "313",
-        "IT-A": "310A1",
-        "IT-B": "311",
-        "MECH": "303",
-        "RA": "302",
+        "AIDS-A": "315(2nd floor)",
+        "AIDS-B": "316(2nd floor)",
+        "AIML-A": "414(3rd floor)",
+        "AIML-B": "415(3rd floor)",
+        "CSBS": "416(3rd floor)",
+        "CSE-A": "411A(3rd floor)",
+        "CSE-B": "412(3rd floor)",
+        "CYS": "301(2nd floor)",
+        "ECE-A": "312(2nd floor)",
+        "ECE-B": "313(2nd floor)",
+        "IT-A": "310A1(2nd floor)",
+        "IT-B": "311(2nd floor)",
+        "MECH": "303(2nd floor)",
+        "RA": "302(2nd floor)",
     }
     
     updated_count = 0
