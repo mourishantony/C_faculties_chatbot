@@ -59,6 +59,7 @@ class Department(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String(100), nullable=False)
     code = Column(String(20), unique=True, nullable=False)
+    room_number = Column(String(20), nullable=True)  # Classroom/Room number
 
 class TimetableEntry(Base):
     __tablename__ = "timetable_entries"

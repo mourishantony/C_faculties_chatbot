@@ -154,7 +154,8 @@ class FAQChatbot:
         response = f"**Period {period} ({period_time}) - {day_name}:**\n\n"
         
         for entry, faculty, dept in entries:
-            response += f"• **{faculty.name}** - {dept.code} ({entry.class_type})\n"
+            room_info = f" | Room: {dept.room_number}" if dept.room_number else ""
+            response += f"• **{faculty.name}** - {dept.code} ({entry.class_type}){room_info}\n"
         
         response += f"\n_Total: {len(entries)} class(es) in this period_"
         return response
@@ -189,13 +190,14 @@ class FAQChatbot:
         from collections import defaultdict
         period_classes = defaultdict(list)
         for entry, faculty, dept in entries:
-            period_classes[entry.period].append((faculty.name, dept.code, entry.class_type))
+            period_classes[entry.period].append((faculty.name, dept.code, entry.class_type, dept.room_number))
         
         for period in sorted(period_classes.keys()):
             period_time = get_period_time(period, self.db)
             response += f"**Period {period}** ({period_time}):\n"
-            for faculty_name, dept_code, class_type in period_classes[period]:
-                response += f"  • {faculty_name} - {dept_code} ({class_type})\n"
+            for faculty_name, dept_code, class_type, room_number in period_classes[period]:
+                room_info = f" | Room: {room_number}" if room_number else ""
+                response += f"  • {faculty_name} - {dept_code} ({class_type}){room_info}\n"
             response += "\n"
         
         return response
@@ -275,7 +277,11 @@ class FAQChatbot:
         if not entries:
             return f"No C Programming classes for **{dept_code}** on **{day_name}**."
         
-        response = f"**{dept_code} Schedule for {day_name}:**\n\n"
+        # Get department info including room
+        dept_info = entries[0][2] if entries else None
+        room_info = f" (Room: {dept_info.room_number})" if dept_info and dept_info.room_number else ""
+        
+        response = f"**{dept_code} Schedule for {day_name}:**{room_info}\n\n"
         
         for entry, faculty, dept in entries:
             period_time = get_period_time(entry.period, self.db)
@@ -327,13 +333,14 @@ class FAQChatbot:
         from collections import defaultdict
         period_classes = defaultdict(list)
         for entry, faculty, dept in entries:
-            period_classes[entry.period].append((faculty.name, dept.code))
+            period_classes[entry.period].append((faculty.name, dept.code, dept.room_number))
         
         for period in sorted(period_classes.keys()):
             period_time = get_period_time(period, self.db)
             response += f"**Period {period}** ({period_time}):\n"
-            for faculty_name, dept_code in period_classes[period]:
-                response += f"  • {faculty_name} - {dept_code}\n"
+            for faculty_name, dept_code, room_number in period_classes[period]:
+                room_info = f" | Room: {room_number}" if room_number else ""
+                response += f"  • {faculty_name} - {dept_code}{room_info}\n"
             response += "\n"
         
         response += f"_Total: {len(entries)} {class_type} class(es) today_"
@@ -572,7 +579,8 @@ Or type **help** for more options!"""
             if faculty.id not in faculty_seen:
                 periods = [e.period for e, f, d in entries if f.id == faculty.id]
                 period_str = ", ".join(map(str, sorted(periods)))
-                response += f"• **{faculty.name}** ({dept.code}) - Period {period_str}\n"
+                room_info = f" | Room: {dept.room_number}" if dept.room_number else ""
+                response += f"• **{faculty.name}** ({dept.code}) - Period {period_str}{room_info}\n"
                 faculty_seen.add(faculty.id)
         
         response += f"\n_Total: {len(faculty_seen)} faculty members teaching today_"
@@ -618,6 +626,8 @@ Or type **help** for more options!"""
         response += f"**Name:** {faculty.name}\n"
         response += f"**Email:** {faculty.email}\n"
         response += f"**Phone:** {faculty.phone}\n"
+        if dept.room_number:
+            response += f"**Room:** {dept.room_number}\n"
         if faculty.experience:
             response += f"**Experience:** {faculty.experience} years\n"
         

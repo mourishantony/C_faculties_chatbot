@@ -160,10 +160,38 @@ class FAQUpdate(BaseModel):
 class DepartmentCreate(BaseModel):
     name: str
     code: str
+    room_number: Optional[str] = None
 
 class DepartmentUpdate(BaseModel):
     name: Optional[str] = None
     code: Optional[str] = None
+    room_number: Optional[str] = None
+
+class DailyEntryUpdate(BaseModel):
+    faculty_id: Optional[int] = None
+    date: Optional[str] = None  # session date
+    period: Optional[int] = None
+    entry_type: Optional[str] = None  # maps to class_type
+    class_type: Optional[str] = None
+    session_number: Optional[int] = None  # maps to syllabus_id lookup
+    session_title: Optional[str] = None
+    syllabus_topics: Optional[str] = None
+    syllabus_id: Optional[int] = None
+    lab_program_number: Optional[int] = None  # maps to lab_program_id lookup
+    lab_program_title: Optional[str] = None
+    lab_program_id: Optional[int] = None
+    lab_work_done: Optional[str] = None
+    mini_project_work: Optional[str] = None  # maps to mini_project_progress
+    mini_project_progress: Optional[str] = None
+    is_own_content: Optional[bool] = None
+    own_content_title: Optional[str] = None
+    own_content_summary: Optional[str] = None
+    summary: Optional[str] = None
+    notes: Optional[str] = None  # maps to summary
+    status: Optional[str] = None  # maps to is_absent
+    is_absent: Optional[bool] = None
+    is_swapped: Optional[bool] = None
+    swapped_with: Optional[str] = None
 
 # ============ Helper Functions ============
 def get_day_name(d: date = None):
@@ -580,6 +608,7 @@ def get_today_classes(date_offset: int = 0, db: Session = Depends(get_db)):
             "department_id": entry.department_id,
             "department_name": dept.name if dept else "Unknown",
             "department_code": dept.code if dept else "Unknown",
+            "room_number": dept.room_number if dept else None,
             "day": entry.day,
             "period": entry.period,
             "subject_code": entry.subject_code,
@@ -640,6 +669,7 @@ def get_classes_by_type(class_type: str, date_offset: int = 0, db: Session = Dep
             "department_id": entry.department_id,
             "department_name": dept.name if dept else "Unknown",
             "department_code": dept.code if dept else "Unknown",
+            "room_number": dept.room_number if dept else None,
             "day": entry.day,
             "period": entry.period,
             "subject_code": entry.subject_code,
@@ -1106,7 +1136,7 @@ def super_admin_get_departments(
     db: Session = Depends(get_db)
 ):
     departments = db.query(Department).all()
-    return [{"id": d.id, "name": d.name, "code": d.code} for d in departments]
+    return [{"id": d.id, "name": d.name, "code": d.code, "room_number": d.room_number} for d in departments]
 
 @app.post("/api/super-admin/departments")
 def super_admin_create_department(
@@ -1118,7 +1148,7 @@ def super_admin_create_department(
     if existing:
         raise HTTPException(status_code=400, detail="Department code already exists")
     
-    dept = Department(name=data.name, code=data.code)
+    dept = Department(name=data.name, code=data.code, room_number=data.room_number)
     db.add(dept)
     db.commit()
     db.refresh(dept)
@@ -1139,6 +1169,8 @@ def super_admin_update_department(
         dept.name = data.name
     if data.code is not None:
         dept.code = data.code
+    if data.room_number is not None:
+        dept.room_number = data.room_number
     
     db.commit()
     return {"message": "Department updated successfully"}
@@ -1161,6 +1193,180 @@ def super_admin_delete_department(
     db.delete(dept)
     db.commit()
     return {"message": "Department deleted successfully"}
+
+# ----- Daily Entries CRUD (Super Admin) -----
+@app.get("/api/super-admin/daily-entries")
+def super_admin_get_daily_entries(
+    start_date: Optional[str] = None,
+    end_date: Optional[str] = None,
+    super_admin: SuperAdmin = Depends(get_current_super_admin),
+    db: Session = Depends(get_db)
+):
+    """Get all daily entries with optional date filtering"""
+    # Default to last 30 days if no date specified
+    if not end_date:
+        end = date.today()
+    else:
+        end = datetime.strptime(end_date, "%Y-%m-%d").date()
+    
+    if not start_date:
+        start = end - timedelta(days=30)
+    else:
+        start = datetime.strptime(start_date, "%Y-%m-%d").date()
+    
+    entries = db.query(DailyEntry).filter(
+        DailyEntry.date >= start,
+        DailyEntry.date <= end
+    ).order_by(DailyEntry.date.desc(), DailyEntry.period).all()
+    
+    result = []
+    for entry in entries:
+        faculty = db.query(Faculty).filter(Faculty.id == entry.faculty_id).first()
+        dept = db.query(Department).filter(Department.id == entry.department_id).first()
+        syllabus = db.query(Syllabus).filter(Syllabus.id == entry.syllabus_id).first() if entry.syllabus_id else None
+        lab_program = db.query(LabProgram).filter(LabProgram.id == entry.lab_program_id).first() if entry.lab_program_id else None
+        
+        result.append({
+            "id": entry.id,
+            "faculty_id": entry.faculty_id,
+            "faculty_name": faculty.name if faculty else "Unknown",
+            "department_id": entry.department_id,
+            "department_name": dept.name if dept else "Unknown",
+            "department_code": dept.code if dept else "Unknown",
+            "room_number": dept.room_number if dept else None,
+            "date": entry.date.isoformat(),
+            "session_date": entry.date.isoformat(),
+            "period": entry.period,
+            "class_type": entry.class_type,
+            "entry_type": entry.class_type,
+            "session_number": entry.syllabus_id,
+            "syllabus_id": entry.syllabus_id,
+            "session_title": syllabus.session_title if syllabus else None,
+            "syllabus_topics": syllabus.topics if syllabus else entry.own_content_summary,
+            "lab_program_id": entry.lab_program_id,
+            "lab_program_number": lab_program.program_number if lab_program else None,
+            "lab_program_title": lab_program.program_title if lab_program else None,
+            "lab_work_done": entry.lab_work_done,
+            "mini_project_work": entry.mini_project_progress,
+            "mini_project_progress": entry.mini_project_progress,
+            "is_own_content": entry.is_own_content,
+            "own_content_title": entry.own_content_title,
+            "own_content_summary": entry.own_content_summary,
+            "summary": entry.summary,
+            "notes": entry.summary,
+            "status": "completed" if not entry.is_absent else "pending",
+            "is_absent": entry.is_absent,
+            "is_swapped": entry.is_swapped,
+            "swapped_with": entry.swapped_with,
+            "created_at": entry.created_at.isoformat() if entry.created_at else None
+        })
+    
+    return result
+
+@app.put("/api/super-admin/daily-entries/{entry_id}")
+def super_admin_update_daily_entry(
+    entry_id: int,
+    data: DailyEntryUpdate,
+    super_admin: SuperAdmin = Depends(get_current_super_admin),
+    db: Session = Depends(get_db)
+):
+    """Update a daily entry"""
+    entry = db.query(DailyEntry).filter(DailyEntry.id == entry_id).first()
+    if not entry:
+        raise HTTPException(status_code=404, detail="Daily entry not found")
+    
+    # Update faculty_id
+    if data.faculty_id is not None:
+        entry.faculty_id = data.faculty_id
+    
+    # Update date
+    if data.date is not None:
+        entry.date = datetime.strptime(data.date, "%Y-%m-%d").date()
+    
+    # Update period
+    if data.period is not None:
+        entry.period = data.period
+    
+    # Update class_type (entry_type maps to class_type)
+    if data.entry_type is not None:
+        entry.class_type = data.entry_type
+    elif data.class_type is not None:
+        entry.class_type = data.class_type
+    
+    # Update syllabus_id from session_number
+    if data.session_number is not None:
+        syllabus = db.query(Syllabus).filter(Syllabus.session_number == data.session_number).first()
+        if syllabus:
+            entry.syllabus_id = syllabus.id
+    elif data.syllabus_id is not None:
+        entry.syllabus_id = data.syllabus_id if data.syllabus_id != 0 else None
+    
+    # Update lab_program_id from lab_program_number
+    if data.lab_program_number is not None:
+        lab_prog = db.query(LabProgram).filter(LabProgram.program_number == data.lab_program_number).first()
+        if lab_prog:
+            entry.lab_program_id = lab_prog.id
+    elif data.lab_program_id is not None:
+        entry.lab_program_id = data.lab_program_id if data.lab_program_id != 0 else None
+    
+    if data.lab_work_done is not None:
+        entry.lab_work_done = data.lab_work_done
+    
+    # Handle mini_project_work/mini_project_progress
+    if data.mini_project_work is not None:
+        entry.mini_project_progress = data.mini_project_work
+    elif data.mini_project_progress is not None:
+        entry.mini_project_progress = data.mini_project_progress
+    
+    if data.is_own_content is not None:
+        entry.is_own_content = data.is_own_content
+    
+    # Handle own content for custom theory topics
+    if data.session_title is not None and data.entry_type == 'theory':
+        entry.is_own_content = True
+        entry.own_content_title = data.session_title
+    if data.syllabus_topics is not None:
+        entry.own_content_summary = data.syllabus_topics
+    
+    if data.own_content_title is not None:
+        entry.own_content_title = data.own_content_title
+    if data.own_content_summary is not None:
+        entry.own_content_summary = data.own_content_summary
+    
+    # Handle summary/notes
+    if data.notes is not None:
+        entry.summary = data.notes
+    elif data.summary is not None:
+        entry.summary = data.summary
+    
+    # Handle status -> is_absent
+    if data.status is not None:
+        entry.is_absent = (data.status != 'completed')
+    elif data.is_absent is not None:
+        entry.is_absent = data.is_absent
+    
+    if data.is_swapped is not None:
+        entry.is_swapped = data.is_swapped
+    if data.swapped_with is not None:
+        entry.swapped_with = data.swapped_with
+    
+    db.commit()
+    return {"message": "Daily entry updated successfully"}
+
+@app.delete("/api/super-admin/daily-entries/{entry_id}")
+def super_admin_delete_daily_entry(
+    entry_id: int,
+    super_admin: SuperAdmin = Depends(get_current_super_admin),
+    db: Session = Depends(get_db)
+):
+    """Delete a daily entry"""
+    entry = db.query(DailyEntry).filter(DailyEntry.id == entry_id).first()
+    if not entry:
+        raise HTTPException(status_code=404, detail="Daily entry not found")
+    
+    db.delete(entry)
+    db.commit()
+    return {"message": "Daily entry deleted successfully"}
 
 # ----- Super Admin Dashboard Stats -----
 @app.get("/api/super-admin/stats")

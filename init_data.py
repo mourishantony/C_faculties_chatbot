@@ -13,6 +13,10 @@ def init_database():
     """
     # Create all tables (won't affect existing tables)
     Base.metadata.create_all(bind=engine)
+    
+    # Add room_number column if missing (for existing databases)
+    _add_room_number_column_if_missing()
+    
     db = SessionLocal()
     
     # Check if this is a fresh database or existing one
@@ -26,6 +30,23 @@ def init_database():
         _add_missing_data(db)
     
     db.close()
+
+def _add_room_number_column_if_missing():
+    """Add room_number column to departments table if it doesn't exist"""
+    import sqlite3
+    conn = sqlite3.connect('c_faculties.db')
+    cursor = conn.cursor()
+    
+    # Check if room_number column exists
+    cursor.execute("PRAGMA table_info(departments)")
+    columns = [column[1] for column in cursor.fetchall()]
+    
+    if 'room_number' not in columns:
+        cursor.execute("ALTER TABLE departments ADD COLUMN room_number VARCHAR(20)")
+        conn.commit()
+        print("✓ Added room_number column to departments table")
+    
+    conn.close()
 
 def _add_missing_data(db):
     """Add missing tables/data to existing database (e.g., SuperAdmin, FAQ)"""
@@ -52,8 +73,43 @@ def _add_missing_data(db):
     else:
         print("✓ FAQs already exist")
     
+    # Update department room numbers if missing
+    _update_department_room_numbers(db)
+    
     if not added_something:
         print("All data is up to date!")
+
+def _update_department_room_numbers(db):
+    """Update existing departments with room numbers"""
+    room_numbers = {
+        "AIDS-A": "315",
+        "AIDS-B": "316",
+        "AIML-A": "414",
+        "AIML-B": "415",
+        "CSBS": "416",
+        "CSE-A": "411A",
+        "CSE-B": "412",
+        "CYS": "301",
+        "ECE-A": "312",
+        "ECE-B": "313",
+        "IT-A": "310A1",
+        "IT-B": "311",
+        "MECH": "303",
+        "RA": "302",
+    }
+    
+    updated_count = 0
+    for code, room in room_numbers.items():
+        dept = db.query(Department).filter(Department.code == code).first()
+        if dept and (not hasattr(dept, 'room_number') or dept.room_number != room):
+            dept.room_number = room
+            updated_count += 1
+    
+    if updated_count > 0:
+        db.commit()
+        print(f"✓ Updated room numbers for {updated_count} department(s)")
+    else:
+        print("✓ Department room numbers already up to date")
 
 def _add_default_faqs(db):
     """Add default FAQ entries"""
@@ -108,22 +164,22 @@ def _add_default_faqs(db):
 
 def _init_all_data(db):
     """Initialize all data for a fresh database"""
-    # Add Departments
+    # Add Departments with Room Numbers
     departments = [
-        {"name": "B.Tech AI&DS - A", "code": "AIDS-A"},
-        {"name": "B.Tech AI&DS - B", "code": "AIDS-B"},
-        {"name": "B.Tech AI&ML - A", "code": "AIML-A"},
-        {"name": "B.Tech AI&ML - B", "code": "AIML-B"},
-        {"name": "B.Tech CSBS", "code": "CSBS"},
-        {"name": "B.Tech CSE - A", "code": "CSE-A"},
-        {"name": "B.Tech CSE - B", "code": "CSE-B"},
-        {"name": "B.Tech CYS", "code": "CYS"},
-        {"name": "B.Tech ECE - A", "code": "ECE-A"},
-        {"name": "B.Tech ECE - B", "code": "ECE-B"},
-        {"name": "B.Tech IT - A", "code": "IT-A"},
-        {"name": "B.Tech IT - B", "code": "IT-B"},
-        {"name": "B.Tech MECH", "code": "MECH"},
-        {"name": "B.Tech RA", "code": "RA"},
+        {"name": "B.Tech AI&DS - A", "code": "AIDS-A", "room_number": "315(2nd floor)"},
+        {"name": "B.Tech AI&DS - B", "code": "AIDS-B", "room_number": "316(2nd floor)"},
+        {"name": "B.Tech AI&ML - A", "code": "AIML-A", "room_number": "414(3rd floor)"},
+        {"name": "B.Tech AI&ML - B", "code": "AIML-B", "room_number": "415(3rd floor)"},
+        {"name": "B.Tech CSBS", "code": "CSBS", "room_number": "416(3rd floor)"},
+        {"name": "B.Tech CSE - A", "code": "CSE-A", "room_number": "411A(3rd floor)"},
+        {"name": "B.Tech CSE - B", "code": "CSE-B", "room_number": "412(3rd floor)"},
+        {"name": "B.Tech CYS", "code": "CYS", "room_number": "301(2nd floor)"},
+        {"name": "B.Tech ECE - A", "code": "ECE-A", "room_number": "312(2nd floor)"},
+        {"name": "B.Tech ECE - B", "code": "ECE-B", "room_number": "313(2nd floor)"},
+        {"name": "B.Tech IT - A", "code": "IT-A", "room_number": "310A1(2nd floor)"},
+        {"name": "B.Tech IT - B", "code": "IT-B", "room_number": "311(2nd floor)"},
+        {"name": "B.Tech MECH", "code": "MECH", "room_number": "303(2nd floor)"},
+        {"name": "B.Tech RA", "code": "RA", "room_number": "302(2nd floor)"}
     ]
     
     for dept in departments:

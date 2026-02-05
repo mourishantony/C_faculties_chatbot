@@ -2102,6 +2102,13 @@
                 
                 typeClasses.forEach(cls => {
                     const statusBadge = getStatusBadge(cls.status);
+                    const roomInfo = cls.room_number ? `<div class=\"class-info-row\">
+                                    <span class=\"info-icon\"><i class=\"material-icons\">meeting_room</i></span>
+                                    <div class=\"info-content\">
+                                        <div class=\"info-label\">Room</div>
+                                        <div class=\"info-value\">${cls.room_number}</div>
+                                    </div>
+                                </div>` : '';
                     
                     html += `
                         <div class=\"class-card\">
@@ -2124,6 +2131,7 @@
                                         <div class=\"info-value\">${cls.department_name} (${cls.department_code})</div>
                                     </div>
                                 </div>
+                                ${roomInfo}
                                 <div class=\"class-info-row\">
                                     <span class=\"info-icon\"><i class=\"material-icons\">menu_book</i></span>
                                     <div class=\"info-content\">
@@ -2251,6 +2259,13 @@
             
             sortedClasses.forEach(cls => {
                 const statusBadge = getStatusBadge(cls.status);
+                const roomInfo = cls.room_number ? `<div class="class-info-row">
+                                <span class="info-icon"><i class="material-icons">meeting_room</i></span>
+                                <div class="info-content">
+                                    <div class="info-label">Room</div>
+                                    <div class="info-value">${cls.room_number}</div>
+                                </div>
+                            </div>` : '';
                 
                 html += `
                     <div class="class-card">
@@ -2273,6 +2288,7 @@
                                     <div class="info-value">${cls.department_name} (${cls.department_code})</div>
                                 </div>
                             </div>
+                            ${roomInfo}
                             <div class="class-info-row">
                                 <span class="info-icon"><i class="material-icons">menu_book</i></span>
                                 <div class="info-content">
@@ -2378,6 +2394,13 @@
                 classes.forEach(cls => {
                     const statusBadge = cls.is_today ? getStatusBadge(cls.status) : 
                         `<span class="class-type-badge ${classType}">${typeIcons[classType]} ${classType.replace('_', ' ').toUpperCase()}</span>`;
+                    const roomInfo = cls.room_number ? `<div class="class-info-row">
+                                        <span class="info-icon"><i class="material-icons">meeting_room</i></span>
+                                        <div class="info-content">
+                                            <div class="info-label">Room</div>
+                                            <div class="info-value">${cls.room_number}</div>
+                                        </div>
+                                    </div>` : '';
                     
                     html += `
                         <div class="class-card">
@@ -2400,6 +2423,7 @@
                                             <div class="info-value">${cls.department_name} (${cls.department_code})</div>
                                         </div>
                                     </div>
+                                    ${roomInfo}
                                     <div class="class-info-row">
                                         <span class="info-icon"><i class="material-icons">menu_book</i></span>
                                         <div class="info-content">
