@@ -1203,14 +1203,14 @@ def super_admin_get_daily_entries(
     db: Session = Depends(get_db)
 ):
     """Get all daily entries with optional date filtering"""
-    # Default to last 30 days if no date specified
+    # Default to last 30 days to 7 days ahead if no date specified
     if not end_date:
-        end = date.today()
+        end = date.today() + timedelta(days=7)  # Include future entries (tomorrow's schedule)
     else:
         end = datetime.strptime(end_date, "%Y-%m-%d").date()
     
     if not start_date:
-        start = end - timedelta(days=30)
+        start = date.today() - timedelta(days=30)
     else:
         start = datetime.strptime(start_date, "%Y-%m-%d").date()
     

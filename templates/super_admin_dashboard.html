@@ -856,7 +856,7 @@
                         <td>${facultyName}</td>
                         <td>${department}</td>
                         <td>${entry.period || '-'}</td>
-                        <td>${entry.entry_type.charAt(0).toUpperCase() + entry.entry_type.slice(1).replace('_', ' ')}</td>
+                        <td>${entry.entry_type ? (entry.entry_type.charAt(0).toUpperCase() + entry.entry_type.slice(1).replace('_', ' ')) : 'N/A'}</td>
                         <td title="${content}">${content.substring(0, 30)}${content.length > 30 ? '...' : ''}</td>
                         <td>${statusBadge}</td>
                         <td>
@@ -918,6 +918,7 @@
 
         // Modal functions
         function openModal(type, action, id = null) {
+            console.log('Opening modal:', type, action, id);
             currentEditType = type;
             currentEditId = id;
             
@@ -936,6 +937,7 @@
                 else if (type === 'faq') data = faqsData.find(f => f.id === id);
                 else if (type === 'department') data = departmentsData.find(d => d.id === id);
                 else if (type === 'dailyentry') data = dailyEntriesData.find(e => e.id === id);
+                console.log('Found data:', data);
             }
             
             formContent.innerHTML = getFormHTML(type, data);
@@ -1333,6 +1335,8 @@
                 }
             });
 
+            console.log('Submitting form:', currentEditType, currentEditId, data);
+
             const endpoints = {
                 'faculty': '/api/super-admin/faculties',
                 'timetable': '/api/super-admin/timetable',
@@ -1351,15 +1355,21 @@
                 method = 'PUT';
             }
 
+            console.log('API Call:', method, endpoint);
+
             showLoading();
             try {
                 const result = await apiRequestAuth(endpoint, method, data);
-                if (result.message) {
+                console.log('API Result:', result);
+                if (result && result.message) {
                     showAlert(result.message, 'success');
                     closeModal();
                     await loadAllData();
+                } else if (result && result.detail) {
+                    showAlert(result.detail, 'error');
                 }
             } catch (error) {
+                console.error('Submit error:', error);
                 showAlert(error.message || 'Error saving data');
             }
             hideLoading();
@@ -1367,6 +1377,8 @@
 
         async function deleteItem(type, id) {
             if (!confirm('Are you sure you want to delete this item?')) return;
+
+            console.log('Deleting:', type, id);
 
             const endpoints = {
                 'faculty': `/api/super-admin/faculties/${id}`,
@@ -1378,14 +1390,20 @@
                 'dailyentry': `/api/super-admin/daily-entries/${id}`
             };
 
+            console.log('Delete API:', endpoints[type]);
+
             showLoading();
             try {
                 const result = await apiRequestAuth(endpoints[type], 'DELETE');
-                if (result.message) {
+                console.log('Delete result:', result);
+                if (result && result.message) {
                     showAlert(result.message, 'success');
                     await loadAllData();
+                } else if (result && result.detail) {
+                    showAlert(result.detail, 'error');
                 }
             } catch (error) {
+                console.error('Delete error:', error);
                 showAlert(error.message || 'Error deleting item');
             }
             hideLoading();
