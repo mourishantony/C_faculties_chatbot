@@ -701,7 +701,7 @@
             
             try {
                 showLoading();
-                await apiRequest('/api/faculty/daily-entry', 'POST', data, true);
+                await apiRequest(`/api/faculty/daily-entry?entry_date=${currentScheduleDate}`, 'POST', data, true);
                 hideLoading();
                 closeModal();
                 await loadSchedule();

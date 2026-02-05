@@ -40,6 +40,7 @@ class DailyEntryCreate(BaseModel):
     department_id: int
     period: int
     class_type: str = "theory"  # theory, lab, mini_project
+    entry_date: Optional[str] = None
     
     # For Theory classes
     syllabus_id: Optional[int] = None
@@ -339,8 +340,9 @@ def submit_daily_entry(
     """Submit daily entry for a specific date
     entry_date: ISO format date string (YYYY-MM-DD), defaults to today
     """
-    if entry_date:
-        target_date = datetime.strptime(entry_date, "%Y-%m-%d").date()
+    resolved_entry_date = entry_date or entry.entry_date
+    if resolved_entry_date:
+        target_date = datetime.strptime(resolved_entry_date, "%Y-%m-%d").date()
     else:
         target_date = date.today()
     
