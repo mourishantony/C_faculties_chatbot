@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>C Faculties - C Faculty Manager</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        /* ========== Page Header ========== */
+        .page-header {
+            background: linear-gradient(135deg, #0f172a, #1e3a8a);
+            padding: 40px 20px;
+            text-align: center;
+            color: white;
+        }
+
+        .page-header h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .page-header p {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+
+        .faculty-count {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 8px 20px;
+            border-radius: 30px;
+            margin-top: 15px;
+            font-weight: 600;
+        }
+
+        /* ========== Dashboard Content ========== */
+        .dashboard {
+            flex: 1;
+            padding: 30px 0;
+        }
+
+        /* ========== Search & Filter ========== */
+        .search-filter-bar {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 250px;
+            position: relative;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 16px 12px 45px;
+            border: 2px solid #d1d4db;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: #0f172a;
+            box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.1);
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6b7280;
+        }
+
+        .filter-select {
+            padding: 12px 16px;
+            border: 2px solid #d1d4db;
+            border-radius: 8px;
+            font-size: 1rem;
+            min-width: 180px;
+            cursor: pointer;
+            background: white;
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: #0f172a;
+        }
+
+        /* ========== Faculty Grid ========== */
+        .faculty-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 25px;
+        }
+
+        /* ========== Flip Card Styles ========== */
+        .flip-card {
+            background-color: transparent;
+            width: 100%;
+            height: 380px;
+            perspective: 1000px;
+        }
+
+        .flip-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.8s;
+            transform-style: preserve-3d;
+            cursor: pointer;
+        }
+
+        .flip-card:hover .flip-card-inner,
+        .flip-card.flipped .flip-card-inner {
+            transform: rotateY(180deg);
+        }
+
+        .flip-card-front, .flip-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            overflow: hidden;
+        }
+
+        .flip-card-front {
+            background: linear-gradient(135deg, #ffffff, #f8fafc);
+            color: #1e1b4b;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 25px;
+        }
+
+        .faculty-image {
+            width: 130px;
+            height: 130px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #e2e8f0;
+            margin-bottom: 18px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .faculty-image-placeholder {
+            width: 130px;
+            height: 130px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #0f172a, #1e3a8a);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 45px;
+            color: white;
+            margin-bottom: 18px;
+            border: 4px solid #e2e8f0;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .flip-card-front h3 {
+            margin: 0 0 10px 0;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #1e1b4b;
+        }
+
+        .faculty-dept {
+            font-size: 0.9rem;
+            background: linear-gradient(135deg, #0f172a, #1e3a8a);
+            color: white;
+            padding: 6px 18px;
+            border-radius: 25px;
+            font-weight: 500;
+        }
+
+        .flip-hint {
+            position: absolute;
+            bottom: 18px;
+            font-size: 0.8rem;
+            color: #6b7280;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .flip-card-back {
+            background: white;
+            transform: rotateY(180deg);
+            display: flex;
+            flex-direction: column;
+            padding: 22px;
+        }
+
+        .flip-card-back h3 {
+            margin: 0 0 5px 0;
+            font-size: 1.15rem;
+            color: #1e1b4b;
+            font-weight: 700;
+        }
+
+        .faculty-dept-back {
+            font-size: 0.85rem;
+            color: #6b7280;
+            margin-bottom: 12px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        .faculty-info-list {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .faculty-info-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 7px 0;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 0.85rem;
+            color: #475569;
+        }
+
+        .faculty-info-item:last-child {
+            border-bottom: none;
+        }
+
+        .faculty-info-item i {
+            color: #1e3a8a;
+            font-size: 18px;
+        }
+
+        .faculty-info-item strong {
+            color: #1e1b4b;
+        }
+
+        .email-text {
+            font-size: 0.8rem;
+            word-break: break-all;
+        }
+
+        /* ========== Social Buttons ========== */
+        .social-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: auto;
+            padding-top: 12px;
+            border-top: 2px solid #f1f5f9;
+        }
+
+        .social-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .social-btn.email {
+            background: linear-gradient(135deg, #0f172a, #1e3a8a);
+            color: white;
+        }
+
+        .social-btn.phone {
+            background: linear-gradient(135deg, #059669, #10b981);
+            color: white;
+        }
+
+        .social-btn.linkedin {
+            background: linear-gradient(135deg, #0077b5, #005885);
+            color: white;
+        }
+
+        .social-btn.github {
+            background: linear-gradient(135deg, #24292e, #1b1f23);
+            color: white;
+        }
+
+        .social-btn:hover {
+            transform: scale(1.12);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+        }
+
+        /* ========== No Results ========== */
+        .no-results {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6b7280;
+        }
+
+        .no-results i {
+            font-size: 60px;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        /* ========== Loading ========== */
+        .loading {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6b7280;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #e2e8f0;
+            border-top-color: #1e3a8a;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* ========== Responsive ========== */
+        @media (max-width: 768px) {
+            .page-header h1 {
+                font-size: 1.5rem;
+            }
+
+            .search-filter-bar {
+                flex-direction: column;
+            }
+
+            .search-box {
+                width: 100%;
+            }
+
+            .filter-select {
+                width: 100%;
+            }
+
+            .faculty-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .flip-card {
+                height: 360px;
+            }
+
+            .faculty-image, .faculty-image-placeholder {
+                width: 110px;
+                height: 110px;
+                font-size: 38px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-wrapper">
+        <!-- Navbar -->
+        <nav class="navbar">
+            <div class="container">
+                <a href="/cprog_admin_view_x7k9" class="navbar-brand">
+                    <img src="/static/images/images.png" alt="Kite Logo" />
+                    <i class="material-icons"></i> C EduManage
+                </a>
+                <ul class="navbar-nav">
+                    <li><a href="/cprog_admin_view_x7k9" class="nav-link">Dashboard</a></li>
+                    <li><a href="/cprog_faculties_f3k2" class="nav-link active">C Faculties</a></li>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1><i class="material-icons" style="vertical-align: middle; font-size: 2rem;">people</i> C Programming Faculties</h1>
+            <div class="faculty-count" id="facultyCount">Loading...</div>
+        </div>
+
+        <!-- Dashboard -->
+        <div class="dashboard">
+            <div class="container">
+                <!-- Search & Filter Bar -->
+                <div class="search-filter-bar">
+                    <div class="search-box">
+                        <i class="material-icons">search</i>
+                        <input type="text" id="searchInput" placeholder="Search by name, email, or research area..." oninput="filterFaculties()">
+                    </div>
+                    <select class="filter-select" id="deptFilter" onchange="filterFaculties()">
+                        <option value="">All Departments</option>
+                    </select>
+                </div>
+
+                <!-- Faculty Grid -->
+                <div class="faculty-grid" id="facultiesContainer">
+                    <div class="loading">
+                        <div class="loading-spinner"></div>
+                        <p>Loading faculties...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="container">
+                <p>&copy; 2026 C Programming Faculty Management System</p>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        let allFaculties = [];
+        let departments = new Set();
+
+        // API Request Helper
+        async function apiRequest(endpoint, method = 'GET', data = null) {
+            const options = {
+                method,
+                headers: { 'Content-Type': 'application/json' }
+            };
+            if (data) options.body = JSON.stringify(data);
+
+            const response = await fetch(endpoint, options);
+            return await response.json();
+        }
+
+        // Load Faculties
+        async function loadFaculties() {
+            try {
+                const faculties = await apiRequest('/api/admin/faculties');
+                allFaculties = faculties;
+                
+                // Extract unique departments
+                faculties.forEach(f => {
+                    if (f.department) departments.add(f.department);
+                });
+
+                // Populate department filter
+                const deptFilter = document.getElementById('deptFilter');
+                departments.forEach(dept => {
+                    const option = document.createElement('option');
+                    option.value = dept;
+                    option.textContent = dept;
+                    deptFilter.appendChild(option);
+                });
+
+                // Update count
+                document.getElementById('facultyCount').textContent = `${faculties.length} Faculty Members`;
+
+                // Render faculties
+                renderFaculties(faculties);
+
+            } catch (error) {
+                console.error('Error loading faculties:', error);
+                document.getElementById('facultiesContainer').innerHTML = `
+                    <div class="no-results">
+                        <i class="material-icons">error_outline</i>
+                        <p>Error loading faculties. Please try again.</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Filter Faculties
+        function filterFaculties() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const deptFilter = document.getElementById('deptFilter').value;
+
+            let filtered = allFaculties.filter(f => {
+                const matchesSearch = !searchTerm || 
+                    f.name.toLowerCase().includes(searchTerm) ||
+                    (f.email && f.email.toLowerCase().includes(searchTerm)) ||
+                    (f.research_area && f.research_area.toLowerCase().includes(searchTerm));
+
+                const matchesDept = !deptFilter || f.department === deptFilter;
+
+                return matchesSearch && matchesDept;
+            });
+
+            renderFaculties(filtered);
+        }
+
+        // Render Faculties
+        function renderFaculties(faculties) {
+            const container = document.getElementById('facultiesContainer');
+
+            if (faculties.length === 0) {
+                container.innerHTML = `
+                    <div class="no-results" style="grid-column: 1 / -1;">
+                        <i class="material-icons">search_off</i>
+                        <p>No faculties found matching your criteria.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '';
+            faculties.forEach(f => {
+                const initials = f.name.split(' ').map(n => n[0]).join('').substring(0, 2);
+                const imageHtml = f.image_url 
+                    ? `<img src="${f.image_url}" alt="${f.name}" class="faculty-image" onerror="this.outerHTML='<div class=\\'faculty-image-placeholder\\'>${initials}</div>'">`
+                    : `<div class="faculty-image-placeholder">${initials}</div>`;
+
+                const expYears = f.experience ? `${f.experience} yrs` : 'N/A';
+                const cExp = f.c_experience ? `${f.c_experience} yrs` : '0';
+                const pyExp = f.py_experience ? `${f.py_experience} yrs` : '0';
+                const research = f.research_area || 'N/A';
+
+                html += `
+                    <div class="flip-card">
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front">
+                                ${imageHtml}
+                                <h3>${f.name}</h3>
+                                <span class="faculty-dept">${f.department || 'C Programming'}</span>
+                                <span class="flip-hint">
+                                    Tap/Hover to see more 
+                                    <i class="material-icons" style="font-size: 16px;">arrow_forward</i>
+                                </span>
+                            </div>
+                            <div class="flip-card-back">
+                                <h3>${f.name}</h3>
+                                <p class="faculty-dept-back">
+                                    <i class="material-icons" style="font-size: 16px;">school</i>
+                                    ${f.department || 'C Programming'}
+                                </p>
+                                
+                                <div class="faculty-info-list">
+                                    <div class="faculty-info-item">
+                                        <i class="material-icons">work</i>
+                                        <span>Experience: <strong>${expYears}</strong></span>
+                                    </div>
+                                    <div class="faculty-info-item">
+                                        <i class="material-icons">code</i>
+                                        <span>C: <strong>${cExp}</strong> | Python: <strong>${pyExp}</strong></span>
+                                    </div>
+                                    <div class="faculty-info-item">
+                                        <i class="material-icons">science</i>
+                                        <span title="${research}">${research.length > 28 ? research.substring(0, 28) + '...' : research}</span>
+                                    </div>
+                                    <div class="faculty-info-item">
+                                        <i class="material-icons">email</i>
+                                        <span class="email-text">${f.personal_email || f.email}</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="social-buttons">
+                                    <a href="mailto:${f.email}" class="social-btn email" title="Email">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+                                    </a>
+                                    <a href="tel:${f.phone}" class="social-btn phone" title="Call">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+                                    </a>
+                                    ${f.linkedin_url ? `<a href="${f.linkedin_url}" target="_blank" class="social-btn linkedin" title="LinkedIn">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+                                    </a>` : ''}
+                                    ${f.github_url ? `<a href="${f.github_url}" target="_blank" class="social-btn github" title="GitHub">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                                    </a>` : ''}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+            setupFlipCardTouch();
+        }
+
+        // Touch support for mobile
+        function setupFlipCardTouch() {
+            document.querySelectorAll('.flip-card').forEach(card => {
+                card.addEventListener('click', function(e) {
+                    if (e.target.closest('.social-btn')) return;
+                    
+                    // Close other flipped cards
+                    document.querySelectorAll('.flip-card.flipped').forEach(flipped => {
+                        if (flipped !== this) flipped.classList.remove('flipped');
+                    });
+                    
+                    this.classList.toggle('flipped');
+                });
+            });
+        }
+
+        // Load on page load
+        document.addEventListener('DOMContentLoaded', loadFaculties);
+    </script>
+</body>
+</html>

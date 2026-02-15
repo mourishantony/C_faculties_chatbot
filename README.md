@@ -89,6 +89,7 @@ docker-compose up --build
 | Page | URL | Access |
 |------|-----|--------|
 | Admin Dashboard | `/cprog_admin_view_x7k9` | Public (no login) |
+| C Faculties Page | `/cprog_faculties_f3k2` | Public (no login) |
 | Login Page | `/cprog_portal_m2p8` | Faculty & Super Admin |
 | Faculty Dashboard | `/cprog_faculty_dash_q4w1` | After login |
 | Super Admin Dashboard | `/cprog_super_dash_z9y3` | After login |

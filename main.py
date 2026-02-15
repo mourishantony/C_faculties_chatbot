@@ -1401,6 +1401,11 @@ def faculty_dashboard_page(request: Request):
 def admin_dashboard_page(request: Request):
     return templates.TemplateResponse("admin_dashboard.html", {"request": request})
 
+# Secret C Faculties Page (Public View)
+@app.get("/cprog_faculties_f3k2", response_class=HTMLResponse)
+def c_faculties_page(request: Request):
+    return templates.TemplateResponse("c_faculties.html", {"request": request})
+
 # Secret Super Admin Dashboard
 @app.get("/cprog_super_dash_z9y3", response_class=HTMLResponse)
 def super_admin_dashboard_page(request: Request):
