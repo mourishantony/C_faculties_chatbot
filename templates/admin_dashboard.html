@@ -35,7 +35,24 @@
                         <h3 class="card-title"><i class="material-icons" style="vertical-align: middle; margin-right: 6px; font-size: 20px;">school</i>Classes by Department</h3>
                     </div>
                     <div style="padding: 20px;">
-                        <div class="filter-group" style="display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 20px; align-items: flex-end;">
+                        <div class="filter-group" style="display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 20px; align-items: center; justify-content: space-between;">
+                            <!-- Class Type Filter -->
+                            <div class="class-type-filter-container">
+                                <button id="allClassesBtn" class="class-filter-btn active" onclick="filterByClassType('all')">
+                                    <i class="material-icons">apps</i> All Classes
+                                </button>
+                                <button id="theoryClassesBtn" class="class-filter-btn" onclick="filterByClassType('theory')">
+                                    <i class="material-icons">book</i> Theory
+                                </button>
+                                <button id="labClassesBtn" class="class-filter-btn" onclick="filterByClassType('lab')">
+                                    <i class="material-icons">science</i> Lab
+                                </button>
+                                <button id="miniProjectBtn" class="class-filter-btn" onclick="filterByClassType('mini_project')">
+                                    <i class="material-icons">lightbulb</i> Mini Project
+                                </button>
+                            </div>
+                            
+                            <!-- Day Filter -->
                             <div id="dateToggleContainer" class="day-buttons-container">
                                 <button id="sunBtn" class="day-btn" data-day="0" onclick="switchToDay(0)">Sun</button>
                                 <button id="monBtn" class="day-btn" data-day="1" onclick="switchToDay(1)">Mon</button>
@@ -66,6 +83,14 @@
                             <label style="display: block; margin-bottom: 8px; color: #64748b; font-weight: 500;">Select Session Date</label>
                             <input type="date" id="reportDate" class="form-control" style="width: 100%;" onchange="loadReport()">
                         </div>
+                    </div>
+                    
+                    <!-- Class Type Filter for Reports -->
+                    <div class="report-type-filter-container">
+                        <button class="report-filter-btn active" onclick="filterReportsByClassType('all')">All Classes</button>
+                        <button class="report-filter-btn theory" onclick="filterReportsByClassType('theory')">Theory</button>
+                        <button class="report-filter-btn lab" onclick="filterReportsByClassType('lab')">Lab</button>
+                        <button class="report-filter-btn mini_project" onclick="filterReportsByClassType('mini_project')">Mini Project</button>
                     </div>
                     
                     <div id="reportContainer">
@@ -331,6 +356,108 @@
             box-shadow: 0 2px 8px rgba(30, 58, 138, 0.4);
         }
         
+        /* ========== Class Type Filter Buttons ========== */
+        .class-type-filter-container {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .class-filter-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 10px 16px;
+            background: #f8fafc;
+            color: #475569;
+            border: 2px solid #e2e8f0;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            transition: all 0.2s ease;
+        }
+        
+        .class-filter-btn i {
+            font-size: 18px;
+        }
+        
+        .class-filter-btn:hover {
+            background: #f1f5f9;
+            border-color: #cbd5e1;
+        }
+        
+        .class-filter-btn.active {
+            background: linear-gradient(135deg, #0f172a, #1e3a8a);
+            color: white;
+            border-color: transparent;
+            box-shadow: 0 3px 10px rgba(15, 23, 42, 0.4);
+        }
+        
+        .class-filter-btn.active i {
+            color: white;
+        }
+        
+        /* Class type specific active colors */
+        .class-filter-btn#theoryClassesBtn.active {
+            background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+        }
+        
+        .class-filter-btn#labClassesBtn.active {
+            background: linear-gradient(135deg, #047857, #10b981);
+        }
+        
+        .class-filter-btn#miniProjectBtn.active {
+            background: linear-gradient(135deg, #b45309, #f59e0b);
+        }
+        
+        /* ========== Report Type Filter Buttons ========== */
+        .report-type-filter-container {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin: 15px 0;
+        }
+        
+        .report-filter-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            background: #f8fafc;
+            color: #475569;
+            border: 2px solid #e2e8f0;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 12px;
+            transition: all 0.2s ease;
+        }
+        
+        .report-filter-btn:hover {
+            background: #f1f5f9;
+            border-color: #cbd5e1;
+        }
+        
+        .report-filter-btn.active {
+            background: linear-gradient(135deg, #0f172a, #1e3a8a);
+            color: white;
+            border-color: transparent;
+            box-shadow: 0 2px 8px rgba(15, 23, 42, 0.3);
+        }
+        
+        .report-filter-btn.active.theory {
+            background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+        }
+        
+        .report-filter-btn.active.lab {
+            background: linear-gradient(135deg, #047857, #10b981);
+        }
+        
+        .report-filter-btn.active.mini_project {
+            background: linear-gradient(135deg, #b45309, #f59e0b);
+        }
+        
         /* ========== Classes Grid ========== */
         .classes-grid {
             display: grid;
@@ -368,6 +495,28 @@
                 padding: 8px 10px;
                 font-size: 12px;
                 min-width: 42px;
+            }
+            
+            .class-type-filter-container {
+                justify-content: center;
+                width: 100%;
+                padding: 10px 0;
+            }
+            
+            .class-filter-btn {
+                padding: 8px 10px;
+                font-size: 12px;
+                min-width: auto;
+            }
+            
+            .report-type-filter-container {
+                justify-content: center;
+                width: 100%;
+            }
+            
+            .report-filter-btn {
+                padding: 6px 10px;
+                font-size: 11px;
             }
             
             .classes-grid {
@@ -1996,81 +2145,135 @@
                 const data = await apiRequest(`/api/admin/report?start_date=${reportDate}&end_date=${reportDate}`);
                 hideLoading();
                 
-                const container = document.getElementById('reportContainer');
+                // Store data for filtering
+                currentReportData = data;
                 
-                if (data.entries.length === 0) {
-                    container.innerHTML = '<p class="text-center" style="padding: 20px;">No entries found for the selected date range.</p>';
-                    return;
-                }
-                
-                let html = `<p style="margin-bottom: 15px;"><strong>Total Entries: ${data.total}</strong></p>`;
-                html += '<table class="schedule-table"><thead><tr>' +
-                    '<th>Session Date</th><th>Period</th><th>Faculty</th><th>Department</th><th>Topic</th><th>Resources</th><th>Status</th><th>Summary</th>' +
-                    '</tr></thead><tbody>';
-                
-                data.entries.forEach(entry => {
-                    let status = 'Present';
-                    let statusClass = 'filled';
-                    
-                    if (entry.is_absent) {
-                        status = 'Absent';
-                        statusClass = 'absent';
-                    } else if (entry.is_swapped) {
-                        status = `Swapped (${entry.swapped_with || 'N/A'})`;
-                        statusClass = 'swapped';
-                    }
-                    
-                    // Determine resource content based on class type
-                    let resourceContent = '';
-                    if (entry.is_own_content && (entry.own_content_title || entry.own_content_summary)) {
-                        // Faculty taught their own content - show both title and summary
-                        const ownContentDetails = `Title: ${entry.own_content_title || 'N/A'}\n\nContent Summary:\n${entry.own_content_summary || 'N/A'}`;
-                        resourceContent = `<button onclick='showDetailModal("Own Content Details", ${JSON.stringify(ownContentDetails)})' class="view-btn"><i class="material-icons">edit_note</i> View</button>`;
-                    } else if (entry.class_type === 'theory' && entry.ppt_url) {
-                        resourceContent = `<a href="${entry.ppt_url}" target="_blank" class="view-btn" title="Open PPT"><i class="material-icons">slideshow</i> View</a>`;
-                    } else if (entry.class_type === 'lab' && entry.moodle_url) {
-                        resourceContent = `<a href="${entry.moodle_url}" target="_blank" class="view-btn" title="Open Moodle"><i class="material-icons">language</i> View</a>`;
-                    } else if (entry.class_type === 'lab' && entry.lab_work_done) {
-                        resourceContent = `<button onclick='showDetailModal("Lab Work Done", ${JSON.stringify(entry.lab_work_done)})' class="view-btn"><i class="material-icons">description</i> View</button>`;
-                    } else if (entry.class_type === 'mini_project' && entry.mini_project_progress) {
-                        resourceContent = `<button onclick='showDetailModal("Mini Project Progress", ${JSON.stringify(entry.mini_project_progress)})' class="view-btn"><i class="material-icons">assignment</i> View</button>`;
-                    } else {
-                        resourceContent = '-';
-                    }
-                    
-                    // Summary column with View button if summary exists
-                    // Also show lab_work_done or mini_project_progress as summary alternatives
-                    let summaryContent = '-';
-                    if (entry.summary) {
-                        summaryContent = `<button onclick='showDetailModal("Summary", ${JSON.stringify(entry.summary)})' class="view-btn"><i class="material-icons">notes</i> View</button>`;
-                    } else if (entry.class_type === 'lab' && entry.lab_work_done) {
-                        summaryContent = `<button onclick='showDetailModal("Lab Work Summary", ${JSON.stringify(entry.lab_work_done)})' class="view-btn"><i class="material-icons">notes</i> View</button>`;
-                    } else if (entry.class_type === 'mini_project' && entry.mini_project_progress) {
-                        summaryContent = `<button onclick='showDetailModal("Mini Project Summary", ${JSON.stringify(entry.mini_project_progress)})' class="view-btn"><i class="material-icons">notes</i> View</button>`;
-                    }
-                    
-                    html += `
-                        <tr>
-                            <td>${formatDate(entry.date)}</td>
-                            <td><span class="period-badge">${getOrdinal(entry.period)}</span></td>
-                            <td><strong>${entry.faculty_name}</strong></td>
-                            <td>${entry.department_name}</td>
-                            <td>${entry.topic}</td>
-                            <td>${resourceContent}</td>
-                            <td><span class="status-badge ${statusClass}">${status}</span></td>
-                            <td>${summaryContent}</td>
-                        </tr>
-                    `;
-                });
-                
-                html += '</tbody></table>';
-                container.innerHTML = html;
+                // Render the report table
+                renderReportTable();
                 
             } catch (error) {
                 hideLoading();
                 console.error('Error loading report:', error);
                 document.getElementById('reportContainer').innerHTML = '<div class="alert alert-error">Failed to load report</div>';
             }
+        }
+        
+        // Filter reports by class type without refetching
+        function filterReportsByClassType(classType) {
+            currentReportClassTypeFilter = classType;
+            
+            // Update active state on filter buttons
+            document.querySelectorAll('.report-filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            const activeBtn = document.querySelector(`.report-filter-btn[onclick*="'${classType}'"]`);
+            if (activeBtn) {
+                activeBtn.classList.add('active');
+            }
+            
+            // Re-render report table with filter applied
+            if (currentReportData) {
+                renderReportTable();
+            }
+        }
+        
+        // Render report table with class type filter applied
+        function renderReportTable() {
+            const container = document.getElementById('reportContainer');
+            
+            if (!currentReportData || currentReportData.entries.length === 0) {
+                container.innerHTML = '<p class="text-center" style="padding: 20px;">No entries found for the selected date range.</p>';
+                return;
+            }
+            
+            // Apply class type filter
+            let filteredEntries = currentReportData.entries;
+            if (currentReportClassTypeFilter !== 'all') {
+                filteredEntries = currentReportData.entries.filter(entry => entry.class_type === currentReportClassTypeFilter);
+            }
+            
+            if (filteredEntries.length === 0) {
+                const filterLabels = {
+                    'all': 'All Classes',
+                    'theory': 'Theory',
+                    'lab': 'Lab',
+                    'mini_project': 'Mini Project'
+                };
+                container.innerHTML = `<p class="text-center" style="padding: 20px;">No ${filterLabels[currentReportClassTypeFilter]} entries found for the selected date.</p>`;
+                return;
+            }
+            
+            // Get filter label for display
+            const filterLabels = {
+                'all': '',
+                'theory': ' (Theory)',
+                'lab': ' (Lab)',
+                'mini_project': ' (Mini Project)'
+            };
+            const filterLabel = filterLabels[currentReportClassTypeFilter];
+            
+            let html = `<p style="margin-bottom: 15px;"><strong>Total Entries: ${filteredEntries.length}${filterLabel}</strong></p>`;
+            html += '<table class="schedule-table"><thead><tr>' +
+                '<th>Session Date</th><th>Period</th><th>Faculty</th><th>Department</th><th>Topic</th><th>Resources</th><th>Status</th><th>Summary</th>' +
+                '</tr></thead><tbody>';
+            
+            filteredEntries.forEach(entry => {
+                let status = 'Present';
+                let statusClass = 'filled';
+                
+                if (entry.is_absent) {
+                    status = 'Absent';
+                    statusClass = 'absent';
+                } else if (entry.is_swapped) {
+                    status = `Swapped (${entry.swapped_with || 'N/A'})`;
+                    statusClass = 'swapped';
+                }
+                
+                // Determine resource content based on class type
+                let resourceContent = '';
+                if (entry.is_own_content && (entry.own_content_title || entry.own_content_summary)) {
+                    // Faculty taught their own content - show both title and summary
+                    const ownContentDetails = `Title: ${entry.own_content_title || 'N/A'}\n\nContent Summary:\n${entry.own_content_summary || 'N/A'}`;
+                    resourceContent = `<button onclick='showDetailModal("Own Content Details", ${JSON.stringify(ownContentDetails)})' class="view-btn"><i class="material-icons">edit_note</i> View</button>`;
+                } else if (entry.class_type === 'theory' && entry.ppt_url) {
+                    resourceContent = `<a href="${entry.ppt_url}" target="_blank" class="view-btn" title="Open PPT"><i class="material-icons">slideshow</i> View</a>`;
+                } else if (entry.class_type === 'lab' && entry.moodle_url) {
+                    resourceContent = `<a href="${entry.moodle_url}" target="_blank" class="view-btn" title="Open Moodle"><i class="material-icons">language</i> View</a>`;
+                } else if (entry.class_type === 'lab' && entry.lab_work_done) {
+                    resourceContent = `<button onclick='showDetailModal("Lab Work Done", ${JSON.stringify(entry.lab_work_done)})' class="view-btn"><i class="material-icons">description</i> View</button>`;
+                } else if (entry.class_type === 'mini_project' && entry.mini_project_progress) {
+                    resourceContent = `<button onclick='showDetailModal("Mini Project Progress", ${JSON.stringify(entry.mini_project_progress)})' class="view-btn"><i class="material-icons">assignment</i> View</button>`;
+                } else {
+                    resourceContent = '-';
+                }
+                
+                // Summary column with View button if summary exists
+                // Also show lab_work_done or mini_project_progress as summary alternatives
+                let summaryContent = '-';
+                if (entry.summary) {
+                    summaryContent = `<button onclick='showDetailModal("Summary", ${JSON.stringify(entry.summary)})' class="view-btn"><i class="material-icons">notes</i> View</button>`;
+                } else if (entry.class_type === 'lab' && entry.lab_work_done) {
+                    summaryContent = `<button onclick='showDetailModal("Lab Work Summary", ${JSON.stringify(entry.lab_work_done)})' class="view-btn"><i class="material-icons">notes</i> View</button>`;
+                } else if (entry.class_type === 'mini_project' && entry.mini_project_progress) {
+                    summaryContent = `<button onclick='showDetailModal("Mini Project Summary", ${JSON.stringify(entry.mini_project_progress)})' class="view-btn"><i class="material-icons">notes</i> View</button>`;
+                }
+                
+                html += `
+                    <tr>
+                        <td>${formatDate(entry.date)}</td>
+                        <td><span class="period-badge">${getOrdinal(entry.period)}</span></td>
+                        <td><strong>${entry.faculty_name}</strong></td>
+                        <td>${entry.department_name}</td>
+                        <td>${entry.topic}</td>
+                        <td>${resourceContent}</td>
+                        <td><span class="status-badge ${statusClass}">${status}</span></td>
+                        <td>${summaryContent}</td>
+                    </tr>
+                `;
+            });
+            
+            html += '</tbody></table>';
+            container.innerHTML = html;
         }
         
         // Modal functions for viewing details
@@ -2106,6 +2309,11 @@
         let currentClassesData = null;
         let currentDateOffset = 0; // Offset from today (0 = today)
         let currentSelectedDayOfWeek = new Date().getDay(); // 0 = Sunday, 6 = Saturday
+        let currentClassTypeFilter = 'all'; // Filter: 'all', 'theory', 'lab', 'mini_project'
+        
+        // Store loaded report data globally for filtering
+        let currentReportData = null;
+        let currentReportClassTypeFilter = 'all'; // Filter for reports: 'all', 'theory', 'lab', 'mini_project'
         
         const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
         const dayBtnIds = ['sunBtn', 'monBtn', 'tueBtn', 'wedBtn', 'thuBtn', 'friBtn', 'satBtn'];
@@ -2155,6 +2363,25 @@
             updateDayButtons();
         }
         
+        // Filter department cards by class type
+        function filterByClassType(classType) {
+            currentClassTypeFilter = classType;
+            
+            // Update active state on filter buttons
+            document.querySelectorAll('.class-filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            const activeBtn = document.querySelector(`.class-filter-btn[onclick*="'${classType}'"]`);
+            if (activeBtn) {
+                activeBtn.classList.add('active');
+            }
+            
+            // Re-render department cards with filter applied
+            if (currentClassesData) {
+                renderDepartmentCards(currentClassesData);
+            }
+        }
+        
         async function loadClassesByDate() {
             await loadDepartmentClasses();
         }
@@ -2191,14 +2418,38 @@
             
             const scheduleLabel = currentDateOffset === 0 ? 'Today\'s Schedule' : `${dayNames[currentSelectedDayOfWeek]}'s Schedule`;
             
-            // Count total classes across all departments
-            const totalClasses = departments.reduce((sum, dept) => sum + dept.total_classes, 0);
+            // Apply class type filter to departments
+            let filteredDepartments = departments.map(dept => {
+                if (currentClassTypeFilter === 'all') {
+                    return dept;
+                }
+                // Filter classes within department
+                const filteredClasses = dept.classes.filter(cls => cls.class_type === currentClassTypeFilter);
+                return {
+                    ...dept,
+                    classes: filteredClasses,
+                    total_classes: filteredClasses.length,
+                    has_classes: filteredClasses.length > 0
+                };
+            });
+            
+            // Count total classes across all filtered departments
+            const totalClasses = filteredDepartments.reduce((sum, dept) => sum + dept.total_classes, 0);
+            
+            // Get filter label for display
+            const filterLabels = {
+                'all': 'All Classes',
+                'theory': 'Theory Classes',
+                'lab': 'Lab Classes',
+                'mini_project': 'Mini Project Classes'
+            };
+            const filterLabel = currentClassTypeFilter !== 'all' ? ` (${filterLabels[currentClassTypeFilter]})` : '';
             
             let html = `
                 <div style="background: linear-gradient(135deg, #0f172a, #1e3a8a); color: white; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
                     <h3 style="margin: 0 0 5px 0; display: flex; align-items: center; gap: 10px;">
                         <i class="material-icons" style="font-size: 28px;">event</i>
-                        <span>${scheduleLabel}</span>
+                        <span>${scheduleLabel}${filterLabel}</span>
                     </h3>
                     <p style="margin: 0; opacity: 0.9; font-size: 14px;">
                         ${totalClasses} class${totalClasses !== 1 ? 'es' : ''} scheduled for ${date} (${day})
@@ -2207,7 +2458,7 @@
                 <div class="dept-cards-grid">
             `;
             
-            departments.forEach(dept => {
+            filteredDepartments.forEach(dept => {
                 const hasClasses = dept.has_classes;
                 const buttonClass = hasClasses ? '' : 'no-classes';
                 const buttonText = hasClasses ? `View Classes (${dept.total_classes})` : 'No Classes Today';
@@ -2259,20 +2510,36 @@
             const dept = currentClassesData.departments.find(d => d.department_code === deptCode);
             if (!dept) return;
             
+            // Apply filter to classes if needed
+            let filteredClasses = dept.classes;
+            if (currentClassTypeFilter !== 'all') {
+                filteredClasses = dept.classes.filter(cls => cls.class_type === currentClassTypeFilter);
+            }
+            const totalFiltered = filteredClasses.length;
+            
             const modal = document.getElementById('periodsModal');
             const titleEl = document.getElementById('periodsModalTitle');
             const subtitleEl = document.getElementById('periodsModalSubtitle');
             const contentEl = document.getElementById('periodsModalContent');
             
-            titleEl.textContent = `${dept.department_name} (${dept.department_code})`;
-            subtitleEl.textContent = `${dept.total_classes} class${dept.total_classes !== 1 ? 'es' : ''} scheduled for ${currentClassesData.day}`;
+            // Get filter label for subtitle
+            const filterLabels = {
+                'all': '',
+                'theory': ' (Theory)',
+                'lab': ' (Lab)',
+                'mini_project': ' (Mini Project)'
+            };
+            const filterLabel = filterLabels[currentClassTypeFilter];
             
-            if (!dept.has_classes || dept.classes.length === 0) {
+            titleEl.textContent = `${dept.department_name} (${dept.department_code})`;
+            subtitleEl.textContent = `${totalFiltered} class${totalFiltered !== 1 ? 'es' : ''}${filterLabel} scheduled for ${currentClassesData.day}`;
+            
+            if (totalFiltered === 0) {
                 contentEl.innerHTML = `
                     <div class="no-classes-message">
                         <i class="material-icons">event_busy</i>
                         <h4>No Classes Today</h4>
-                        <p>There are no C Programming classes scheduled for ${dept.department_code} on ${currentClassesData.day}.</p>
+                        <p>There are no C Programming classes${filterLabel} scheduled for ${dept.department_code} on ${currentClassesData.day}.</p>
                     </div>
                 `;
             } else {
@@ -2283,7 +2550,7 @@
                     'mini_project': []
                 };
                 
-                dept.classes.forEach(cls => {
+                filteredClasses.forEach(cls => {
                     if (groupedClasses[cls.class_type]) {
                         groupedClasses[cls.class_type].push(cls);
                     }
