@@ -457,7 +457,7 @@ def _init_all_data(db):
             "experience": "0.2",
             "c_exp": "0",
             "py_exp": "0",
-            "research": None,
+            "research": "Data Science & ML",
             "personal_email": "raakeshmuthuvel@gmail.com"
         },
         {
