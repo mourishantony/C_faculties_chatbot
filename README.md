@@ -151,7 +151,7 @@ C_faculties_chatbot/
 | Table | Description |
 |-------|-------------|
 | `faculties` | Faculty member information |
-| `departments` | 14 B.Tech departments |
+| `departments` | 14   departments |
 | `timetable_entries` | Weekly class schedule |
 | `daily_entries` | Daily class records |
 | `syllabus` | Session-wise syllabus |

@@ -166,20 +166,20 @@ def _init_all_data(db):
     """Initialize all data for a fresh database"""
     # Add Departments with Room Numbers
     departments = [
-        {"name": "B.Tech AI&DS - A", "code": "AIDS-A", "room_number": "315(2nd floor)"},
-        {"name": "B.Tech AI&DS - B", "code": "AIDS-B", "room_number": "316(2nd floor)"},
-        {"name": "B.Tech AI&ML - A", "code": "AIML-A", "room_number": "414(3rd floor)"},
-        {"name": "B.Tech AI&ML - B", "code": "AIML-B", "room_number": "415(3rd floor)"},
-        {"name": "B.Tech CSBS", "code": "CSBS", "room_number": "416(3rd floor)"},
-        {"name": "B.Tech CSE - A", "code": "CSE-A", "room_number": "411A(3rd floor)"},
-        {"name": "B.Tech CSE - B", "code": "CSE-B", "room_number": "412(3rd floor)"},
-        {"name": "B.Tech CYS", "code": "CYS", "room_number": "301(2nd floor)"},
-        {"name": "B.Tech ECE - A", "code": "ECE-A", "room_number": "312(2nd floor)"},
-        {"name": "B.Tech ECE - B", "code": "ECE-B", "room_number": "313(2nd floor)"},
-        {"name": "B.Tech IT - A", "code": "IT-A", "room_number": "310A1(2nd floor)"},
-        {"name": "B.Tech IT - B", "code": "IT-B", "room_number": "311(2nd floor)"},
-        {"name": "B.Tech MECH", "code": "MECH", "room_number": "303(2nd floor)"},
-        {"name": "B.Tech RA", "code": "RA", "room_number": "302(2nd floor)"}
+        {"name": " AI&DS - A", "code": "AIDS-A", "room_number": "315(2nd floor)"},
+        {"name": " AI&DS - B", "code": "AIDS-B", "room_number": "316(2nd floor)"},
+        {"name": " AI&ML - A", "code": "AIML-A", "room_number": "414(3rd floor)"},
+        {"name": " AI&ML - B", "code": "AIML-B", "room_number": "415(3rd floor)"},
+        {"name": " CSBS", "code": "CSBS", "room_number": "416(3rd floor)"},
+        {"name": " CSE - A", "code": "CSE-A", "room_number": "411A(3rd floor)"},
+        {"name": " CSE - B", "code": "CSE-B", "room_number": "412(3rd floor)"},
+        {"name": " CYS", "code": "CYS", "room_number": "301(2nd floor)"},
+        {"name": " ECE - A", "code": "ECE-A", "room_number": "312(2nd floor)"},
+        {"name": " ECE - B", "code": "ECE-B", "room_number": "313(2nd floor)"},
+        {"name": " IT - A", "code": "IT-A", "room_number": "310A1(2nd floor)"},
+        {"name": " IT - B", "code": "IT-B", "room_number": "311(2nd floor)"},
+        {"name": " MECH", "code": "MECH", "room_number": "303(2nd floor)"},
+        {"name": " RA", "code": "RA", "room_number": "302(2nd floor)"}
     ]
     
     for dept in departments:
