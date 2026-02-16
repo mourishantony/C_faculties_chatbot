@@ -29,25 +29,13 @@
                 <div class="dashboard-header">
                 </div>
 
-                <!-- Class Type Filter Section -->
+                <!-- Classes by Department Section -->
                 <div class="card">
                     <div class="card-header">
-                        <h3 class="card-title"><i class="material-icons" style="vertical-align: middle; margin-right: 6px; font-size: 20px;"></i>Classes by Type</h3>
+                        <h3 class="card-title"><i class="material-icons" style="vertical-align: middle; margin-right: 6px; font-size: 20px;">school</i>Classes by Department</h3>
                     </div>
                     <div style="padding: 20px;">
                         <div class="filter-group" style="display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 20px; align-items: flex-end;">
-                            <div style="flex: 1; min-width: 200px;">
-                                <label for="classTypeFilter" style="display: block; margin-bottom: 8px; font-weight: 600; color: #334155;">
-                                    Select View:
-                                </label>
-                                <select id="classTypeFilter" class="form-control" onchange="loadClassesByType()" style="padding: 10px; font-size: 14px;">
-                                    <option value="">-- Today's Schedule --</option>
-                                    <option value="theory">Theory Classes (Today)</option>
-                                    <option value="lab">Lab Classes (Today)</option>
-                                    <option value="mini_project">Mini Project Classes (Today)</option>
-                                </select>
-                            </div>
-                            
                             <div id="dateToggleContainer" class="day-buttons-container">
                                 <button id="sunBtn" class="day-btn" data-day="0" onclick="switchToDay(0)">Sun</button>
                                 <button id="monBtn" class="day-btn" data-day="1" onclick="switchToDay(1)">Mon</button>
@@ -57,27 +45,11 @@
                                 <button id="friBtn" class="day-btn" data-day="5" onclick="switchToDay(5)">Fri</button>
                                 <button id="satBtn" class="day-btn" data-day="6" onclick="switchToDay(6)">Sat</button>
                             </div>
-                            
-                            <div id="dayFilterContainer" style="flex: 1; min-width: 200px; display: none;">
-                                <label for="dayFilter" style="display: block; margin-bottom: 8px; font-weight: 600; color: #334155;">
-                                    Select Day:
-                                </label>
-                                <select id="dayFilter" class="form-control" onchange="filterByDay()" style="padding: 10px; font-size: 14px;">
-                                    <option value="">-- All Days --</option>
-                                    <option value="Monday">Monday</option>
-                                    <option value="Tuesday">Tuesday</option>
-                                    <option value="Wednesday">Wednesday</option>
-                                    <option value="Thursday">Thursday</option>
-                                    <option value="Friday">Friday</option>
-                                    <option value="Saturday">Saturday</option>
-                                    <option value="Sunday">Sunday</option>
-                                </select>
-                            </div>
                         </div>
                         
                         <div id="classesByTypeContainer" style="margin-top: 20px;">
                             <p class="text-center" style="padding: 20px; color: #64748b;">
-                                Loading today's classes...
+                                Loading classes...
                             </p>
                         </div>
                     </div>
@@ -253,6 +225,23 @@
                 </button>
             </div>
             <div id="modalContent" style="padding: 20px; line-height: 1.6; color: #334155; white-space: pre-wrap; word-wrap: break-word;">
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for viewing department periods -->
+    <div id="periodsModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 10000; align-items: center; justify-content: center;">
+        <div style="background: white; border-radius: 16px; max-width: 650px; width: 95%; max-height: 85vh; overflow-y: auto; box-shadow: 0 8px 32px rgba(0,0,0,0.3);">
+            <div style="padding: 20px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; background: linear-gradient(135deg, #0f172a, #1e3a8a); color: white; border-radius: 16px 16px 0 0; position: sticky; top: 0; z-index: 1;">
+                <div>
+                    <h3 id="periodsModalTitle" style="margin: 0; font-size: 18px; font-weight: 600;">Class Schedule</h3>
+                    <p id="periodsModalSubtitle" style="margin: 5px 0 0 0; font-size: 13px; opacity: 0.9;"></p>
+                </div>
+                <button onclick="closePeriodsModal()" style="background: rgba(255,255,255,0.2); border: none; color: white; cursor: pointer; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: background 0.2s;">
+                    <i class="material-icons" style="font-size: 20px;">close</i>
+                </button>
+            </div>
+            <div id="periodsModalContent" style="padding: 20px;">
             </div>
         </div>
     </div>
@@ -568,6 +557,264 @@
             box-shadow: 0 2px 6px rgba(245, 158, 11, 0.2);
         }
         
+        /* Department Cards Grid */
+        .dept-cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            justify-content: center;
+        }
+        
+        .dept-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+        
+        .dept-card:hover {
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+            transform: translateY(-4px);
+            border-color: #1e3a8a;
+        }
+        
+        .dept-card-header {
+            background: linear-gradient(135deg, #0f172a, #1e3a8a);
+            color: white;
+            padding: 16px 18px;
+            position: relative;
+        }
+        
+        .dept-card-header h4 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .dept-card-header .class-count {
+            position: absolute;
+            top: 12px;
+            right: 14px;
+            background: rgba(255,255,255,0.2);
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .dept-card-body {
+            padding: 18px;
+            background: #ffffff;
+        }
+        
+        .dept-info-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+            padding: 10px 12px;
+            border-radius: 10px;
+            background: #f8fafc;
+            transition: background 0.2s ease;
+        }
+        
+        .dept-info-row:hover {
+            background: #f1f5f9;
+        }
+        
+        .dept-info-row:last-child {
+            margin-bottom: 0;
+        }
+        
+        .dept-info-row .info-icon {
+            font-size: 20px;
+            min-width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #0f172a, #1e3a8a);
+            color: white;
+            border-radius: 10px;
+        }
+        
+        .dept-info-row .info-content {
+            flex: 1;
+        }
+        
+        .dept-info-row .info-label {
+            font-size: 10px;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 2px;
+            font-weight: 600;
+        }
+        
+        .dept-info-row .info-value {
+            font-size: 14px;
+            color: #1e293b;
+            font-weight: 600;
+        }
+        
+        .dept-card-footer {
+            padding: 14px 18px;
+            background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+            border-top: 1px solid #e2e8f0;
+        }
+        
+        .view-classes-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            padding: 12px 16px;
+            background: linear-gradient(135deg, #1e3a8a, #334155);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .view-classes-btn:hover {
+            background: linear-gradient(135deg, #0f172a, #1e3a8a);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.4);
+        }
+        
+        .view-classes-btn.no-classes {
+            background: #94a3b8;
+            cursor: default;
+        }
+        
+        .view-classes-btn.no-classes:hover {
+            transform: none;
+            box-shadow: none;
+        }
+        
+        /* Period item in modal */
+        .period-item {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            transition: all 0.2s ease;
+        }
+        
+        .period-item:hover {
+            border-color: #cbd5e1;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+        
+        .period-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .period-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .period-badge-modal {
+            background: linear-gradient(135deg, #0f172a, #1e3a8a);
+            color: white;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            box-shadow: 0 2px 6px rgba(15, 23, 42, 0.4);
+        }
+        
+        .period-item-body {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        
+        .period-detail {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: #475569;
+        }
+        
+        .period-detail i {
+            font-size: 18px;
+            color: #1e3a8a;
+        }
+        
+        .period-detail strong {
+            color: #1e293b;
+        }
+        
+        .no-classes-message {
+            text-align: center;
+            padding: 40px 20px;
+            color: #64748b;
+        }
+        
+        .no-classes-message i {
+            font-size: 48px;
+            color: #cbd5e1;
+            margin-bottom: 16px;
+        }
+        
+        .no-classes-message h4 {
+            margin: 0 0 8px 0;
+            color: #475569;
+            font-size: 18px;
+        }
+        
+        .no-classes-message p {
+            margin: 0;
+            font-size: 14px;
+        }
+        
+        /* Mobile responsive for dept cards */
+        @media (max-width: 768px) {
+            .dept-cards-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+                padding: 0 5px;
+            }
+            
+            .dept-card-header {
+                padding: 14px 16px;
+            }
+            
+            .dept-card-header h4 {
+                font-size: 16px;
+            }
+            
+            .dept-card-body {
+                padding: 14px;
+            }
+            
+            .dept-info-row {
+                padding: 8px 10px;
+                margin-bottom: 10px;
+            }
+            
+            .period-item-body {
+                grid-template-columns: 1fr;
+            }
+        }
+
         /* Status badges for report table */
         .status-badge {
             padding: 6px 14px;
@@ -1792,9 +2039,15 @@
                     }
                     
                     // Summary column with View button if summary exists
-                    const summaryContent = entry.summary 
-                        ? `<button onclick='showDetailModal("Summary", ${JSON.stringify(entry.summary)})' class="view-btn"><i class="material-icons">notes</i> View</button>` 
-                        : '-';
+                    // Also show lab_work_done or mini_project_progress as summary alternatives
+                    let summaryContent = '-';
+                    if (entry.summary) {
+                        summaryContent = `<button onclick='showDetailModal("Summary", ${JSON.stringify(entry.summary)})' class="view-btn"><i class="material-icons">notes</i> View</button>`;
+                    } else if (entry.class_type === 'lab' && entry.lab_work_done) {
+                        summaryContent = `<button onclick='showDetailModal("Lab Work Summary", ${JSON.stringify(entry.lab_work_done)})' class="view-btn"><i class="material-icons">notes</i> View</button>`;
+                    } else if (entry.class_type === 'mini_project' && entry.mini_project_progress) {
+                        summaryContent = `<button onclick='showDetailModal("Mini Project Summary", ${JSON.stringify(entry.mini_project_progress)})' class="view-btn"><i class="material-icons">notes</i> View</button>`;
+                    }
                     
                     html += `
                         <tr>
@@ -1832,12 +2085,19 @@
             document.getElementById('detailModal').style.display = 'none';
         }
         
-        // Close modal when clicking outside
+        // Close modals when clicking outside
         document.addEventListener('DOMContentLoaded', () => {
-            const modal = document.getElementById('detailModal');
-            modal.addEventListener('click', (e) => {
-                if (e.target === modal) {
+            const detailModal = document.getElementById('detailModal');
+            detailModal.addEventListener('click', (e) => {
+                if (e.target === detailModal) {
                     closeDetailModal();
+                }
+            });
+            
+            const periodsModal = document.getElementById('periodsModal');
+            periodsModal.addEventListener('click', (e) => {
+                if (e.target === periodsModal) {
+                    closePeriodsModal();
                 }
             });
         });
@@ -1896,173 +2156,198 @@
         }
         
         async function loadClassesByDate() {
-            const classTypeFilter = document.getElementById('classTypeFilter');
-            classTypeFilter.value = ''; // Reset type filter
-            await loadTodayClasses();
+            await loadDepartmentClasses();
         }
         
-        async function loadTodayClasses() {
+        async function loadDepartmentClasses() {
             const container = document.getElementById('classesByTypeContainer');
-            const dayFilterContainer = document.getElementById('dayFilterContainer');
             
             try {
                 const dayLabel = dayNames[currentSelectedDayOfWeek];
                 container.innerHTML = `<p class="text-center" style="padding: 20px;">Loading ${dayLabel}'s classes...</p>`;
                 
-                const data = await apiRequest(`/api/admin/today-classes?date_offset=${currentDateOffset}`);
+                const data = await apiRequest(`/api/admin/classes-by-department?date_offset=${currentDateOffset}`);
                 
-                if (data.classes.length === 0) {
-                    container.innerHTML = `<p class="text-center" style="padding: 20px; color: #64748b;">No classes scheduled for ${dayLabel} (${data.date}).</p>`;
-                    dayFilterContainer.style.display = 'none';
-                    return;
-                }
+                // Store data for reference
+                currentClassesData = data;
                 
-                // Store data for potential filtering
-                currentClassesData = {
-                    classType: 'all',
-                    classes: data.classes,
-                    totalClasses: data.total_classes,
-                    isToday: currentDateOffset === 0,
-                    date: data.date,
-                    day: data.day,
-                    dateOffset: currentDateOffset
-                };
-                
-                // Hide day filter for today view
-                dayFilterContainer.style.display = 'none';
-                
-                // Render today's classes
-                renderTodayClasses(data);
+                // Render department cards
+                renderDepartmentCards(data);
                 
             } catch (error) {
                 console.error('Error loading classes:', error);
                 container.innerHTML = '<div class="alert alert-error">Failed to load classes. Please try again.</div>';
-                dayFilterContainer.style.display = 'none';
             }
         }
         
-        function renderTodayClasses(data) {
+        // Alias for backward compatibility
+        async function loadTodayClasses() {
+            await loadDepartmentClasses();
+        }
+        
+        function renderDepartmentCards(data) {
             const container = document.getElementById('classesByTypeContainer');
-            const { classes, day, date } = data;
-            
-            // Group by class type for better organization
-            const groupedByType = {
-                'theory': [],
-                'lab': [],
-                'mini_project': []
-            };
-            
-            classes.forEach(cls => {
-                if (groupedByType[cls.class_type]) {
-                    groupedByType[cls.class_type].push(cls);
-                }
-            });
-            
-            // Sort each group by period
-            Object.keys(groupedByType).forEach(type => {
-                groupedByType[type].sort((a, b) => a.period - b.period);
-            });
-            
-            const typeIcons = {
-                'theory': '<i class=\"material-icons\" style=\"font-size: 24px; vertical-align: middle;\">book</i>',
-                'lab': '<i class=\"material-icons\" style=\"font-size: 24px; vertical-align: middle;\">science</i>',
-                'mini_project': '<i class=\"material-icons\" style=\"font-size: 24px; vertical-align: middle;\">lightbulb</i>'
-            };
-            
-            const typeNames = {
-                'theory': 'Theory',
-                'lab': 'Lab',
-                'mini_project': 'Mini Project'
-            };
+            const { departments, date, day } = data;
             
             const scheduleLabel = currentDateOffset === 0 ? 'Today\'s Schedule' : `${dayNames[currentSelectedDayOfWeek]}'s Schedule`;
             
+            // Count total classes across all departments
+            const totalClasses = departments.reduce((sum, dept) => sum + dept.total_classes, 0);
+            
             let html = `
-                <div style=\"background: linear-gradient(135deg, #0f172a, #1e3a8a); color: white; padding: 15px; border-radius: 10px; margin-bottom: 20px;\">
-                    <h3 style=\"margin: 0 0 5px 0; display: flex; align-items: center; gap: 10px;\">
-                        <i class=\"material-icons\" style=\"font-size: 28px;\">event</i>
+                <div style="background: linear-gradient(135deg, #0f172a, #1e3a8a); color: white; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+                    <h3 style="margin: 0 0 5px 0; display: flex; align-items: center; gap: 10px;">
+                        <i class="material-icons" style="font-size: 28px;">event</i>
                         <span>${scheduleLabel}</span>
                     </h3>
-                    <p style=\"margin: 0; opacity: 0.9; font-size: 14px;\">
-                        ${classes.length} class${classes.length !== 1 ? 'es' : ''} scheduled for ${date}
+                    <p style="margin: 0; opacity: 0.9; font-size: 14px;">
+                        ${totalClasses} class${totalClasses !== 1 ? 'es' : ''} scheduled for ${date} (${day})
                     </p>
                 </div>
+                <div class="dept-cards-grid">
             `;
             
-            // Render each class type section
-            Object.keys(groupedByType).forEach(type => {
-                const typeClasses = groupedByType[type];
-                if (typeClasses.length === 0) return;
+            departments.forEach(dept => {
+                const hasClasses = dept.has_classes;
+                const buttonClass = hasClasses ? '' : 'no-classes';
+                const buttonText = hasClasses ? `View Classes (${dept.total_classes})` : 'No Classes Today';
+                const buttonIcon = hasClasses ? 'visibility' : 'event_busy';
+                const buttonOnClick = hasClasses ? `showPeriodsModal('${dept.department_code}')` : '';
                 
                 html += `
-                    <div style=\"margin-bottom: 25px;\">
-                        <h4 style=\"background: #e0e7ff; padding: 10px 15px; border-radius: 8px; color: #0f172a; margin: 0 0 12px 0; display: flex; align-items: center; gap: 8px;\">
-                            ${typeIcons[type]}
-                            <span>${typeNames[type]} Classes</span>
-                            <span style=\"margin-left: auto; background: linear-gradient(135deg, #1e3a8a, #334155); color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: normal; box-shadow: 0 2px 6px rgba(15, 23, 42, 0.4);\">
-                                ${typeClasses.length} class${typeClasses.length !== 1 ? 'es' : ''}
-                            </span>
-                        </h4>
-                        <div class=\"classes-grid\">
-                `;
-                
-                typeClasses.forEach(cls => {
-                    const statusBadge = getStatusBadge(cls.status);
-                    const roomInfo = cls.room_number ? `<div class=\"class-info-row\">
-                                    <span class=\"info-icon\"><i class=\"material-icons\">meeting_room</i></span>
-                                    <div class=\"info-content\">
-                                        <div class=\"info-label\">Room</div>
-                                        <div class=\"info-value\">${cls.room_number}</div>
-                                    </div>
-                                </div>` : '';
-                    
-                    html += `
-                        <div class=\"class-card\">
-                            <div class=\"class-card-header\">
-                                <span class=\"period-badge-large\">${getOrdinal(cls.period)} Period</span>
-                                ${statusBadge}
-                            </div>
-                            <div class=\"class-card-body\">
-                                <div class=\"class-info-row\">
-                                    <span class=\"info-icon\"><i class=\"material-icons\">school</i></span>
-                                    <div class=\"info-content\">
-                                        <div class=\"info-label\">Faculty</div>
-                                        <div class=\"info-value\">${cls.faculty_name}</div>
-                                    </div>
-                                </div>
-                                <div class=\"class-info-row\">
-                                    <span class=\"info-icon\"><i class=\"material-icons\">business</i></span>
-                                    <div class=\"info-content\">
-                                        <div class=\"info-label\">Department</div>
-                                        <div class=\"info-value\">${cls.department_name} (${cls.department_code})</div>
-                                    </div>
-                                </div>
-                                ${roomInfo}
-                                <div class=\"class-info-row\">
-                                    <span class=\"info-icon\"><i class=\"material-icons\">menu_book</i></span>
-                                    <div class=\"info-content\">
-                                        <div class=\"info-label\">Subject</div>
-                                        <div class=\"info-value\">${cls.subject_name} (${cls.subject_code})</div>
-                                    </div>
+                    <div class="dept-card">
+                        <div class="dept-card-header">
+                            <h4>
+                                <i class="material-icons">school</i>
+                                ${dept.department_name}
+                            </h4>
+                            <span class="class-count">${dept.department_code}</span>
+                        </div>
+                        <div class="dept-card-body">
+                            <div class="dept-info-row">
+                                <span class="info-icon"><i class="material-icons">person</i></span>
+                                <div class="info-content">
+                                    <div class="info-label">Faculty</div>
+                                    <div class="info-value">${dept.display_faculty}</div>
                                 </div>
                             </div>
-                            <div class=\"class-card-footer\">
-                                <a href=\"mailto:${cls.faculty_email}\" class=\"contact-btn\">
-                                    <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"currentColor\"><path d=\"M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z\"/></svg>
-                                    Contact Faculty
-                                </a>
+                            <div class="dept-info-row">
+                                <span class="info-icon"><i class="material-icons">meeting_room</i></span>
+                                <div class="info-content">
+                                    <div class="info-label">Classroom</div>
+                                    <div class="info-value">${dept.room_number || 'Not Assigned'}</div>
+                                </div>
                             </div>
                         </div>
-                    `;
-                });
-                
-                html += `
+                        <div class="dept-card-footer">
+                            <button class="view-classes-btn ${buttonClass}" ${hasClasses ? `onclick="${buttonOnClick}"` : ''}>
+                                <i class="material-icons">${buttonIcon}</i>
+                                ${buttonText}
+                            </button>
                         </div>
                     </div>
                 `;
             });
             
+            html += '</div>';
             container.innerHTML = html;
+        }
+        
+        function showPeriodsModal(deptCode) {
+            if (!currentClassesData) return;
+            
+            const dept = currentClassesData.departments.find(d => d.department_code === deptCode);
+            if (!dept) return;
+            
+            const modal = document.getElementById('periodsModal');
+            const titleEl = document.getElementById('periodsModalTitle');
+            const subtitleEl = document.getElementById('periodsModalSubtitle');
+            const contentEl = document.getElementById('periodsModalContent');
+            
+            titleEl.textContent = `${dept.department_name} (${dept.department_code})`;
+            subtitleEl.textContent = `${dept.total_classes} class${dept.total_classes !== 1 ? 'es' : ''} scheduled for ${currentClassesData.day}`;
+            
+            if (!dept.has_classes || dept.classes.length === 0) {
+                contentEl.innerHTML = `
+                    <div class="no-classes-message">
+                        <i class="material-icons">event_busy</i>
+                        <h4>No Classes Today</h4>
+                        <p>There are no C Programming classes scheduled for ${dept.department_code} on ${currentClassesData.day}.</p>
+                    </div>
+                `;
+            } else {
+                // Group classes by type
+                const groupedClasses = {
+                    'theory': [],
+                    'lab': [],
+                    'mini_project': []
+                };
+                
+                dept.classes.forEach(cls => {
+                    if (groupedClasses[cls.class_type]) {
+                        groupedClasses[cls.class_type].push(cls);
+                    }
+                });
+                
+                const typeLabels = {
+                    'theory': { name: 'Theory Classes', icon: 'book', color: '#1e3a8a' },
+                    'lab': { name: 'Lab Classes', icon: 'science', color: '#059669' },
+                    'mini_project': { name: 'Mini Project', icon: 'lightbulb', color: '#d97706' }
+                };
+                
+                let html = '';
+                
+                Object.keys(groupedClasses).forEach(type => {
+                    const classes = groupedClasses[type];
+                    if (classes.length === 0) return;
+                    
+                    const typeInfo = typeLabels[type];
+                    
+                    html += `
+                        <div style="margin-bottom: 20px;">
+                            <h4 style="display: flex; align-items: center; gap: 8px; margin: 0 0 12px 0; color: ${typeInfo.color}; font-size: 15px;">
+                                <i class="material-icons" style="font-size: 20px;">${typeInfo.icon}</i>
+                                ${typeInfo.name}
+                                <span style="background: ${typeInfo.color}; color: white; padding: 2px 10px; border-radius: 12px; font-size: 12px; font-weight: 500; margin-left: auto;">
+                                    ${classes.length}
+                                </span>
+                            </h4>
+                    `;
+                    
+                    classes.forEach(cls => {
+                        const statusBadge = getStatusBadge(cls.status);
+                        
+                        html += `
+                            <div class="period-item">
+                                <div class="period-item-header">
+                                    <span class="period-badge-modal">${getOrdinal(cls.period)} Period</span>
+                                    ${statusBadge}
+                                </div>
+                                <div class="period-item-body">
+                                    <div class="period-detail">
+                                        <i class="material-icons">person</i>
+                                        <span><strong>Faculty:</strong> ${cls.faculty_name}</span>
+                                    </div>
+                                    <div class="period-detail">
+                                        <i class="material-icons">email</i>
+                                        <a href="mailto:${cls.faculty_email}" style="color: #1e3a8a; text-decoration: none;">${cls.faculty_email || 'N/A'}</a>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    
+                    html += '</div>';
+                });
+                
+                contentEl.innerHTML = html;
+            }
+            
+            modal.style.display = 'flex';
+        }
+        
+        function closePeriodsModal() {
+            document.getElementById('periodsModal').style.display = 'none';
         }
         
         function getStatusBadge(status) {
@@ -2073,288 +2358,6 @@
                 'scheduled': '<span class="class-type-badge status-scheduled"><i class="material-icons" style="font-size: 14px;">event</i> Scheduled</span>'
             };
             return badges[status] || badges['scheduled'];
-        }
-        
-        async function loadClassesByType() {
-            const classType = document.getElementById('classTypeFilter').value;
-            const container = document.getElementById('classesByTypeContainer');
-            const dayFilterContainer = document.getElementById('dayFilterContainer');
-            const dayFilter = document.getElementById('dayFilter');
-            
-            // Reset day filter
-            dayFilter.value = '';
-            
-            if (!classType) {
-                // Load today's classes
-                await loadTodayClasses();
-                return;
-            }
-            
-            try {
-                container.innerHTML = '<p class="text-center" style="padding: 20px;">Loading...</p>';
-                
-                // Filter by current date (today or tomorrow)
-                const data = await apiRequest(`/api/admin/classes-by-type?class_type=${classType}&date_offset=${currentDateOffset}`);
-                
-                const dayLabel = currentDateOffset === 0 ? 'today' : dayNames[currentSelectedDayOfWeek];
-                if (data.classes.length === 0) {
-                    const typeNames = {
-                        'theory': 'Theory',
-                        'lab': 'Lab',
-                        'mini_project': 'Mini Project'
-                    };
-                    container.innerHTML = `<p class="text-center" style="padding: 20px; color: #64748b;">No ${typeNames[classType]} classes scheduled for ${dayLabel}.</p>`;
-                    dayFilterContainer.style.display = 'none';
-                    currentClassesData = null;
-                    return;
-                }
-                
-                // Hide day filter since we're only showing today
-                dayFilterContainer.style.display = 'none';
-                
-                // Render today's filtered classes
-                renderTodayFilteredClasses(data);
-                
-            } catch (error) {
-                console.error('Error loading classes by type:', error);
-                container.innerHTML = '<div class="alert alert-error">Failed to load classes. Please try again.</div>';
-                dayFilterContainer.style.display = 'none';
-                currentClassesData = null;
-            }
-        }
-        
-        function filterByDay() {
-            if (!currentClassesData) return;
-            renderClasses();
-        }
-        
-        function renderTodayFilteredClasses(data) {
-            const container = document.getElementById('classesByTypeContainer');
-            const { class_type, classes } = data;
-            
-            // Sort by period
-            const sortedClasses = [...classes].sort((a, b) => a.period - b.period);
-            
-            const typeIcons = {
-                'theory': '<i class="material-icons" style="font-size: 24px; vertical-align: middle;">book</i>',
-                'lab': '<i class="material-icons" style="font-size: 24px; vertical-align: middle;">science</i>',
-                'mini_project': '<i class="material-icons" style="font-size: 24px; vertical-align: middle;">lightbulb</i>'
-            };
-            
-            const typeNames = {
-                'theory': 'Theory Classes',
-                'lab': 'Lab Classes',
-                'mini_project': 'Mini Project Classes'
-            };
-            
-            const headerIconName = class_type === 'theory' ? 'book' : class_type === 'lab' ? 'science' : 'lightbulb';
-            const dateLabel = currentDateOffset === 0 ? 'Today' : dayNames[currentSelectedDayOfWeek];
-            
-            let html = `
-                <div style="background: linear-gradient(135deg, #0f172a, #1e3a8a); color: white; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
-                    <h3 style="margin: 0 0 5px 0; display: flex; align-items: center; gap: 10px;">
-                        <i class="material-icons" style="font-size: 28px;">${headerIconName}</i>
-                        <span>${typeNames[class_type]} - ${dateLabel}</span>
-                    </h3>
-                    <p style="margin: 0; opacity: 0.9; font-size: 14px;">
-                        ${sortedClasses.length} class${sortedClasses.length !== 1 ? 'es' : ''} scheduled for ${data.day || sortedClasses[0]?.day || dateLabel.toLowerCase()}
-                    </p>
-                </div>
-                <div class="classes-grid">
-            `;
-            
-            sortedClasses.forEach(cls => {
-                const statusBadge = getStatusBadge(cls.status);
-                const roomInfo = cls.room_number ? `<div class="class-info-row">
-                                <span class="info-icon"><i class="material-icons">meeting_room</i></span>
-                                <div class="info-content">
-                                    <div class="info-label">Room</div>
-                                    <div class="info-value">${cls.room_number}</div>
-                                </div>
-                            </div>` : '';
-                
-                html += `
-                    <div class="class-card">
-                        <div class="class-card-header">
-                            <span class="period-badge-large">${getOrdinal(cls.period)} Period</span>
-                            ${statusBadge}
-                        </div>
-                        <div class="class-card-body">
-                            <div class="class-info-row">
-                                <span class="info-icon"><i class="material-icons">school</i></span>
-                                <div class="info-content">
-                                    <div class="info-label">Faculty</div>
-                                    <div class="info-value">${cls.faculty_name}</div>
-                                </div>
-                            </div>
-                            <div class="class-info-row">
-                                <span class="info-icon"><i class="material-icons">business</i></span>
-                                <div class="info-content">
-                                    <div class="info-label">Department</div>
-                                    <div class="info-value">${cls.department_name} (${cls.department_code})</div>
-                                </div>
-                            </div>
-                            ${roomInfo}
-                            <div class="class-info-row">
-                                <span class="info-icon"><i class="material-icons">menu_book</i></span>
-                                <div class="info-content">
-                                    <div class="info-label">Subject</div>
-                                    <div class="info-value">${cls.subject_name} (${cls.subject_code})</div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="class-card-footer">
-                            <a href="mailto:${cls.faculty_email}" class="contact-btn">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
-                                Contact Faculty
-                            </a>
-                        </div>
-                    </div>
-                `;
-            });
-            
-            html += '</div>';
-            container.innerHTML = html;
-        }
-        
-        function renderClasses() {
-            if (!currentClassesData) return;
-            
-            const container = document.getElementById('classesByTypeContainer');
-            const selectedDay = document.getElementById('dayFilter').value;
-            const { classType, classes, totalClasses } = currentClassesData;
-            
-            // Filter by day if selected
-            let filteredClasses = classes;
-            if (selectedDay) {
-                filteredClasses = classes.filter(cls => cls.day === selectedDay);
-                
-                if (filteredClasses.length === 0) {
-                    container.innerHTML = `<p class="text-center" style="padding: 20px; color: #64748b;">No classes scheduled for ${selectedDay}.</p>`;
-                    return;
-                }
-            }
-            
-            // Group classes by day
-            const dayOrder = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-            const groupedByDay = {};
-            
-            filteredClasses.forEach(cls => {
-                if (!groupedByDay[cls.day]) {
-                    groupedByDay[cls.day] = [];
-                }
-                groupedByDay[cls.day].push(cls);
-            });
-            
-            // Sort each day's classes by period
-            Object.keys(groupedByDay).forEach(day => {
-                groupedByDay[day].sort((a, b) => a.period - b.period);
-            });
-            
-            // Build HTML
-            const typeIcons = {
-                'theory': '<i class="material-icons" style="font-size: 24px; vertical-align: middle;">book</i>',
-                'lab': '<i class="material-icons" style="font-size: 24px; vertical-align: middle;">science</i>',
-                'mini_project': '<i class="material-icons" style="font-size: 24px; vertical-align: middle;">lightbulb</i>'
-            };
-            
-            const typeNames = {
-                'theory':'Theory Classes',
-                'lab':'Lab Classes',
-                'mini_project':'Mini Project Classes'
-            };
-            
-            const headerIconName = classType === 'theory' ? 'book' : classType === 'lab' ? 'science' : 'lightbulb';
-            
-            let html = `
-                <div style="background: linear-gradient(135deg, #0f172a, #1e3a8a); color: white; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
-                    <h3 style="margin: 0 0 5px 0; display: flex; align-items: center; gap: 10px;">
-                        <i class="material-icons" style="font-size: 28px;">${headerIconName}</i>
-                        <span>${typeNames[classType]}</span>
-                    </h3>
-                    <p style="margin: 0; opacity: 0.9; font-size: 14px;">
-                        ${selectedDay ? `${selectedDay}: ` : ''}${filteredClasses.length} class${filteredClasses.length !== 1 ? 'es' : ''} 
-                        ${selectedDay ? `(Total: ${totalClasses})` : 'scheduled'}
-                    </p>
-                </div>
-            `;
-            
-            // Sort days according to day order
-            const sortedDays = dayOrder.filter(day => groupedByDay[day]);
-            
-            sortedDays.forEach(day => {
-                const classes = groupedByDay[day];
-                
-                html += `
-                    <div style="margin-bottom: 25px;">
-                        <h4 style="background: #e0e7ff; padding: 10px 15px; border-radius: 8px; color: #0f172a; margin: 0 0 12px 0; display: flex; align-items: center; gap: 8px;">
-                            <i class="material-icons" style="font-size: 20px;">event</i>
-                            <span>${day}</span>
-                            <span style="margin-left: auto; background: linear-gradient(135deg, #1e3a8a, #334155); color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: normal; box-shadow: 0 2px 6px rgba(15, 23, 42, 0.4);">
-                                ${classes.length} class${classes.length !== 1 ? 'es' : ''}
-                            </span>
-                        </h4>
-                        <div class="classes-grid">
-                `;
-                
-                classes.forEach(cls => {
-                    const statusBadge = cls.is_today ? getStatusBadge(cls.status) : 
-                        `<span class="class-type-badge ${classType}">${typeIcons[classType]} ${classType.replace('_', ' ').toUpperCase()}</span>`;
-                    const roomInfo = cls.room_number ? `<div class="class-info-row">
-                                        <span class="info-icon"><i class="material-icons">meeting_room</i></span>
-                                        <div class="info-content">
-                                            <div class="info-label">Room</div>
-                                            <div class="info-value">${cls.room_number}</div>
-                                        </div>
-                                    </div>` : '';
-                    
-                    html += `
-                        <div class="class-card">
-                            <div class="class-card-header">
-                                <span class="period-badge-large">${getOrdinal(cls.period)} Period</span>
-                                ${statusBadge}
-                            </div>
-                                <div class="class-card-body">
-                                    <div class="class-info-row">
-                                        <span class="info-icon"><i class="material-icons">school</i></span>
-                                        <div class="info-content">
-                                            <div class="info-label">Faculty</div>
-                                            <div class="info-value">${cls.faculty_name}</div>
-                                        </div>
-                                    </div>
-                                    <div class="class-info-row">
-                                        <span class="info-icon"><i class="material-icons">business</i></span>
-                                        <div class="info-content">
-                                            <div class="info-label">Department</div>
-                                            <div class="info-value">${cls.department_name} (${cls.department_code})</div>
-                                        </div>
-                                    </div>
-                                    ${roomInfo}
-                                    <div class="class-info-row">
-                                        <span class="info-icon"><i class="material-icons">menu_book</i></span>
-                                        <div class="info-content">
-                                            <div class="info-label">Subject</div>
-                                            <div class="info-value">${cls.subject_name} (${cls.subject_code})</div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="class-card-footer">
-                                    <a href="mailto:${cls.faculty_email}" class="contact-btn">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
-                                        Contact Faculty
-                                    </a>
-                                </div>
-                            </div>
-                        `;
-                });
-                
-                html += `
-                        </div>
-                    </div>
-                `;
-            });
-            
-            container.innerHTML = html;
         }
         
         function toggleChatbot() {

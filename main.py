@@ -687,6 +687,126 @@ def get_classes_by_type(class_type: str, date_offset: int = 0, db: Session = Dep
         "day": day_name
     }
 
+@app.get("/api/admin/classes-by-department")
+def get_classes_by_department(date_offset: int = 0, db: Session = Depends(get_db)):
+    """Get all classes grouped by department for a specific date
+    Returns 14 department cards with their respective classes (theory, lab, mini_project)
+    """
+    target_date = date.today() + timedelta(days=date_offset)
+    day_name = get_day_name(target_date)
+    
+    # Define department order: AIDS-A to RA
+    department_order = [
+        "AIDS-A", "AIDS-B", "AIML-A", "AIML-B", "CSBS", 
+        "CSE-A", "CSE-B", "CYS", "ECE-A", "ECE-B", 
+        "IT-A", "IT-B", "MECH", "RA"
+    ]
+    
+    # Get all departments
+    departments = db.query(Department).all()
+    dept_map = {dept.code: dept for dept in departments}
+    
+    # Get ALL timetable entries (for all days) to find assigned faculty for each department
+    all_entries = db.query(TimetableEntry).all()
+    
+    # Build faculty assignment map for all departments (from all days)
+    dept_faculty_map = {}
+    for entry in all_entries:
+        dept = db.query(Department).filter(Department.id == entry.department_id).first()
+        if not dept:
+            continue
+        faculty = db.query(Faculty).filter(Faculty.id == entry.faculty_id).first()
+        if not faculty:
+            continue
+            
+        if dept.code not in dept_faculty_map:
+            dept_faculty_map[dept.code] = set()
+        dept_faculty_map[dept.code].add(faculty.name)
+    
+    # Get timetable entries for the target day only (for today's classes)
+    entries = db.query(TimetableEntry).filter(
+        TimetableEntry.day == day_name
+    ).order_by(TimetableEntry.period).all()
+    
+    # Group today's entries by department
+    dept_classes = {}
+    for entry in entries:
+        dept = db.query(Department).filter(Department.id == entry.department_id).first()
+        if not dept:
+            continue
+            
+        faculty = db.query(Faculty).filter(Faculty.id == entry.faculty_id).first()
+        
+        # Check if daily entry exists for target date
+        daily_entry = db.query(DailyEntry).filter(
+            DailyEntry.faculty_id == entry.faculty_id,
+            DailyEntry.department_id == entry.department_id,
+            DailyEntry.date == target_date,
+            DailyEntry.period == entry.period
+        ).first()
+        
+        status = "pending"
+        if daily_entry:
+            if daily_entry.is_absent:
+                status = "absent"
+            else:
+                status = "filled"
+        
+        class_info = {
+            "id": entry.id,
+            "period": entry.period,
+            "class_type": entry.class_type,
+            "faculty_id": entry.faculty_id,
+            "faculty_name": faculty.name if faculty else "Unknown",
+            "faculty_email": faculty.email if faculty else None,
+            "status": status
+        }
+        
+        if dept.code not in dept_classes:
+            dept_classes[dept.code] = []
+        
+        dept_classes[dept.code].append(class_info)
+    
+    # Build result in the specified order
+    result = []
+    for code in department_order:
+        if code in dept_map:
+            dept = dept_map[code]
+            
+            # Get today's classes for this department
+            today_classes = dept_classes.get(code, [])
+            today_classes.sort(key=lambda x: x["period"])
+            
+            # Get ALL assigned faculty names (from all days) for this department
+            all_faculty_names = list(dept_faculty_map.get(code, set()))
+            
+            # Determine display faculty name based on all assignments
+            if len(all_faculty_names) == 0:
+                display_faculty = "Not Assigned"
+            elif len(all_faculty_names) == 1:
+                display_faculty = all_faculty_names[0]
+            else:
+                display_faculty = "(varies)"
+            
+            result.append({
+                "department_id": dept.id,
+                "department_name": dept.name,
+                "department_code": code,
+                "room_number": dept.room_number,
+                "display_faculty": display_faculty,
+                "faculty_names": all_faculty_names,
+                "classes": today_classes,
+                "total_classes": len(today_classes),
+                "has_classes": len(today_classes) > 0
+            })
+    
+    return {
+        "date": target_date.isoformat(),
+        "day": day_name,
+        "total_departments": len(result),
+        "departments": result
+    }
+
 # ----- Chatbot Route -----
 @app.post("/api/chatbot")
 def chatbot_query(data: ChatQuery, db: Session = Depends(get_db)):
