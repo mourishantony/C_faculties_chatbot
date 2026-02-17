@@ -230,6 +230,11 @@
                         <label for="isAbsent">Mark as Absent</label>
                     </div>
                     
+                    <div class="form-group hidden" id="absentReasonGroup">
+                        <label class="form-label">Reason for Absence</label>
+                        <textarea class="form-control" id="absentReason" placeholder="Please provide the reason for being absent..." rows="3"></textarea>
+                    </div>
+                    
                     <div id="classDetails">
                         <div class="checkbox-group">
                             <input type="checkbox" id="isSwapped" onchange="toggleSwapped()">
@@ -239,6 +244,11 @@
                         <div class="form-group hidden" id="swappedWithGroup">
                             <label class="form-label">Swapped With (Faculty Name)</label>
                             <input type="text" class="form-control" id="swappedWith" placeholder="Enter faculty name">
+                        </div>
+                        
+                        <div class="form-group hidden" id="swapReasonGroup">
+                            <label class="form-label">Reason for Swap</label>
+                            <textarea class="form-control" id="swapReason" placeholder="Please provide the reason for swapping this class..." rows="3"></textarea>
                         </div>
                         
                         <!-- Theory Class Form -->
@@ -768,6 +778,8 @@
             document.getElementById('isAbsent').checked = false;
             document.getElementById('isSwapped').checked = false;
             document.getElementById('swappedWith').value = '';
+            document.getElementById('absentReason').value = '';
+            document.getElementById('swapReason').value = '';
             document.getElementById('isOwnContent').checked = false;
             document.getElementById('syllabusSelect').value = '';
             document.getElementById('labProgramSelect').value = '';
@@ -783,6 +795,8 @@
             document.getElementById('labProgramDetails').classList.add('hidden');
             document.getElementById('classDetails').classList.remove('hidden');
             document.getElementById('swappedWithGroup').classList.add('hidden');
+            document.getElementById('swapReasonGroup').classList.add('hidden');
+            document.getElementById('absentReasonGroup').classList.add('hidden');
             document.getElementById('syllabusSection').classList.remove('hidden');
             document.getElementById('ownContentSection').classList.add('hidden');
             
@@ -803,14 +817,18 @@
             // Fill existing data if available
             if (existingData) {
                 document.getElementById('isAbsent').checked = existingData.is_absent;
+                document.getElementById('absentReason').value = existingData.absent_reason || '';
                 document.getElementById('isSwapped').checked = existingData.is_swapped;
                 document.getElementById('swappedWith').value = existingData.swapped_with || '';
+                document.getElementById('swapReason').value = existingData.swap_reason || '';
                 
                 if (existingData.is_absent) {
                     document.getElementById('classDetails').classList.add('hidden');
+                    document.getElementById('absentReasonGroup').classList.remove('hidden');
                 }
                 if (existingData.is_swapped) {
                     document.getElementById('swappedWithGroup').classList.remove('hidden');
+                    document.getElementById('swapReasonGroup').classList.remove('hidden');
                 }
                 
                 // Fill class-type specific data
@@ -847,8 +865,10 @@
             const isAbsent = document.getElementById('isAbsent').checked;
             if (isAbsent) {
                 document.getElementById('classDetails').classList.add('hidden');
+                document.getElementById('absentReasonGroup').classList.remove('hidden');
             } else {
                 document.getElementById('classDetails').classList.remove('hidden');
+                document.getElementById('absentReasonGroup').classList.add('hidden');
             }
         }
         
@@ -856,8 +876,10 @@
             const isSwapped = document.getElementById('isSwapped').checked;
             if (isSwapped) {
                 document.getElementById('swappedWithGroup').classList.remove('hidden');
+                document.getElementById('swapReasonGroup').classList.remove('hidden');
             } else {
                 document.getElementById('swappedWithGroup').classList.add('hidden');
+                document.getElementById('swapReasonGroup').classList.add('hidden');
             }
         }
         
@@ -882,8 +904,10 @@
                 period: parseInt(document.getElementById('modalPeriod').value),
                 class_type: classType,
                 is_absent: document.getElementById('isAbsent').checked,
+                absent_reason: document.getElementById('absentReason').value || null,
                 is_swapped: document.getElementById('isSwapped').checked,
                 swapped_with: document.getElementById('swappedWith').value || null,
+                swap_reason: document.getElementById('swapReason').value || null,
                 entry_date: currentScheduleDate // Include the date we're viewing
             };
             

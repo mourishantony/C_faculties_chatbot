@@ -132,8 +132,10 @@ class DailyEntry(Base):
     # Common fields
     summary = Column(Text, nullable=True)
     is_absent = Column(Boolean, default=False)
+    absent_reason = Column(Text, nullable=True)  # Reason for being absent
     is_swapped = Column(Boolean, default=False)
     swapped_with = Column(String(100), nullable=True)
+    swap_reason = Column(Text, nullable=True)  # Reason for class swap
     
     # For temporary extra classes (not in regular timetable)
     is_extra_class = Column(Boolean, default=False)

@@ -60,8 +60,10 @@ class DailyEntryCreate(BaseModel):
     # Common fields
     summary: Optional[str] = None
     is_absent: bool = False
+    absent_reason: Optional[str] = None
     is_swapped: bool = False
     swapped_with: Optional[str] = None
+    swap_reason: Optional[str] = None
 
 class ChatQuery(BaseModel):
     query: str
@@ -345,8 +347,10 @@ def get_today_schedule(date_offset: int = 0, faculty: Faculty = Depends(get_curr
                 "own_content_summary": daily.own_content_summary if daily else None,
                 "summary": daily.summary if daily else None,
                 "is_absent": daily.is_absent if daily else False,
+                "absent_reason": daily.absent_reason if daily else None,
                 "is_swapped": daily.is_swapped if daily else False,
-                "swapped_with": daily.swapped_with if daily else None
+                "swapped_with": daily.swapped_with if daily else None,
+                "swap_reason": daily.swap_reason if daily else None
             } if daily else None
         })
     
@@ -432,8 +436,10 @@ def submit_daily_entry(
         existing.own_content_summary = entry.own_content_summary
         existing.summary = entry.summary
         existing.is_absent = entry.is_absent
+        existing.absent_reason = entry.absent_reason
         existing.is_swapped = entry.is_swapped
         existing.swapped_with = entry.swapped_with
+        existing.swap_reason = entry.swap_reason
         db.commit()
         return {
             "message": "Entry updated successfully", 
@@ -457,8 +463,10 @@ def submit_daily_entry(
         own_content_summary=entry.own_content_summary,
         summary=entry.summary,
         is_absent=entry.is_absent,
+        absent_reason=entry.absent_reason,
         is_swapped=entry.is_swapped,
-        swapped_with=entry.swapped_with
+        swapped_with=entry.swapped_with,
+        swap_reason=entry.swap_reason
     )
     db.add(daily_entry)
     db.commit()
