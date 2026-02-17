@@ -70,6 +70,32 @@ class UnifiedLogin(BaseModel):
     email: str
     password: str
 
+class ExtraClassCreate(BaseModel):
+    department_id: int
+    period: int
+    class_type: str = "theory"  # theory, lab, mini_project
+    entry_date: str  # YYYY-MM-DD format, required
+    subject_code: str = "24UCS271"
+    subject_name: str = "C Programming"
+    
+    # For Theory classes
+    syllabus_id: Optional[int] = None
+    
+    # For Lab classes
+    lab_program_id: Optional[int] = None
+    lab_work_done: Optional[str] = None
+    
+    # For Mini Project
+    mini_project_progress: Optional[str] = None
+    
+    # For Own Content
+    is_own_content: bool = False
+    own_content_title: Optional[str] = None
+    own_content_summary: Optional[str] = None
+    
+    # Common fields
+    summary: Optional[str] = None
+
 # ----- Super Admin Pydantic Models -----
 class FacultyCreate(BaseModel):
     name: str
@@ -443,9 +469,221 @@ def submit_daily_entry(
         "entry_id": daily_entry.id,
         "session_date": target_date.isoformat()
     }
+
+@app.get("/api/faculty/free-periods")
+def get_free_periods(
+    date_offset: int = 0,
+    faculty: Faculty = Depends(get_current_faculty),
+    db: Session = Depends(get_db)
+):
+    """Get available (free) periods for faculty to add extra classes
+    date_offset: 0 for today, 1 for tomorrow
+    Returns periods where faculty doesn't have a scheduled class or extra class
+    """
+    target_date = date.today() + timedelta(days=date_offset)
+    day_name = get_day_name(target_date)
+    
+    # Get all periods (1-9)
+    all_periods = set(range(1, 10))
+    
+    # Get scheduled periods from timetable
+    scheduled = db.query(TimetableEntry.period).filter(
+        TimetableEntry.faculty_id == faculty.id,
+        TimetableEntry.day == day_name
+    ).all()
+    scheduled_periods = {s.period for s in scheduled}
+    
+    # Get periods with extra classes already added
+    extra_classes = db.query(DailyEntry.period).filter(
+        DailyEntry.faculty_id == faculty.id,
+        DailyEntry.date == target_date,
+        DailyEntry.is_extra_class == True
+    ).all()
+    extra_periods = {e.period for e in extra_classes}
+    
+    # Free periods = all periods - scheduled - extra classes
+    free_periods = all_periods - scheduled_periods - extra_periods
+    
+    # Get period timings
+    timings = db.query(PeriodTiming).all()
+    timing_map = {t.period: t.display_time for t in timings}
+    
+    result = []
+    for period in sorted(free_periods):
+        result.append({
+            "period": period,
+            "display_time": timing_map.get(period, f"Period {period}")
+        })
+    
+    return {
+        "date": target_date.isoformat(),
+        "day": day_name,
+        "free_periods": result,
+        "scheduled_periods": sorted(scheduled_periods),
+        "extra_periods": sorted(extra_periods)
+    }
+
+@app.post("/api/faculty/extra-class")
+def add_extra_class(
+    entry: ExtraClassCreate,
+    faculty: Faculty = Depends(get_current_faculty),
+    db: Session = Depends(get_db)
+):
+    """Add a temporary extra class for a specific date
+    This creates a DailyEntry marked as an extra class
+    """
+    target_date = datetime.strptime(entry.entry_date, "%Y-%m-%d").date()
+    day_name = get_day_name(target_date)
+    
+    # Validate: only today or tomorrow allowed
+    today = date.today()
+    tomorrow = today + timedelta(days=1)
+    if target_date not in [today, tomorrow]:
+        raise HTTPException(
+            status_code=400, 
+            detail="Extra classes can only be added for today or tomorrow"
+        )
+    
+    # Check if period is free (not in timetable)
+    scheduled = db.query(TimetableEntry).filter(
+        TimetableEntry.faculty_id == faculty.id,
+        TimetableEntry.day == day_name,
+        TimetableEntry.period == entry.period
+    ).first()
+    
+    if scheduled:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Period {entry.period} is already scheduled in your timetable. Use regular entry submission."
+        )
+    
+    # Check if extra class already exists for this period
+    existing = db.query(DailyEntry).filter(
+        DailyEntry.faculty_id == faculty.id,
+        DailyEntry.date == target_date,
+        DailyEntry.period == entry.period,
+        DailyEntry.is_extra_class == True
+    ).first()
+    
+    if existing:
+        # Update existing extra class entry
+        existing.department_id = entry.department_id
+        existing.class_type = entry.class_type
+        existing.extra_class_subject_code = entry.subject_code
+        existing.extra_class_subject_name = entry.subject_name
+        existing.syllabus_id = entry.syllabus_id
+        existing.lab_program_id = entry.lab_program_id
+        existing.lab_work_done = entry.lab_work_done
+        existing.mini_project_progress = entry.mini_project_progress
+        existing.is_own_content = entry.is_own_content
+        existing.own_content_title = entry.own_content_title
+        existing.own_content_summary = entry.own_content_summary
+        existing.summary = entry.summary
+        db.commit()
+        return {
+            "message": "Extra class updated successfully",
+            "entry_id": existing.id,
+            "session_date": target_date.isoformat(),
+            "is_extra_class": True
+        }
+    
+    # Create new extra class entry
+    daily_entry = DailyEntry(
+        faculty_id=faculty.id,
+        department_id=entry.department_id,
+        date=target_date,
+        period=entry.period,
+        class_type=entry.class_type,
+        syllabus_id=entry.syllabus_id,
+        lab_program_id=entry.lab_program_id,
+        lab_work_done=entry.lab_work_done,
+        mini_project_progress=entry.mini_project_progress,
+        is_own_content=entry.is_own_content,
+        own_content_title=entry.own_content_title,
+        own_content_summary=entry.own_content_summary,
+        summary=entry.summary,
+        is_absent=False,
+        is_swapped=False,
+        is_extra_class=True,
+        extra_class_subject_code=entry.subject_code,
+        extra_class_subject_name=entry.subject_name
+    )
+    db.add(daily_entry)
+    db.commit()
     db.refresh(daily_entry)
     
-    return {"message": "Entry submitted successfully", "entry_id": daily_entry.id}
+    return {
+        "message": "Extra class added successfully",
+        "entry_id": daily_entry.id,
+        "session_date": target_date.isoformat(),
+        "is_extra_class": True
+    }
+
+@app.get("/api/faculty/extra-classes")
+def get_extra_classes(
+    date_offset: int = 0,
+    faculty: Faculty = Depends(get_current_faculty),
+    db: Session = Depends(get_db)
+):
+    """Get extra classes added by faculty for a specific date"""
+    target_date = date.today() + timedelta(days=date_offset)
+    
+    entries = db.query(DailyEntry).filter(
+        DailyEntry.faculty_id == faculty.id,
+        DailyEntry.date == target_date,
+        DailyEntry.is_extra_class == True
+    ).order_by(DailyEntry.period).all()
+    
+    result = []
+    for entry in entries:
+        dept = db.query(Department).filter(Department.id == entry.department_id).first()
+        result.append({
+            "id": entry.id,
+            "department_id": entry.department_id,
+            "department_name": dept.name if dept else "Unknown",
+            "period": entry.period,
+            "class_type": entry.class_type,
+            "subject_code": entry.extra_class_subject_code,
+            "subject_name": entry.extra_class_subject_name,
+            "syllabus_id": entry.syllabus_id,
+            "lab_program_id": entry.lab_program_id,
+            "lab_work_done": entry.lab_work_done,
+            "mini_project_progress": entry.mini_project_progress,
+            "is_own_content": entry.is_own_content,
+            "own_content_title": entry.own_content_title,
+            "own_content_summary": entry.own_content_summary,
+            "summary": entry.summary,
+            "is_extra_class": True
+        })
+    
+    return {
+        "date": target_date.isoformat(),
+        "extra_classes": result
+    }
+
+@app.delete("/api/faculty/extra-class/{entry_id}")
+def delete_extra_class(
+    entry_id: int,
+    faculty: Faculty = Depends(get_current_faculty),
+    db: Session = Depends(get_db)
+):
+    """Delete an extra class entry"""
+    entry = db.query(DailyEntry).filter(
+        DailyEntry.id == entry_id,
+        DailyEntry.faculty_id == faculty.id,
+        DailyEntry.is_extra_class == True
+    ).first()
+    
+    if not entry:
+        raise HTTPException(
+            status_code=404,
+            detail="Extra class not found or not authorized to delete"
+        )
+    
+    db.delete(entry)
+    db.commit()
+    
+    return {"message": "Extra class deleted successfully"}
 
 # ----- Admin Routes -----
 @app.get("/api/admin/report")
@@ -507,7 +745,10 @@ def get_admin_report(
             "swapped_with": entry.swapped_with,
             "summary": entry.summary,
             "ppt_url": syllabus.ppt_url if syllabus else None,
-            "moodle_url": lab_program.moodle_url if lab_program else None
+            "moodle_url": lab_program.moodle_url if lab_program else None,
+            "is_extra_class": entry.is_extra_class,
+            "extra_class_subject_code": entry.extra_class_subject_code,
+            "extra_class_subject_name": entry.extra_class_subject_name
         })
     
     return {"entries": result, "total": len(result)}

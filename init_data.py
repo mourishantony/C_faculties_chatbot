@@ -17,6 +17,9 @@ def init_database():
     # Add room_number column if missing (for existing databases)
     _add_room_number_column_if_missing()
     
+    # Add extra class columns if missing (for existing databases)
+    _add_extra_class_columns_if_missing()
+    
     db = SessionLocal()
     
     # Check if this is a fresh database or existing one
@@ -45,6 +48,36 @@ def _add_room_number_column_if_missing():
         cursor.execute("ALTER TABLE departments ADD COLUMN room_number VARCHAR(20)")
         conn.commit()
         print("✓ Added room_number column to departments table")
+    
+    conn.close()
+
+def _add_extra_class_columns_if_missing():
+    """Add extra class columns to daily_entries table if they don't exist"""
+    import sqlite3
+    conn = sqlite3.connect('c_faculties.db')
+    cursor = conn.cursor()
+    
+    # Check existing columns in daily_entries table
+    cursor.execute("PRAGMA table_info(daily_entries)")
+    columns = [column[1] for column in cursor.fetchall()]
+    
+    # Add is_extra_class column if missing
+    if 'is_extra_class' not in columns:
+        cursor.execute("ALTER TABLE daily_entries ADD COLUMN is_extra_class BOOLEAN DEFAULT 0")
+        conn.commit()
+        print("✓ Added is_extra_class column to daily_entries table")
+    
+    # Add extra_class_subject_code column if missing
+    if 'extra_class_subject_code' not in columns:
+        cursor.execute("ALTER TABLE daily_entries ADD COLUMN extra_class_subject_code VARCHAR(20)")
+        conn.commit()
+        print("✓ Added extra_class_subject_code column to daily_entries table")
+    
+    # Add extra_class_subject_name column if missing
+    if 'extra_class_subject_name' not in columns:
+        cursor.execute("ALTER TABLE daily_entries ADD COLUMN extra_class_subject_name VARCHAR(50)")
+        conn.commit()
+        print("✓ Added extra_class_subject_name column to daily_entries table")
     
     conn.close()
 

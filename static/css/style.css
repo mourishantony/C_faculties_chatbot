@@ -461,6 +461,12 @@ textarea.form-control {
     color: #0f172a;
 }
 
+.status-badge.extra {
+    background: linear-gradient(135deg, #059669, #10b981);
+    color: white;
+    font-weight: 600;
+}
+
 /* PPT Link */
 .ppt-link {
     display: inline-flex;

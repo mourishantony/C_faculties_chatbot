@@ -134,6 +134,12 @@ class DailyEntry(Base):
     is_absent = Column(Boolean, default=False)
     is_swapped = Column(Boolean, default=False)
     swapped_with = Column(String(100), nullable=True)
+    
+    # For temporary extra classes (not in regular timetable)
+    is_extra_class = Column(Boolean, default=False)
+    extra_class_subject_code = Column(String(20), nullable=True)
+    extra_class_subject_name = Column(String(50), nullable=True)
+    
     created_at = Column(DateTime, default=datetime.utcnow)
     
     faculty = relationship("Faculty", back_populates="daily_entries")

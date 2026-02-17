@@ -19,6 +19,11 @@
         .class-type-lab { background: #fce4ec; color: #c62828; }
         .class-type-mini_project { background: #e8f5e9; color: #2e7d32; }
         
+        .status-badge.extra { 
+            background: linear-gradient(135deg, #059669, #10b981); 
+            color: white; 
+        }
+        
         .form-section {
             border: 1px solid var(--border);
             border-radius: 8px;
@@ -167,7 +172,10 @@
                         <h1 class="dashboard-title" id="scheduleTitle"><i class="material-icons" style="vertical-align: middle; margin-right: 8px;">event</i>Today's Schedule</h1>
                         <p id="dateDisplay" style="color: var(--text-secondary);"></p>
                     </div>
-                    <div style="display: flex; gap: 10px;">
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                        <button id="addExtraClassBtn" class="btn" onclick="openExtraClassModal()" style="background: linear-gradient(135deg, #059669, #10b981); color: white; padding: 8px 16px; border: none; border-radius: 8px; cursor: pointer; font-weight: 500;">
+                            <i class="material-icons" style="font-size: 16px; vertical-align: middle; margin-right: 4px;">add_circle</i>Extra Class
+                        </button>
                         <button id="todayBtn" class="btn btn-primary" onclick="switchToToday()" style="background: linear-gradient(135deg, #0f172a, #1e3a8a); color: white; padding: 8px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: 500;">
                             <i class="material-icons" style="font-size: 16px; vertical-align: middle; margin-right: 4px;">today</i>Today
                         </button>
@@ -318,10 +326,136 @@
         </div>
     </div>
 
+    <!-- Modal for adding extra class -->
+    <div class="modal-overlay" id="extraClassModal">
+        <div class="modal" style="max-width: 600px;">
+            <div class="modal-header">
+                <h3 class="modal-title"><i class="material-icons" style="vertical-align: middle; margin-right: 6px; font-size: 20px;">add_circle</i>Add Extra Class</h3>
+                <button class="modal-close" onclick="closeExtraClassModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="extraClassForm">
+                    <div class="form-group">
+                        <label class="form-label">Select Free Period</label>
+                        <select class="form-control" id="extraClassPeriod" required>
+                            <option value="">-- Select Period --</option>
+                        </select>
+                        <small id="freePeriodInfo" style="color: #64748b;"></small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Select Department</label>
+                        <select class="form-control" id="extraClassDepartment" required>
+                            <option value="">-- Select Department --</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Class Type</label>
+                        <select class="form-control" id="extraClassType" onchange="toggleExtraClassForms()" required>
+                            <option value="theory">Theory</option>
+                            <option value="lab">Lab</option>
+                            <option value="mini_project">Mini Project</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Subject Code</label>
+                        <input type="text" class="form-control" id="extraClassSubjectCode" value="24UCS271" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Subject Name</label>
+                        <input type="text" class="form-control" id="extraClassSubjectName" value="C Programming" required>
+                    </div>
+                    
+                    <!-- Theory Class Form for Extra Class -->
+                    <div id="extraTheoryForm" class="form-section">
+                        <div class="form-section-title"><i class="material-icons" style="font-size: 18px; vertical-align: middle; margin-right: 6px;">menu_book</i>Theory Class Details</div>
+                        
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="extraIsOwnContent" onchange="toggleExtraOwnContent()">
+                            <label for="extraIsOwnContent">Teaching Own Content (not from syllabus)</label>
+                        </div>
+                        
+                        <div id="extraSyllabusSection">
+                            <div class="form-group">
+                                <label class="form-label">Select Session</label>
+                                <select class="form-control" id="extraSyllabusSelect" onchange="showExtraSessionDetails()">
+                                    <option value="">-- Select Session --</option>
+                                </select>
+                            </div>
+                            <div id="extraSessionDetails" class="hidden" style="margin-top: 10px; padding: 10px; background: #f5f5f5; border-radius: 5px;">
+                                <p><strong>Topics:</strong> <span id="extraSessionTopics"></span></p>
+                            </div>
+                        </div>
+                        
+                        <div id="extraOwnContentSection" class="hidden">
+                            <div class="form-group">
+                                <label class="form-label">Content Title</label>
+                                <input type="text" class="form-control" id="extraOwnContentTitle" placeholder="What topic are you teaching?">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Content Summary</label>
+                                <textarea class="form-control" id="extraOwnContentSummary" placeholder="Brief description of the content..."></textarea>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Class Summary</label>
+                            <textarea class="form-control" id="extraTheorySummary" placeholder="What will be covered in this class?"></textarea>
+                        </div>
+                    </div>
+                    
+                    <!-- Lab Class Form for Extra Class -->
+                    <div id="extraLabForm" class="form-section hidden">
+                        <div class="form-section-title"><i class="material-icons" style="font-size: 18px; vertical-align: middle; margin-right: 6px;">science</i>Lab Class Details</div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Select Lab Program</label>
+                            <select class="form-control" id="extraLabProgramSelect" onchange="showExtraLabDetails()">
+                                <option value="">-- Select Lab Program --</option>
+                            </select>
+                        </div>
+                        <div id="extraLabProgramDetails" class="hidden" style="margin-top: 10px; padding: 10px; background: #f5f5f5; border-radius: 5px;">
+                            <p><strong>Description:</strong> <span id="extraLabDescription"></span></p>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">What will be done in this lab?</label>
+                            <textarea class="form-control" id="extraLabWorkDone" placeholder="Explain, demo, practice, completion status..."></textarea>
+                        </div>
+                    </div>
+                    
+                    <!-- Mini Project Form for Extra Class -->
+                    <div id="extraMiniProjectForm" class="form-section hidden">
+                        <div class="form-section-title"><i class="material-icons" style="font-size: 18px; vertical-align: middle; margin-right: 6px;">rocket_launch</i>Mini Project Details</div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Project Progress & Activities</label>
+                            <textarea class="form-control" id="extraMiniProjectProgress" placeholder="What progress will be made? What activities?"></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Summary</label>
+                            <textarea class="form-control" id="extraMiniProjectSummary" placeholder="Brief summary of the mini project session..."></textarea>
+                        </div>
+                    </div>
+                    
+                    <div class="modal-footer" style="padding: 0; border: none; margin-top: 20px;">
+                        <button type="button" class="btn btn-secondary" onclick="closeExtraClassModal()">Cancel</button>
+                        <button type="submit" class="btn btn-primary" style="background: linear-gradient(135deg, #059669, #10b981);">Add Extra Class</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <script src="/static/js/app.js"></script>
     <script>
         let syllabusData = [];
         let labProgramsData = [];
+        let departmentsData = [];
         let currentDateOffset = 0; // 0 = today, 1 = tomorrow
         let currentScheduleDate = null; // Store the date we're viewing
         
@@ -335,9 +469,17 @@
         
         // Load data on page load
         document.addEventListener('DOMContentLoaded', async () => {
-            await Promise.all([loadSyllabus(), loadLabPrograms()]);
+            await Promise.all([loadSyllabus(), loadLabPrograms(), loadDepartments()]);
             await loadSchedule();
         });
+        
+        async function loadDepartments() {
+            try {
+                departmentsData = await apiRequest('/api/departments');
+            } catch (error) {
+                console.error('Error loading departments:', error);
+            }
+        }
         
         function switchToToday() {
             currentDateOffset = 0;
@@ -465,7 +607,14 @@
         
         async function loadSchedule() {
             try {
-                const data = await apiRequest(`/api/faculty/today-schedule?date_offset=${currentDateOffset}`, 'GET', null, true);
+                // Load both regular schedule and extra classes
+                const [scheduleData, extraClassesData] = await Promise.all([
+                    apiRequest(`/api/faculty/today-schedule?date_offset=${currentDateOffset}`, 'GET', null, true),
+                    apiRequest(`/api/faculty/extra-classes?date_offset=${currentDateOffset}`, 'GET', null, true)
+                ]);
+                
+                const data = scheduleData;
+                const extraClasses = extraClassesData.extra_classes || [];
                 
                 // Store the date we're viewing for entry submission
                 currentScheduleDate = data.date;
@@ -475,12 +624,49 @@
                 
                 const container = document.getElementById('scheduleContainer');
                 
-                if (data.schedule.length === 0) {
+                // Combine regular schedule and extra classes
+                const allClasses = [...data.schedule];
+                
+                // Add extra classes to the list
+                extraClasses.forEach(ec => {
+                    allClasses.push({
+                        timetable_id: null,
+                        department_id: ec.department_id,
+                        department_name: ec.department_name,
+                        period: ec.period,
+                        subject_code: ec.subject_code || '24UCS271',
+                        subject_name: ec.subject_name || 'C Programming',
+                        class_type: ec.class_type,
+                        is_filled: true,
+                        is_extra_class: true,
+                        extra_class_id: ec.id,
+                        daily_entry: {
+                            id: ec.id,
+                            class_type: ec.class_type,
+                            syllabus_id: ec.syllabus_id,
+                            lab_program_id: ec.lab_program_id,
+                            lab_work_done: ec.lab_work_done,
+                            mini_project_progress: ec.mini_project_progress,
+                            is_own_content: ec.is_own_content,
+                            own_content_title: ec.own_content_title,
+                            own_content_summary: ec.own_content_summary,
+                            summary: ec.summary,
+                            is_absent: false,
+                            is_swapped: false,
+                            swapped_with: null
+                        }
+                    });
+                });
+                
+                // Sort by period
+                allClasses.sort((a, b) => a.period - b.period);
+                
+                if (allClasses.length === 0) {
                     container.innerHTML = `
                         <div class="card text-center">
                             <h3><i class="material-icons" style="font-size: 48px; color: #10b981;">celebration</i></h3>
                             <h3>No classes scheduled for today!</h3>
-                            <p style="color: var(--text-secondary); margin-top: 10px;">Enjoy your day!</p>
+                            <p style="color: var(--text-secondary); margin-top: 10px;">Enjoy your day or add an extra class!</p>
                         </div>
                     `;
                     return;
@@ -490,12 +676,18 @@
                     '<th>Period</th><th>Time</th><th>Department</th><th>Class Type</th><th>Status</th><th>Action</th>' +
                     '</tr></thead><tbody>';
                 
-                data.schedule.forEach(item => {
+                allClasses.forEach(item => {
                     let status = '';
                     let statusClass = 'pending';
                     let btnText = 'Fill Entry';
+                    let rowStyle = '';
                     
-                    if (item.is_filled) {
+                    if (item.is_extra_class) {
+                        status = 'Extra Class';
+                        statusClass = 'extra';
+                        btnText = 'View/Edit';
+                        rowStyle = 'background: linear-gradient(135deg, rgba(5, 150, 105, 0.1), rgba(16, 185, 129, 0.1));';
+                    } else if (item.is_filled) {
                         if (item.daily_entry.is_absent) {
                             status = 'Absent';
                             statusClass = 'absent';
@@ -515,18 +707,31 @@
                         
                     };
                     
+                    const extraBadge = item.is_extra_class ? '<span style="background: #059669; color: white; font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; margin-left: 5px;">EXTRA</span>' : '';
+                    
                     html += `
-                        <tr>
+                        <tr style="${rowStyle}">
                             <td><span class="period-badge">${getOrdinal(item.period)}</span></td>
                             <td>${getPeriodTime(item.period)}</td>
-                            <td><strong>${item.department_name}</strong><br><small>${item.subject_code} - ${item.subject_name}</small></td>
+                            <td><strong>${item.department_name}</strong>${extraBadge}<br><small>${item.subject_code} - ${item.subject_name}</small></td>
                             <td><span class="class-type-badge class-type-${item.class_type}">${classTypeLabel[item.class_type] || item.class_type}</span></td>
                             <td><span class="status-badge ${statusClass}">${status}</span></td>
                             <td>
-                                <button class="btn btn-sm ${item.is_filled ? 'btn-secondary' : 'btn-primary'}" 
-                                    onclick='openModal(${item.department_id}, ${item.period}, "${item.department_name}", "${item.class_type}", ${JSON.stringify(item.daily_entry)})'>
-                                    ${btnText}
-                                </button>
+                                ${item.is_extra_class ? `
+                                    <button class="btn btn-sm btn-secondary" style="background: #059669; border-color: #059669;" 
+                                        onclick='editExtraClass(${item.extra_class_id}, ${item.department_id}, ${item.period}, "${item.department_name}", "${item.class_type}", ${JSON.stringify(item.daily_entry)})'>
+                                        Edit
+                                    </button>
+                                    <button class="btn btn-sm" style="background: #dc2626; color: white; border: none; margin-left: 5px;" 
+                                        onclick='deleteExtraClass(${item.extra_class_id})'>
+                                        <i class="material-icons" style="font-size: 14px; vertical-align: middle;">delete</i>
+                                    </button>
+                                ` : `
+                                    <button class="btn btn-sm ${item.is_filled ? 'btn-secondary' : 'btn-primary'}" 
+                                        onclick='openModal(${item.department_id}, ${item.period}, "${item.department_name}", "${item.class_type}", ${JSON.stringify(item.daily_entry)})'>
+                                        ${btnText}
+                                    </button>
+                                `}
                             </td>
                         </tr>
                     `;
@@ -711,6 +916,228 @@
                 await loadSchedule();
                 console.log('Entry saved for session date:', response.session_date);
                 alert(`Entry saved successfully for session date: ${response.session_date || sessionDate}`);
+            } catch (error) {
+                hideLoading();
+                alert('Error: ' + error.message);
+            }
+        });
+        
+        // ============ Extra Class Functions ============
+        
+        async function openExtraClassModal() {
+            // Reset form
+            document.getElementById('extraClassForm').reset();
+            document.getElementById('extraClassSubjectCode').value = '24UCS271';
+            document.getElementById('extraClassSubjectName').value = 'C Programming';
+            
+            // Load free periods
+            await loadFreePeriods();
+            
+            // Populate departments dropdown
+            const deptSelect = document.getElementById('extraClassDepartment');
+            deptSelect.innerHTML = '<option value="">-- Select Department --</option>';
+            departmentsData.forEach(dept => {
+                const option = document.createElement('option');
+                option.value = dept.id;
+                option.textContent = `${dept.name} (${dept.code})`;
+                deptSelect.appendChild(option);
+            });
+            
+            // Populate syllabus dropdown for extra class modal
+            const extraSyllabusSelect = document.getElementById('extraSyllabusSelect');
+            extraSyllabusSelect.innerHTML = '<option value="">-- Select Session --</option>';
+            let currentUnit = 0;
+            let optgroup = null;
+            syllabusData.forEach(session => {
+                if (session.unit !== currentUnit) {
+                    optgroup = document.createElement('optgroup');
+                    optgroup.label = `Unit ${session.unit}`;
+                    extraSyllabusSelect.appendChild(optgroup);
+                    currentUnit = session.unit;
+                }
+                const option = document.createElement('option');
+                option.value = session.id;
+                option.textContent = `Session ${session.session_number}: ${session.session_title}`;
+                if (optgroup) {
+                    optgroup.appendChild(option);
+                } else {
+                    extraSyllabusSelect.appendChild(option);
+                }
+            });
+            
+            // Populate lab programs dropdown for extra class modal
+            const extraLabSelect = document.getElementById('extraLabProgramSelect');
+            extraLabSelect.innerHTML = '<option value="">-- Select Lab Program --</option>';
+            labProgramsData.forEach(program => {
+                const option = document.createElement('option');
+                option.value = program.id;
+                option.textContent = `${program.program_number}. ${program.program_title}`;
+                extraLabSelect.appendChild(option);
+            });
+            
+            // Reset form sections
+            toggleExtraClassForms();
+            
+            document.getElementById('extraClassModal').classList.add('active');
+        }
+        
+        function closeExtraClassModal() {
+            document.getElementById('extraClassModal').classList.remove('active');
+        }
+        
+        async function loadFreePeriods() {
+            try {
+                const data = await apiRequest(`/api/faculty/free-periods?date_offset=${currentDateOffset}`, 'GET', null, true);
+                const periodSelect = document.getElementById('extraClassPeriod');
+                periodSelect.innerHTML = '<option value="">-- Select Period --</option>';
+                
+                if (data.free_periods.length === 0) {
+                    document.getElementById('freePeriodInfo').textContent = 'No free periods available for this day.';
+                } else {
+                    data.free_periods.forEach(p => {
+                        const option = document.createElement('option');
+                        option.value = p.period;
+                        option.textContent = `${getOrdinal(p.period)} Period - ${p.display_time}`;
+                        periodSelect.appendChild(option);
+                    });
+                    document.getElementById('freePeriodInfo').textContent = `${data.free_periods.length} free period(s) available`;
+                }
+            } catch (error) {
+                console.error('Error loading free periods:', error);
+                document.getElementById('freePeriodInfo').textContent = 'Error loading free periods';
+            }
+        }
+        
+        function toggleExtraClassForms() {
+            const classType = document.getElementById('extraClassType').value;
+            
+            // Hide all forms first
+            document.getElementById('extraTheoryForm').classList.add('hidden');
+            document.getElementById('extraLabForm').classList.add('hidden');
+            document.getElementById('extraMiniProjectForm').classList.add('hidden');
+            
+            // Show the relevant form
+            if (classType === 'theory') {
+                document.getElementById('extraTheoryForm').classList.remove('hidden');
+            } else if (classType === 'lab') {
+                document.getElementById('extraLabForm').classList.remove('hidden');
+            } else if (classType === 'mini_project') {
+                document.getElementById('extraMiniProjectForm').classList.remove('hidden');
+            }
+        }
+        
+        function toggleExtraOwnContent() {
+            const isOwnContent = document.getElementById('extraIsOwnContent').checked;
+            if (isOwnContent) {
+                document.getElementById('extraSyllabusSection').classList.add('hidden');
+                document.getElementById('extraOwnContentSection').classList.remove('hidden');
+            } else {
+                document.getElementById('extraSyllabusSection').classList.remove('hidden');
+                document.getElementById('extraOwnContentSection').classList.add('hidden');
+            }
+        }
+        
+        function showExtraSessionDetails() {
+            const sessionId = document.getElementById('extraSyllabusSelect').value;
+            const detailsDiv = document.getElementById('extraSessionDetails');
+            
+            if (!sessionId) {
+                detailsDiv.classList.add('hidden');
+                return;
+            }
+            
+            const session = syllabusData.find(s => s.id == sessionId);
+            if (session) {
+                document.getElementById('extraSessionTopics').textContent = session.topics || 'No topics listed';
+                detailsDiv.classList.remove('hidden');
+            }
+        }
+        
+        function showExtraLabDetails() {
+            const programId = document.getElementById('extraLabProgramSelect').value;
+            const detailsDiv = document.getElementById('extraLabProgramDetails');
+            
+            if (!programId) {
+                detailsDiv.classList.add('hidden');
+                return;
+            }
+            
+            const program = labProgramsData.find(p => p.id == programId);
+            if (program) {
+                document.getElementById('extraLabDescription').textContent = program.description || 'No description';
+                detailsDiv.classList.remove('hidden');
+            }
+        }
+        
+        async function deleteExtraClass(entryId) {
+            if (!confirm('Are you sure you want to delete this extra class?')) {
+                return;
+            }
+            
+            try {
+                showLoading();
+                await apiRequest(`/api/faculty/extra-class/${entryId}`, 'DELETE', null, true);
+                hideLoading();
+                await loadSchedule();
+                alert('Extra class deleted successfully');
+            } catch (error) {
+                hideLoading();
+                alert('Error deleting extra class: ' + error.message);
+            }
+        }
+        
+        function editExtraClass(entryId, deptId, period, deptName, classType, existingData) {
+            // For now, just show an alert with info - editing extra classes uses the same form
+            alert(`Extra class for ${deptName}, Period ${period}\\nClass Type: ${classType}\\n\\nTo edit, delete this entry and add a new extra class with updated information.`);
+        }
+        
+        // Handle extra class form submission
+        document.getElementById('extraClassForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const classType = document.getElementById('extraClassType').value;
+            const period = parseInt(document.getElementById('extraClassPeriod').value);
+            const departmentId = parseInt(document.getElementById('extraClassDepartment').value);
+            
+            if (!period || !departmentId) {
+                alert('Please select a period and department');
+                return;
+            }
+            
+            const data = {
+                department_id: departmentId,
+                period: period,
+                class_type: classType,
+                entry_date: currentScheduleDate,
+                subject_code: document.getElementById('extraClassSubjectCode').value,
+                subject_name: document.getElementById('extraClassSubjectName').value
+            };
+            
+            // Add class-type specific data
+            if (classType === 'theory') {
+                data.is_own_content = document.getElementById('extraIsOwnContent').checked;
+                if (data.is_own_content) {
+                    data.own_content_title = document.getElementById('extraOwnContentTitle').value || null;
+                    data.own_content_summary = document.getElementById('extraOwnContentSummary').value || null;
+                } else {
+                    data.syllabus_id = document.getElementById('extraSyllabusSelect').value ? parseInt(document.getElementById('extraSyllabusSelect').value) : null;
+                }
+                data.summary = document.getElementById('extraTheorySummary').value || null;
+            } else if (classType === 'lab') {
+                data.lab_program_id = document.getElementById('extraLabProgramSelect').value ? parseInt(document.getElementById('extraLabProgramSelect').value) : null;
+                data.lab_work_done = document.getElementById('extraLabWorkDone').value || null;
+            } else if (classType === 'mini_project') {
+                data.mini_project_progress = document.getElementById('extraMiniProjectProgress').value || null;
+                data.summary = document.getElementById('extraMiniProjectSummary').value || null;
+            }
+            
+            try {
+                showLoading();
+                const response = await apiRequest('/api/faculty/extra-class', 'POST', data, true);
+                hideLoading();
+                closeExtraClassModal();
+                await loadSchedule();
+                alert(`Extra class added successfully for ${response.session_date}`);
             } catch (error) {
                 hideLoading();
                 alert('Error: ' + error.message);
