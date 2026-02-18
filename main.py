@@ -9,7 +9,7 @@ from typing import Optional, List
 from pydantic import BaseModel
 
 from database import engine, get_db, SessionLocal
-from models import Base, Faculty, Admin, Department, TimetableEntry, DailyEntry, Syllabus, PeriodTiming, LabProgram, SuperAdmin, FAQ
+from models import Base, Faculty, Admin, Department, TimetableEntry, DailyEntry, Syllabus, PeriodTiming, LabProgram, SuperAdmin, FAQ, SwapEntry
 from auth import (
     verify_password, get_password_hash, create_access_token, decode_token,
     get_current_faculty, get_current_admin, get_current_super_admin
@@ -97,6 +97,20 @@ class ExtraClassCreate(BaseModel):
     
     # Common fields
     summary: Optional[str] = None
+
+class SwapEntryCreate(BaseModel):
+    swap_type: str  # 'swap', 'extra', 'substitution'
+    original_date: Optional[str] = None  # YYYY-MM-DD, required for swap
+    original_period: Optional[int] = None  # required for swap
+    new_date: str  # YYYY-MM-DD, required
+    new_period: int  # required
+    department_id: int
+    class_type: str = "theory"  # theory, lab, mini_project
+    subject_code: str = "24UCS271"
+    subject_name: str = "C Programming"
+    swapped_with_faculty: Optional[str] = None  # name of other faculty
+    swapped_with_department: Optional[str] = None  # their department
+    reason: Optional[str] = None
 
 # ----- Super Admin Pydantic Models -----
 class FacultyCreate(BaseModel):
@@ -645,6 +659,12 @@ def get_extra_classes(
     result = []
     for entry in entries:
         dept = db.query(Department).filter(Department.id == entry.department_id).first()
+        
+        # Get swap entry metadata if exists
+        swap_entry = db.query(SwapEntry).filter(
+            SwapEntry.daily_entry_id == entry.id
+        ).first()
+        
         result.append({
             "id": entry.id,
             "department_id": entry.department_id,
@@ -661,7 +681,14 @@ def get_extra_classes(
             "own_content_title": entry.own_content_title,
             "own_content_summary": entry.own_content_summary,
             "summary": entry.summary,
-            "is_extra_class": True
+            "is_extra_class": True,
+            "swap_type": entry.swap_type or "extra",
+            "swap_entry_id": swap_entry.id if swap_entry else None,
+            "swapped_with_faculty": swap_entry.swapped_with_faculty if swap_entry else None,
+            "swapped_with_department": swap_entry.swapped_with_department if swap_entry else None,
+            "swap_reason": swap_entry.reason if swap_entry else None,
+            "original_date": swap_entry.original_date.isoformat() if swap_entry and swap_entry.original_date else None,
+            "original_period": swap_entry.original_period if swap_entry else None
         })
     
     return {
@@ -692,6 +719,249 @@ def delete_extra_class(
     db.commit()
     
     return {"message": "Extra class deleted successfully"}
+
+# ----- Swap / Extra / Substitution Entry Routes -----
+
+@app.post("/api/faculty/swap-entry")
+def create_swap_entry(
+    entry: SwapEntryCreate,
+    faculty: Faculty = Depends(get_current_faculty),
+    db: Session = Depends(get_db)
+):
+    """Create a swap/extra/substitution entry with detailed tracking"""
+    today = date.today()
+    tomorrow = today + timedelta(days=1)
+    
+    new_date = datetime.strptime(entry.new_date, "%Y-%m-%d").date()
+    if new_date not in [today, tomorrow]:
+        raise HTTPException(status_code=400, detail="New class date must be today or tomorrow")
+    
+    original_date = None
+    if entry.original_date:
+        original_date = datetime.strptime(entry.original_date, "%Y-%m-%d").date()
+    
+    # Validate swap type specific fields
+    if entry.swap_type == "swap":
+        if not entry.original_date or not entry.original_period:
+            raise HTTPException(status_code=400, detail="Original date and period are required for swap type")
+        if not entry.swapped_with_faculty:
+            raise HTTPException(status_code=400, detail="Swapped with faculty name is required for swap type")
+    
+    if entry.swap_type == "substitution":
+        if not entry.swapped_with_faculty:
+            raise HTTPException(status_code=400, detail="Faculty name being substituted is required")
+    
+    # Check if the new period is free
+    day_name = get_day_name(new_date)
+    scheduled = db.query(TimetableEntry).filter(
+        TimetableEntry.faculty_id == faculty.id,
+        TimetableEntry.day == day_name,
+        TimetableEntry.period == entry.new_period
+    ).first()
+    
+    if scheduled:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Period {entry.new_period} is already in your timetable for {day_name}. Choose a free period."
+        )
+    
+    # Check if period already has an extra/swap entry
+    existing = db.query(DailyEntry).filter(
+        DailyEntry.faculty_id == faculty.id,
+        DailyEntry.date == new_date,
+        DailyEntry.period == entry.new_period,
+        DailyEntry.is_extra_class == True
+    ).first()
+    
+    if existing:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Period {entry.new_period} already has an entry for {new_date.isoformat()}"
+        )
+    
+    # Create DailyEntry for the new class slot
+    daily_entry = DailyEntry(
+        faculty_id=faculty.id,
+        department_id=entry.department_id,
+        date=new_date,
+        period=entry.new_period,
+        class_type=entry.class_type,
+        is_absent=False,
+        is_swapped=(entry.swap_type == "swap"),
+        swapped_with=entry.swapped_with_faculty if entry.swap_type == "swap" else None,
+        swap_reason=entry.reason if entry.swap_type == "swap" else None,
+        is_extra_class=True,
+        extra_class_subject_code=entry.subject_code,
+        extra_class_subject_name=entry.subject_name,
+        swap_type=entry.swap_type
+    )
+    db.add(daily_entry)
+    db.flush()  # Get the daily_entry.id
+    
+    # Create SwapEntry for detailed tracking
+    swap_entry = SwapEntry(
+        faculty_id=faculty.id,
+        swap_type=entry.swap_type,
+        original_date=original_date,
+        original_period=entry.original_period,
+        new_date=new_date,
+        new_period=entry.new_period,
+        department_id=entry.department_id,
+        class_type=entry.class_type,
+        subject_code=entry.subject_code,
+        subject_name=entry.subject_name,
+        swapped_with_faculty=entry.swapped_with_faculty,
+        swapped_with_department=entry.swapped_with_department,
+        reason=entry.reason,
+        daily_entry_id=daily_entry.id
+    )
+    db.add(swap_entry)
+    db.commit()
+    db.refresh(swap_entry)
+    
+    return {
+        "message": f"{entry.swap_type.title()} entry created successfully",
+        "swap_entry_id": swap_entry.id,
+        "daily_entry_id": daily_entry.id,
+        "session_date": new_date.isoformat()
+    }
+
+
+@app.get("/api/faculty/swap-entries")
+def get_swap_entries(
+    date_offset: int = 0,
+    faculty: Faculty = Depends(get_current_faculty),
+    db: Session = Depends(get_db)
+):
+    """Get swap/extra/substitution entries for faculty on a given date"""
+    target_date = date.today() + timedelta(days=date_offset)
+    
+    entries = db.query(SwapEntry).filter(
+        SwapEntry.faculty_id == faculty.id,
+        SwapEntry.new_date == target_date
+    ).order_by(SwapEntry.new_period).all()
+    
+    result = []
+    for entry in entries:
+        dept = db.query(Department).filter(Department.id == entry.department_id).first()
+        result.append({
+            "id": entry.id,
+            "swap_type": entry.swap_type,
+            "original_date": entry.original_date.isoformat() if entry.original_date else None,
+            "original_period": entry.original_period,
+            "new_date": entry.new_date.isoformat(),
+            "new_period": entry.new_period,
+            "department_id": entry.department_id,
+            "department_name": dept.name if dept else "Unknown",
+            "class_type": entry.class_type,
+            "subject_code": entry.subject_code,
+            "subject_name": entry.subject_name,
+            "swapped_with_faculty": entry.swapped_with_faculty,
+            "swapped_with_department": entry.swapped_with_department,
+            "reason": entry.reason,
+            "daily_entry_id": entry.daily_entry_id,
+            "created_at": entry.created_at.isoformat() if entry.created_at else None
+        })
+    
+    return {"date": target_date.isoformat(), "swap_entries": result}
+
+
+@app.delete("/api/faculty/swap-entry/{entry_id}")
+def delete_swap_entry(
+    entry_id: int,
+    faculty: Faculty = Depends(get_current_faculty),
+    db: Session = Depends(get_db)
+):
+    """Delete a swap/extra/substitution entry and its associated DailyEntry"""
+    swap_entry = db.query(SwapEntry).filter(
+        SwapEntry.id == entry_id,
+        SwapEntry.faculty_id == faculty.id
+    ).first()
+    
+    if not swap_entry:
+        raise HTTPException(status_code=404, detail="Swap entry not found")
+    
+    # Delete associated DailyEntry
+    if swap_entry.daily_entry_id:
+        daily_entry = db.query(DailyEntry).filter(
+            DailyEntry.id == swap_entry.daily_entry_id
+        ).first()
+        if daily_entry:
+            db.delete(daily_entry)
+    
+    db.delete(swap_entry)
+    db.commit()
+    
+    return {"message": "Entry deleted successfully"}
+
+
+@app.get("/api/admin/swap-history")
+def get_admin_swap_history(
+    start_date: Optional[str] = None,
+    end_date: Optional[str] = None,
+    db: Session = Depends(get_db)
+):
+    """Get all swap/extra/substitution entries for admin view"""
+    if not start_date:
+        start_date = (date.today() - timedelta(days=30)).isoformat()
+    if not end_date:
+        end_date = date.today().isoformat()
+    
+    start = datetime.strptime(start_date, "%Y-%m-%d").date()
+    end = datetime.strptime(end_date, "%Y-%m-%d").date()
+    
+    entries = db.query(SwapEntry).filter(
+        SwapEntry.new_date >= start,
+        SwapEntry.new_date <= end
+    ).order_by(SwapEntry.new_date.desc(), SwapEntry.new_period.desc()).all()
+    
+    result = []
+    for entry in entries:
+        fac = db.query(Faculty).filter(Faculty.id == entry.faculty_id).first()
+        dept = db.query(Department).filter(Department.id == entry.department_id).first()
+        
+        # Get daily entry details if filled
+        daily = None
+        if entry.daily_entry_id:
+            de = db.query(DailyEntry).filter(DailyEntry.id == entry.daily_entry_id).first()
+            if de:
+                syllabus = db.query(Syllabus).filter(Syllabus.id == de.syllabus_id).first() if de.syllabus_id else None
+                lab_program = db.query(LabProgram).filter(LabProgram.id == de.lab_program_id).first() if de.lab_program_id else None
+                daily = {
+                    "is_absent": de.is_absent,
+                    "absent_reason": de.absent_reason,
+                    "summary": de.summary,
+                    "is_own_content": de.is_own_content,
+                    "own_content_title": de.own_content_title,
+                    "own_content_summary": de.own_content_summary,
+                    "session_title": syllabus.session_title if syllabus else None,
+                    "lab_program_title": lab_program.program_title if lab_program else None,
+                    "lab_work_done": de.lab_work_done,
+                    "mini_project_progress": de.mini_project_progress,
+                    "ppt_url": syllabus.ppt_url if syllabus else None,
+                    "moodle_url": lab_program.moodle_url if lab_program else None
+                }
+        
+        result.append({
+            "id": entry.id,
+            "swap_type": entry.swap_type,
+            "faculty_name": fac.name if fac else "Unknown",
+            "original_date": entry.original_date.isoformat() if entry.original_date else None,
+            "original_period": entry.original_period,
+            "new_date": entry.new_date.isoformat(),
+            "new_period": entry.new_period,
+            "department_name": dept.name if dept else "Unknown",
+            "class_type": entry.class_type,
+            "subject_code": entry.subject_code,
+            "subject_name": entry.subject_name,
+            "swapped_with_faculty": entry.swapped_with_faculty,
+            "swapped_with_department": entry.swapped_with_department,
+            "reason": entry.reason,
+            "daily_entry": daily,
+            "created_at": entry.created_at.isoformat() if entry.created_at else None
+        })
+    
+    return {"entries": result, "total": len(result)}
 
 # ----- Admin Routes -----
 @app.get("/api/admin/report")
@@ -756,7 +1026,8 @@ def get_admin_report(
             "moodle_url": lab_program.moodle_url if lab_program else None,
             "is_extra_class": entry.is_extra_class,
             "extra_class_subject_code": entry.extra_class_subject_code,
-            "extra_class_subject_name": entry.extra_class_subject_name
+            "extra_class_subject_name": entry.extra_class_subject_name,
+            "swap_type": entry.swap_type
         })
     
     return {"entries": result, "total": len(result)}

@@ -142,9 +142,50 @@ class DailyEntry(Base):
     extra_class_subject_code = Column(String(20), nullable=True)
     extra_class_subject_name = Column(String(50), nullable=True)
     
+    # Swap/Extra/Substitution type tracking
+    swap_type = Column(String(20), nullable=True)  # 'swap', 'extra', 'substitution'
+    
     created_at = Column(DateTime, default=datetime.utcnow)
     
     faculty = relationship("Faculty", back_populates="daily_entries")
     department = relationship("Department")
     syllabus = relationship("Syllabus")
     lab_program = relationship("LabProgram")
+
+
+class SwapEntry(Base):
+    __tablename__ = "swap_entries"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    faculty_id = Column(Integer, ForeignKey("faculties.id"), nullable=False)
+    swap_type = Column(String(20), nullable=False)  # 'swap', 'extra', 'substitution'
+    
+    # Original class details (the class being given away / replaced)
+    original_date = Column(Date, nullable=True)
+    original_period = Column(Integer, nullable=True)
+    
+    # New class details (the class being taken)
+    new_date = Column(Date, nullable=False)
+    new_period = Column(Integer, nullable=False)
+    
+    # Department and class info
+    department_id = Column(Integer, ForeignKey("departments.id"), nullable=False)
+    class_type = Column(String(20), default="theory")  # theory, lab, mini_project
+    subject_code = Column(String(20), default="24UCS271")
+    subject_name = Column(String(50), default="C Programming")
+    
+    # Swapped with faculty info
+    swapped_with_faculty = Column(String(100), nullable=True)
+    swapped_with_department = Column(String(100), nullable=True)
+    
+    # Reason
+    reason = Column(Text, nullable=True)
+    
+    # Link to DailyEntry created for the new class
+    daily_entry_id = Column(Integer, ForeignKey("daily_entries.id"), nullable=True)
+    
+    created_at = Column(DateTime, default=datetime.utcnow)
+    
+    faculty = relationship("Faculty")
+    department = relationship("Department")
+    daily_entry = relationship("DailyEntry")

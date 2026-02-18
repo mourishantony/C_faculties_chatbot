@@ -98,6 +98,39 @@
                     </div>
                 </div>
                 
+                <!-- Swap & Extra History Section -->
+                <div class="card" style="margin-top: 20px;">
+                    <div class="card-header">
+                        <h3 class="card-title"><i class="material-icons" style="vertical-align: middle; margin-right: 6px; font-size: 20px;">swap_horiz</i>Swap / Extra / Substitution History</h3>
+                    </div>
+                    
+                    <div class="report-filters" style="display: flex; gap: 15px; align-items: flex-end; flex-wrap: wrap;">
+                        <div class="filter-group" style="flex: 1; min-width: 150px; max-width: 200px;">
+                            <label style="display: block; margin-bottom: 8px; color: #64748b; font-weight: 500;">Start Date</label>
+                            <input type="date" id="swapStartDate" class="form-control" style="width: 100%;">
+                        </div>
+                        <div class="filter-group" style="flex: 1; min-width: 150px; max-width: 200px;">
+                            <label style="display: block; margin-bottom: 8px; color: #64748b; font-weight: 500;">End Date</label>
+                            <input type="date" id="swapEndDate" class="form-control" style="width: 100%;">
+                        </div>
+                        <button class="btn btn-primary" onclick="loadSwapHistory()" style="height: 42px; padding: 0 20px; white-space: nowrap;">
+                            <i class="material-icons" style="font-size: 16px; vertical-align: middle; margin-right: 4px;">search</i>Load History
+                        </button>
+                    </div>
+                    
+                    <!-- Swap Type Filter -->
+                    <div class="report-type-filter-container" style="margin-top: 15px;">
+                        <button class="report-filter-btn swap-filter active" onclick="filterSwapHistory('all')">All Types</button>
+                        <button class="report-filter-btn swap-filter" style="background: #059669; color: white;" onclick="filterSwapHistory('extra')">Extra</button>
+                        <button class="report-filter-btn swap-filter" style="background: #7c3aed; color: white;" onclick="filterSwapHistory('swap')">Swap</button>
+                        <button class="report-filter-btn swap-filter" style="background: #d97706; color: white;" onclick="filterSwapHistory('substitution')">Substitution</button>
+                    </div>
+                    
+                    <div id="swapHistoryContainer">
+                        <p class="text-center" style="padding: 20px; color: #64748b;">Select date range and click "Load History" to view swap/extra/substitution entries</p>
+                    </div>
+                </div>
+                
                 <!-- Stats -->
                 <!-- <div class="stats-grid" id="statsGrid">
                     <div class="stat-card">
@@ -991,6 +1024,33 @@
         .status-badge.swapped {
             background: linear-gradient(135deg, #7c3aed, #8b5cf6);
             color: white;
+        }
+        
+        .swap-type-badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.72rem;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+        }
+        .swap-type-badge.extra {
+            background: linear-gradient(135deg, #059669, #10b981);
+            color: white;
+        }
+        .swap-type-badge.swap {
+            background: linear-gradient(135deg, #7c3aed, #8b5cf6);
+            color: white;
+        }
+        .swap-type-badge.substitution {
+            background: linear-gradient(135deg, #d97706, #f59e0b);
+            color: white;
+        }
+        
+        .swap-filter.active {
+            background: linear-gradient(135deg, #0f172a, #1e3a8a) !important;
+            color: white !important;
         }
         
         /* Enhanced View Button */
@@ -2087,10 +2147,17 @@
         const today = new Date().toISOString().split('T')[0];
         document.getElementById('reportDate').value = today;
         
+        // Set default dates for swap history (last 7 days to today)
+        const weekAgo = new Date();
+        weekAgo.setDate(weekAgo.getDate() - 7);
+        document.getElementById('swapStartDate').value = weekAgo.toISOString().split('T')[0];
+        document.getElementById('swapEndDate').value = today;
+        
         // Load data on page load
         document.addEventListener('DOMContentLoaded', async () => {
             await loadSummary();
             await loadReport();
+            await loadSwapHistory();
             
             // Initialize day buttons with today selected
             initializeDayButtons();
@@ -2229,6 +2296,12 @@
                     statusClass = 'swapped';
                 }
                 
+                // Show swap type badge if applicable
+                let swapBadge = '';
+                if (entry.swap_type) {
+                    swapBadge = ` <span class="swap-type-badge ${entry.swap_type}">${entry.swap_type}</span>`;
+                }
+                
                 // Determine resource content based on class type
                 let resourceContent = '';
                 if (entry.is_own_content && (entry.own_content_title || entry.own_content_summary)) {
@@ -2266,7 +2339,7 @@
                         <td>${entry.department_name}</td>
                         <td>${entry.topic}</td>
                         <td>${resourceContent}</td>
-                        <td><span class="status-badge ${statusClass}">${status}</span></td>
+                        <td><span class="status-badge ${statusClass}">${status}</span>${swapBadge}</td>
                         <td>${summaryContent}</td>
                     </tr>
                 `;
@@ -2286,6 +2359,136 @@
         
         function closeDetailModal() {
             document.getElementById('detailModal').style.display = 'none';
+        }
+        
+        // ============ Swap / Extra / Substitution History ============
+        
+        async function loadSwapHistory() {
+            const startDate = document.getElementById('swapStartDate').value;
+            const endDate = document.getElementById('swapEndDate').value;
+            
+            if (!startDate || !endDate) {
+                document.getElementById('swapHistoryContainer').innerHTML = '<p class="text-center" style="padding: 20px; color: #dc2626;">Please select both start and end dates</p>';
+                return;
+            }
+            
+            try {
+                showLoading();
+                const data = await apiRequest(`/api/admin/swap-history?start_date=${startDate}&end_date=${endDate}`);
+                hideLoading();
+                currentSwapHistoryData = data;
+                renderSwapHistoryTable();
+            } catch (error) {
+                hideLoading();
+                document.getElementById('swapHistoryContainer').innerHTML = '<div class="alert alert-error">Failed to load swap history</div>';
+            }
+        }
+        
+        function filterSwapHistory(type) {
+            currentSwapTypeFilter = type;
+            document.querySelectorAll('.swap-filter').forEach(btn => btn.classList.remove('active'));
+            const activeBtn = document.querySelector(`.swap-filter[onclick*="'${type}'"]`);
+            if (activeBtn) activeBtn.classList.add('active');
+            if (currentSwapHistoryData) renderSwapHistoryTable();
+        }
+        
+        function renderSwapHistoryTable() {
+            if (!currentSwapHistoryData || !currentSwapHistoryData.entries) return;
+            
+            let entries = currentSwapHistoryData.entries;
+            if (currentSwapTypeFilter !== 'all') {
+                entries = entries.filter(e => e.swap_type === currentSwapTypeFilter);
+            }
+            
+            const container = document.getElementById('swapHistoryContainer');
+            
+            if (entries.length === 0) {
+                container.innerHTML = '<p class="text-center" style="padding: 20px; color: #64748b;">No entries found for the selected date range and filter</p>';
+                return;
+            }
+            
+            let html = '<table class="schedule-table" style="margin-top: 15px;">';
+            html += '<thead><tr>' +
+                '<th>Date</th>' +
+                '<th>Type</th>' +
+                '<th>Faculty</th>' +
+                '<th>Department</th>' +
+                '<th>New Period</th>' +
+                '<th>Original</th>' +
+                '<th>Swapped With</th>' +
+                '<th>Reason</th>' +
+                '<th>Class Type</th>' +
+                '<th>Daily Entry</th>' +
+                '</tr></thead><tbody>';
+            
+            entries.forEach(entry => {
+                const typeLabel = entry.swap_type;
+                
+                // Original class info
+                let originalInfo = '-';
+                if (entry.original_date && entry.original_period) {
+                    originalInfo = `${entry.original_date}<br>Period ${entry.original_period}`;
+                }
+                
+                // Swapped with info
+                let swappedInfo = '-';
+                if (entry.swapped_with_faculty) {
+                    swappedInfo = entry.swapped_with_faculty;
+                    if (entry.swapped_with_department) {
+                        swappedInfo += `<br><small style="color: #64748b;">${entry.swapped_with_department}</small>`;
+                    }
+                }
+                
+                // Daily entry status
+                let dailyStatus = '<span class="status-badge pending">Not Filled</span>';
+                if (entry.daily_entry) {
+                    if (entry.daily_entry.is_absent) {
+                        dailyStatus = '<span class="status-badge absent">Absent</span>';
+                    } else if (entry.daily_entry.summary || entry.daily_entry.lab_work_done || entry.daily_entry.mini_project_progress || entry.daily_entry.session_title) {
+                        dailyStatus = '<span class="status-badge filled">Filled</span>';
+                        // Add view button for summary
+                        const summaryContent = entry.daily_entry.summary || entry.daily_entry.lab_work_done || entry.daily_entry.mini_project_progress || '';
+                        if (summaryContent) {
+                            dailyStatus += ` <button class="view-btn" onclick="showDetailModal('Entry Summary', '${summaryContent.replace(/'/g, "\\'")}')"><i class="material-icons" style="font-size: 14px;">visibility</i></button>`;
+                        }
+                    } else {
+                        dailyStatus = '<span class="status-badge filled">Created</span>';
+                    }
+                }
+                
+                // Reason with truncation
+                let reasonHtml = '-';
+                if (entry.reason) {
+                    const short = entry.reason.length > 30 ? entry.reason.substring(0, 30) + '...' : entry.reason;
+                    reasonHtml = `<span title="${entry.reason.replace(/"/g, '&quot;')}">${short}</span>`;
+                    if (entry.reason.length > 30) {
+                        reasonHtml += ` <button class="view-btn" onclick="showDetailModal('Reason', '${entry.reason.replace(/'/g, "\\'").replace(/\n/g, ' ')}')"><i class="material-icons" style="font-size: 14px;">visibility</i></button>`;
+                    }
+                }
+                
+                const classTypeLabels = {
+                    'theory': '<span class="class-type-badge class-type-theory">Theory</span>',
+                    'lab': '<span class="class-type-badge class-type-lab">Lab</span>',
+                    'mini_project': '<span class="class-type-badge class-type-mini_project">Mini Project</span>'
+                };
+                
+                html += `<tr>
+                    <td>${entry.new_date}</td>
+                    <td><span class="swap-type-badge ${entry.swap_type}">${typeLabel}</span></td>
+                    <td><strong>${entry.faculty_name}</strong></td>
+                    <td>${entry.department_name}</td>
+                    <td><span class="period-badge">${entry.new_period}</span></td>
+                    <td>${originalInfo}</td>
+                    <td>${swappedInfo}</td>
+                    <td>${reasonHtml}</td>
+                    <td>${classTypeLabels[entry.class_type] || entry.class_type}</td>
+                    <td>${dailyStatus}</td>
+                </tr>`;
+            });
+            
+            html += '</tbody></table>';
+            html += `<p style="text-align: right; padding: 10px; color: #64748b; font-size: 0.85rem;">Total: ${entries.length} entries</p>`;
+            container.innerHTML = html;
         }
         
         // Close modals when clicking outside
@@ -2314,6 +2517,10 @@
         // Store loaded report data globally for filtering
         let currentReportData = null;
         let currentReportClassTypeFilter = 'all'; // Filter for reports: 'all', 'theory', 'lab', 'mini_project'
+        
+        // Swap history data
+        let currentSwapHistoryData = null;
+        let currentSwapTypeFilter = 'all'; // Filter: 'all', 'extra', 'swap', 'substitution'
         
         const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
         const dayBtnIds = ['sunBtn', 'monBtn', 'tueBtn', 'wedBtn', 'thuBtn', 'friBtn', 'satBtn'];

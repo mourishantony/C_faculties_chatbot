@@ -173,8 +173,8 @@
                         <p id="dateDisplay" style="color: var(--text-secondary);"></p>
                     </div>
                     <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                        <button id="addExtraClassBtn" class="btn" onclick="openExtraClassModal()" style="background: linear-gradient(135deg, #059669, #10b981); color: white; padding: 8px 16px; border: none; border-radius: 8px; cursor: pointer; font-weight: 500;">
-                            <i class="material-icons" style="font-size: 16px; vertical-align: middle; margin-right: 4px;">add_circle</i>Extra Class
+                        <button id="addExtraClassBtn" class="btn" onclick="openSwapModal()" style="background: linear-gradient(135deg, #7c3aed, #8b5cf6); color: white; padding: 8px 16px; border: none; border-radius: 8px; cursor: pointer; font-weight: 500;">
+                            <i class="material-icons" style="font-size: 16px; vertical-align: middle; margin-right: 4px;">swap_horiz</i>Swap / Extra
                         </button>
                         <button id="todayBtn" class="btn btn-primary" onclick="switchToToday()" style="background: linear-gradient(135deg, #0f172a, #1e3a8a); color: white; padding: 8px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: 500;">
                             <i class="material-icons" style="font-size: 16px; vertical-align: middle; margin-right: 4px;">today</i>Today
@@ -336,125 +336,119 @@
         </div>
     </div>
 
-    <!-- Modal for adding extra class -->
+    <!-- Modal for Swap/Extra/Substitution entry -->
     <div class="modal-overlay" id="extraClassModal">
-        <div class="modal" style="max-width: 600px;">
+        <div class="modal" style="max-width: 650px;">
             <div class="modal-header">
-                <h3 class="modal-title"><i class="material-icons" style="vertical-align: middle; margin-right: 6px; font-size: 20px;">add_circle</i>Add Extra Class</h3>
-                <button class="modal-close" onclick="closeExtraClassModal()">&times;</button>
+                <h3 class="modal-title"><i class="material-icons" style="vertical-align: middle; margin-right: 6px; font-size: 20px;">swap_horiz</i>Create Swap / Extra / Substitution</h3>
+                <button class="modal-close" onclick="closeSwapModal()">&times;</button>
             </div>
             <div class="modal-body">
-                <form id="extraClassForm">
+                <form id="swapEntryForm">
+                    <!-- Swap Type -->
                     <div class="form-group">
-                        <label class="form-label">Select Free Period</label>
-                        <select class="form-control" id="extraClassPeriod" required>
-                            <option value="">-- Select Period --</option>
+                        <label class="form-label">Entry Type</label>
+                        <select class="form-control" id="swapType" onchange="toggleSwapFields()" required>
+                            <option value="extra">Extra Class</option>
+                            <option value="swap">Swap</option>
+                            <option value="substitution">Substitution</option>
                         </select>
-                        <small id="freePeriodInfo" style="color: #64748b;"></small>
+                        <small style="color: #64748b;" id="swapTypeHint">Adding an additional class in a free period</small>
                     </div>
                     
-                    <div class="form-group">
-                        <label class="form-label">Select Department</label>
-                        <select class="form-control" id="extraClassDepartment" required>
-                            <option value="">-- Select Department --</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">Class Type</label>
-                        <select class="form-control" id="extraClassType" onchange="toggleExtraClassForms()" required>
-                            <option value="theory">Theory</option>
-                            <option value="lab">Lab</option>
-                            <option value="mini_project">Mini Project</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">Subject Code</label>
-                        <input type="text" class="form-control" id="extraClassSubjectCode" value="24UCS271" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">Subject Name</label>
-                        <input type="text" class="form-control" id="extraClassSubjectName" value="C Programming" required>
-                    </div>
-                    
-                    <!-- Theory Class Form for Extra Class -->
-                    <div id="extraTheoryForm" class="form-section">
-                        <div class="form-section-title"><i class="material-icons" style="font-size: 18px; vertical-align: middle; margin-right: 6px;">menu_book</i>Theory Class Details</div>
-                        
-                        <div class="checkbox-group">
-                            <input type="checkbox" id="extraIsOwnContent" onchange="toggleExtraOwnContent()">
-                            <label for="extraIsOwnContent">Teaching Own Content (not from syllabus)</label>
-                        </div>
-                        
-                        <div id="extraSyllabusSection">
-                            <div class="form-group">
-                                <label class="form-label">Select Session</label>
-                                <select class="form-control" id="extraSyllabusSelect" onchange="showExtraSessionDetails()">
-                                    <option value="">-- Select Session --</option>
+                    <!-- Original Date & Period (for Swap type) -->
+                    <div id="originalDateGroup" class="form-section hidden" style="border-left: 3px solid #7c3aed;">
+                        <div class="form-section-title"><i class="material-icons" style="font-size: 18px; vertical-align: middle; margin-right: 6px;">history</i>Original Class (Being Given Away)</div>
+                        <div style="display: flex; gap: 10px;">
+                            <div class="form-group" style="flex: 1;">
+                                <label class="form-label">Original Date</label>
+                                <select class="form-control" id="swapOriginalDate">
+                                    <option value="">-- Select --</option>
                                 </select>
                             </div>
-                            <div id="extraSessionDetails" class="hidden" style="margin-top: 10px; padding: 10px; background: #f5f5f5; border-radius: 5px;">
-                                <p><strong>Topics:</strong> <span id="extraSessionTopics"></span></p>
+                            <div class="form-group" style="flex: 1;">
+                                <label class="form-label">Original Period</label>
+                                <select class="form-control" id="swapOriginalPeriod">
+                                    <option value="">-- Select --</option>
+                                    <option value="1">1st Period</option>
+                                    <option value="2">2nd Period</option>
+                                    <option value="3">3rd Period</option>
+                                    <option value="4">4th Period</option>
+                                    <option value="5">5th Period</option>
+                                    <option value="6">6th Period</option>
+                                    <option value="7">7th Period</option>
+                                    <option value="8">8th Period</option>
+                                    <option value="9">9th Period</option>
+                                </select>
                             </div>
-                        </div>
-                        
-                        <div id="extraOwnContentSection" class="hidden">
-                            <div class="form-group">
-                                <label class="form-label">Content Title</label>
-                                <input type="text" class="form-control" id="extraOwnContentTitle" placeholder="What topic are you teaching?">
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Content Summary</label>
-                                <textarea class="form-control" id="extraOwnContentSummary" placeholder="Brief description of the content..."></textarea>
-                            </div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label class="form-label">Class Summary</label>
-                            <textarea class="form-control" id="extraTheorySummary" placeholder="What will be covered in this class?"></textarea>
                         </div>
                     </div>
                     
-                    <!-- Lab Class Form for Extra Class -->
-                    <div id="extraLabForm" class="form-section hidden">
-                        <div class="form-section-title"><i class="material-icons" style="font-size: 18px; vertical-align: middle; margin-right: 6px;">science</i>Lab Class Details</div>
+                    <!-- Swapped With Faculty (for Swap / Substitution) -->
+                    <div id="swapFacultyGroup" class="hidden">
+                        <div style="display: flex; gap: 10px;">
+                            <div class="form-group" style="flex: 1;">
+                                <label class="form-label">Swapped With Faculty</label>
+                                <input type="text" class="form-control" id="swapFacultyName" placeholder="Enter faculty name">
+                            </div>
+                            <div class="form-group" style="flex: 1;">
+                                <label class="form-label">Their Department</label>
+                                <input type="text" class="form-control" id="swapFacultyDept" placeholder="e.g. CSE, IT, ECE">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- New Class Details -->
+                    <div class="form-section" style="border-left: 3px solid #2563eb;">
+                        <div class="form-section-title"><i class="material-icons" style="font-size: 18px; vertical-align: middle; margin-right: 6px;">event</i>New Class Details</div>
                         
                         <div class="form-group">
-                            <label class="form-label">Select Lab Program</label>
-                            <select class="form-control" id="extraLabProgramSelect" onchange="showExtraLabDetails()">
-                                <option value="">-- Select Lab Program --</option>
+                            <label class="form-label">Select Free Period</label>
+                            <select class="form-control" id="swapNewPeriod" required>
+                                <option value="">-- Select Period --</option>
+                            </select>
+                            <small id="swapFreePeriodInfo" style="color: #64748b;"></small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Select Department</label>
+                            <select class="form-control" id="swapDepartment" required>
+                                <option value="">-- Select Department --</option>
                             </select>
                         </div>
-                        <div id="extraLabProgramDetails" class="hidden" style="margin-top: 10px; padding: 10px; background: #f5f5f5; border-radius: 5px;">
-                            <p><strong>Description:</strong> <span id="extraLabDescription"></span></p>
+                        
+                        <div style="display: flex; gap: 10px;">
+                            <div class="form-group" style="flex: 1;">
+                                <label class="form-label">Class Type</label>
+                                <select class="form-control" id="swapClassType" required>
+                                    <option value="theory">Theory</option>
+                                    <option value="lab">Lab</option>
+                                    <option value="mini_project">Mini Project</option>
+                                </select>
+                            </div>
                         </div>
                         
-                        <div class="form-group">
-                            <label class="form-label">What will be done in this lab?</label>
-                            <textarea class="form-control" id="extraLabWorkDone" placeholder="Explain, demo, practice, completion status..."></textarea>
+                        <div style="display: flex; gap: 10px;">
+                            <div class="form-group" style="flex: 1;">
+                                <label class="form-label">Subject Code</label>
+                                <input type="text" class="form-control" id="swapSubjectCode" value="24UCS271" required>
+                            </div>
+                            <div class="form-group" style="flex: 1;">
+                                <label class="form-label">Subject Name</label>
+                                <input type="text" class="form-control" id="swapSubjectName" value="C Programming" required>
+                            </div>
                         </div>
                     </div>
                     
-                    <!-- Mini Project Form for Extra Class -->
-                    <div id="extraMiniProjectForm" class="form-section hidden">
-                        <div class="form-section-title"><i class="material-icons" style="font-size: 18px; vertical-align: middle; margin-right: 6px;">rocket_launch</i>Mini Project Details</div>
-                        
-                        <div class="form-group">
-                            <label class="form-label">Project Progress & Activities</label>
-                            <textarea class="form-control" id="extraMiniProjectProgress" placeholder="What progress will be made? What activities?"></textarea>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label class="form-label">Summary</label>
-                            <textarea class="form-control" id="extraMiniProjectSummary" placeholder="Brief summary of the mini project session..."></textarea>
-                        </div>
+                    <!-- Reason -->
+                    <div class="form-group">
+                        <label class="form-label">Reason</label>
+                        <textarea class="form-control" id="swapReason" placeholder="Reason for swap/extra/substitution..." rows="2"></textarea>
                     </div>
                     
                     <div class="modal-footer" style="padding: 0; border: none; margin-top: 20px;">
-                        <button type="button" class="btn btn-secondary" onclick="closeExtraClassModal()">Cancel</button>
-                        <button type="submit" class="btn btn-primary" style="background: linear-gradient(135deg, #059669, #10b981);">Add Extra Class</button>
+                        <button type="button" class="btn btn-secondary" onclick="closeSwapModal()">Cancel</button>
+                        <button type="submit" class="btn btn-primary" id="swapSubmitBtn" style="background: linear-gradient(135deg, #7c3aed, #8b5cf6);">Create Entry</button>
                     </div>
                 </form>
             </div>
@@ -639,6 +633,7 @@
                 
                 // Add extra classes to the list
                 extraClasses.forEach(ec => {
+                    const swapType = ec.swap_type || 'extra';
                     allClasses.push({
                         timetable_id: null,
                         department_id: ec.department_id,
@@ -647,9 +642,12 @@
                         subject_code: ec.subject_code || '24UCS271',
                         subject_name: ec.subject_name || 'C Programming',
                         class_type: ec.class_type,
-                        is_filled: true,
+                        is_filled: !!(ec.syllabus_id || ec.lab_program_id || ec.summary || ec.lab_work_done || ec.mini_project_progress || ec.is_own_content),
                         is_extra_class: true,
                         extra_class_id: ec.id,
+                        swap_type: swapType,
+                        swap_entry_id: ec.swap_entry_id,
+                        swapped_with_faculty: ec.swapped_with_faculty,
                         daily_entry: {
                             id: ec.id,
                             class_type: ec.class_type,
@@ -662,8 +660,8 @@
                             own_content_summary: ec.own_content_summary,
                             summary: ec.summary,
                             is_absent: false,
-                            is_swapped: false,
-                            swapped_with: null
+                            is_swapped: swapType === 'swap',
+                            swapped_with: ec.swapped_with_faculty
                         }
                     });
                 });
@@ -693,10 +691,21 @@
                     let rowStyle = '';
                     
                     if (item.is_extra_class) {
-                        status = 'Extra Class';
-                        statusClass = 'extra';
-                        btnText = 'View/Edit';
-                        rowStyle = 'background: linear-gradient(135deg, rgba(5, 150, 105, 0.1), rgba(16, 185, 129, 0.1));';
+                        const swapType = item.swap_type || 'extra';
+                        if (swapType === 'swap') {
+                            status = 'Swap';
+                            statusClass = 'swapped';
+                            rowStyle = 'background: linear-gradient(135deg, rgba(124, 58, 237, 0.08), rgba(139, 92, 246, 0.08));';
+                        } else if (swapType === 'substitution') {
+                            status = 'Substitution';
+                            statusClass = 'swapped';
+                            rowStyle = 'background: linear-gradient(135deg, rgba(217, 119, 6, 0.08), rgba(245, 158, 11, 0.08));';
+                        } else {
+                            status = 'Extra Class';
+                            statusClass = 'extra';
+                            rowStyle = 'background: linear-gradient(135deg, rgba(5, 150, 105, 0.1), rgba(16, 185, 129, 0.1));';
+                        }
+                        btnText = item.is_filled ? 'Edit Entry' : 'Fill Entry';
                     } else if (item.is_filled) {
                         if (item.daily_entry.is_absent) {
                             status = 'Absent';
@@ -717,23 +726,38 @@
                         
                     };
                     
-                    const extraBadge = item.is_extra_class ? '<span style="background: #059669; color: white; font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; margin-left: 5px;">EXTRA</span>' : '';
+                    // Badge for swap/extra/sub type
+                    let typeBadge = '';
+                    if (item.is_extra_class) {
+                        const st = item.swap_type || 'extra';
+                        if (st === 'swap') {
+                            typeBadge = '<span style="background: #7c3aed; color: white; font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; margin-left: 5px;">SWAP</span>';
+                        } else if (st === 'substitution') {
+                            typeBadge = '<span style="background: #d97706; color: white; font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; margin-left: 5px;">SUB</span>';
+                        } else {
+                            typeBadge = '<span style="background: #059669; color: white; font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; margin-left: 5px;">EXTRA</span>';
+                        }
+                    }
+                    
+                    const swapInfo = (item.is_extra_class && item.swapped_with_faculty) 
+                        ? `<br><small style="color: #7c3aed;">with ${item.swapped_with_faculty}</small>` 
+                        : '';
                     
                     html += `
                         <tr style="${rowStyle}">
                             <td><span class="period-badge">${getOrdinal(item.period)}</span></td>
                             <td>${getPeriodTime(item.period)}</td>
-                            <td><strong>${item.department_name}</strong>${extraBadge}<br><small>${item.subject_code} - ${item.subject_name}</small></td>
+                            <td><strong>${item.department_name}</strong>${typeBadge}${swapInfo}<br><small>${item.subject_code} - ${item.subject_name}</small></td>
                             <td><span class="class-type-badge class-type-${item.class_type}">${classTypeLabel[item.class_type] || item.class_type}</span></td>
                             <td><span class="status-badge ${statusClass}">${status}</span></td>
                             <td>
                                 ${item.is_extra_class ? `
-                                    <button class="btn btn-sm btn-secondary" style="background: #059669; border-color: #059669;" 
-                                        onclick='editExtraClass(${item.extra_class_id}, ${item.department_id}, ${item.period}, "${item.department_name}", "${item.class_type}", ${JSON.stringify(item.daily_entry)})'>
-                                        Edit
+                                    <button class="btn btn-sm ${item.is_filled ? 'btn-secondary' : 'btn-primary'}" 
+                                        onclick='openModal(${item.department_id}, ${item.period}, "${item.department_name}", "${item.class_type}", ${JSON.stringify(item.daily_entry)})'>
+                                        ${btnText}
                                     </button>
                                     <button class="btn btn-sm" style="background: #dc2626; color: white; border: none; margin-left: 5px;" 
-                                        onclick='deleteExtraClass(${item.extra_class_id})'>
+                                        onclick='deleteSwapEntry(${item.swap_entry_id || 0}, ${item.extra_class_id})'>
                                         <i class="material-icons" style="font-size: 14px; vertical-align: middle;">delete</i>
                                     </button>
                                 ` : `
@@ -946,19 +970,32 @@
             }
         });
         
-        // ============ Extra Class Functions ============
+        // ============ Swap / Extra / Substitution Functions ============
         
-        async function openExtraClassModal() {
+        async function openSwapModal() {
             // Reset form
-            document.getElementById('extraClassForm').reset();
-            document.getElementById('extraClassSubjectCode').value = '24UCS271';
-            document.getElementById('extraClassSubjectName').value = 'C Programming';
+            document.getElementById('swapEntryForm').reset();
+            document.getElementById('swapSubjectCode').value = '24UCS271';
+            document.getElementById('swapSubjectName').value = 'C Programming';
+            
+            // Set default swap type
+            document.getElementById('swapType').value = 'extra';
+            toggleSwapFields();
+            
+            // Populate original date options (Today / Tomorrow)
+            const origDateSelect = document.getElementById('swapOriginalDate');
+            origDateSelect.innerHTML = '<option value="">-- Select --</option>';
+            const today = new Date();
+            const tomorrow = new Date(today);
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            origDateSelect.innerHTML += `<option value="${today.toISOString().split('T')[0]}">Today (${today.toLocaleDateString()})</option>`;
+            origDateSelect.innerHTML += `<option value="${tomorrow.toISOString().split('T')[0]}">Tomorrow (${tomorrow.toLocaleDateString()})</option>`;
             
             // Load free periods
-            await loadFreePeriods();
+            await loadSwapFreePeriods();
             
             // Populate departments dropdown
-            const deptSelect = document.getElementById('extraClassDepartment');
+            const deptSelect = document.getElementById('swapDepartment');
             deptSelect.innerHTML = '<option value="">-- Select Department --</option>';
             departmentsData.forEach(dept => {
                 const option = document.createElement('option');
@@ -967,56 +1004,49 @@
                 deptSelect.appendChild(option);
             });
             
-            // Populate syllabus dropdown for extra class modal
-            const extraSyllabusSelect = document.getElementById('extraSyllabusSelect');
-            extraSyllabusSelect.innerHTML = '<option value="">-- Select Session --</option>';
-            let currentUnit = 0;
-            let optgroup = null;
-            syllabusData.forEach(session => {
-                if (session.unit !== currentUnit) {
-                    optgroup = document.createElement('optgroup');
-                    optgroup.label = `Unit ${session.unit}`;
-                    extraSyllabusSelect.appendChild(optgroup);
-                    currentUnit = session.unit;
-                }
-                const option = document.createElement('option');
-                option.value = session.id;
-                option.textContent = `Session ${session.session_number}: ${session.session_title}`;
-                if (optgroup) {
-                    optgroup.appendChild(option);
-                } else {
-                    extraSyllabusSelect.appendChild(option);
-                }
-            });
-            
-            // Populate lab programs dropdown for extra class modal
-            const extraLabSelect = document.getElementById('extraLabProgramSelect');
-            extraLabSelect.innerHTML = '<option value="">-- Select Lab Program --</option>';
-            labProgramsData.forEach(program => {
-                const option = document.createElement('option');
-                option.value = program.id;
-                option.textContent = `${program.program_number}. ${program.program_title}`;
-                extraLabSelect.appendChild(option);
-            });
-            
-            // Reset form sections
-            toggleExtraClassForms();
-            
             document.getElementById('extraClassModal').classList.add('active');
         }
         
-        function closeExtraClassModal() {
+        function closeSwapModal() {
             document.getElementById('extraClassModal').classList.remove('active');
         }
         
-        async function loadFreePeriods() {
+        function toggleSwapFields() {
+            const swapType = document.getElementById('swapType').value;
+            const originalGroup = document.getElementById('originalDateGroup');
+            const facultyGroup = document.getElementById('swapFacultyGroup');
+            const hint = document.getElementById('swapTypeHint');
+            const submitBtn = document.getElementById('swapSubmitBtn');
+            
+            if (swapType === 'swap') {
+                originalGroup.classList.remove('hidden');
+                facultyGroup.classList.remove('hidden');
+                hint.textContent = 'Swapping your class period with another faculty';
+                submitBtn.style.background = 'linear-gradient(135deg, #7c3aed, #8b5cf6)';
+                submitBtn.textContent = 'Create Swap Entry';
+            } else if (swapType === 'substitution') {
+                originalGroup.classList.add('hidden');
+                facultyGroup.classList.remove('hidden');
+                hint.textContent = 'Taking a class on behalf of another faculty';
+                submitBtn.style.background = 'linear-gradient(135deg, #d97706, #f59e0b)';
+                submitBtn.textContent = 'Create Substitution Entry';
+            } else {
+                originalGroup.classList.add('hidden');
+                facultyGroup.classList.add('hidden');
+                hint.textContent = 'Adding an additional class in a free period';
+                submitBtn.style.background = 'linear-gradient(135deg, #059669, #10b981)';
+                submitBtn.textContent = 'Create Extra Class';
+            }
+        }
+        
+        async function loadSwapFreePeriods() {
             try {
                 const data = await apiRequest(`/api/faculty/free-periods?date_offset=${currentDateOffset}`, 'GET', null, true);
-                const periodSelect = document.getElementById('extraClassPeriod');
+                const periodSelect = document.getElementById('swapNewPeriod');
                 periodSelect.innerHTML = '<option value="">-- Select Period --</option>';
                 
                 if (data.free_periods.length === 0) {
-                    document.getElementById('freePeriodInfo').textContent = 'No free periods available for this day.';
+                    document.getElementById('swapFreePeriodInfo').textContent = 'No free periods available for this day.';
                 } else {
                     data.free_periods.forEach(p => {
                         const option = document.createElement('option');
@@ -1024,144 +1054,101 @@
                         option.textContent = `${getOrdinal(p.period)} Period - ${p.display_time}`;
                         periodSelect.appendChild(option);
                     });
-                    document.getElementById('freePeriodInfo').textContent = `${data.free_periods.length} free period(s) available`;
+                    document.getElementById('swapFreePeriodInfo').textContent = `${data.free_periods.length} free period(s) available`;
                 }
             } catch (error) {
                 console.error('Error loading free periods:', error);
-                document.getElementById('freePeriodInfo').textContent = 'Error loading free periods';
+                document.getElementById('swapFreePeriodInfo').textContent = 'Error loading free periods';
             }
         }
         
-        function toggleExtraClassForms() {
-            const classType = document.getElementById('extraClassType').value;
-            
-            // Hide all forms first
-            document.getElementById('extraTheoryForm').classList.add('hidden');
-            document.getElementById('extraLabForm').classList.add('hidden');
-            document.getElementById('extraMiniProjectForm').classList.add('hidden');
-            
-            // Show the relevant form
-            if (classType === 'theory') {
-                document.getElementById('extraTheoryForm').classList.remove('hidden');
-            } else if (classType === 'lab') {
-                document.getElementById('extraLabForm').classList.remove('hidden');
-            } else if (classType === 'mini_project') {
-                document.getElementById('extraMiniProjectForm').classList.remove('hidden');
-            }
-        }
-        
-        function toggleExtraOwnContent() {
-            const isOwnContent = document.getElementById('extraIsOwnContent').checked;
-            if (isOwnContent) {
-                document.getElementById('extraSyllabusSection').classList.add('hidden');
-                document.getElementById('extraOwnContentSection').classList.remove('hidden');
-            } else {
-                document.getElementById('extraSyllabusSection').classList.remove('hidden');
-                document.getElementById('extraOwnContentSection').classList.add('hidden');
-            }
-        }
-        
-        function showExtraSessionDetails() {
-            const sessionId = document.getElementById('extraSyllabusSelect').value;
-            const detailsDiv = document.getElementById('extraSessionDetails');
-            
-            if (!sessionId) {
-                detailsDiv.classList.add('hidden');
-                return;
-            }
-            
-            const session = syllabusData.find(s => s.id == sessionId);
-            if (session) {
-                document.getElementById('extraSessionTopics').textContent = session.topics || 'No topics listed';
-                detailsDiv.classList.remove('hidden');
-            }
-        }
-        
-        function showExtraLabDetails() {
-            const programId = document.getElementById('extraLabProgramSelect').value;
-            const detailsDiv = document.getElementById('extraLabProgramDetails');
-            
-            if (!programId) {
-                detailsDiv.classList.add('hidden');
-                return;
-            }
-            
-            const program = labProgramsData.find(p => p.id == programId);
-            if (program) {
-                document.getElementById('extraLabDescription').textContent = program.description || 'No description';
-                detailsDiv.classList.remove('hidden');
-            }
-        }
-        
-        async function deleteExtraClass(entryId) {
-            if (!confirm('Are you sure you want to delete this extra class?')) {
-                return;
-            }
+        async function deleteSwapEntry(swapEntryId, dailyEntryId) {
+            if (!confirm('Are you sure you want to delete this entry?')) return;
             
             try {
                 showLoading();
-                await apiRequest(`/api/faculty/extra-class/${entryId}`, 'DELETE', null, true);
+                if (swapEntryId) {
+                    await apiRequest(`/api/faculty/swap-entry/${swapEntryId}`, 'DELETE', null, true);
+                } else {
+                    // Fallback to old extra class delete
+                    await apiRequest(`/api/faculty/extra-class/${dailyEntryId}`, 'DELETE', null, true);
+                }
                 hideLoading();
                 await loadSchedule();
-                alert('Extra class deleted successfully');
+                alert('Entry deleted successfully');
             } catch (error) {
                 hideLoading();
-                alert('Error deleting extra class: ' + error.message);
+                alert('Error: ' + error.message);
             }
         }
         
-        function editExtraClass(entryId, deptId, period, deptName, classType, existingData) {
-            // For now, just show an alert with info - editing extra classes uses the same form
-            alert(`Extra class for ${deptName}, Period ${period}\\nClass Type: ${classType}\\n\\nTo edit, delete this entry and add a new extra class with updated information.`);
-        }
-        
-        // Handle extra class form submission
-        document.getElementById('extraClassForm').addEventListener('submit', async (e) => {
+        // Handle swap entry form submission
+        document.getElementById('swapEntryForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
-            const classType = document.getElementById('extraClassType').value;
-            const period = parseInt(document.getElementById('extraClassPeriod').value);
-            const departmentId = parseInt(document.getElementById('extraClassDepartment').value);
+            const swapType = document.getElementById('swapType').value;
+            const newPeriod = parseInt(document.getElementById('swapNewPeriod').value);
+            const departmentId = parseInt(document.getElementById('swapDepartment').value);
             
-            if (!period || !departmentId) {
-                alert('Please select a period and department');
+            if (!newPeriod || !departmentId) {
+                alert('Please select a free period and department');
                 return;
+            }
+            
+            // Validate swap-specific fields
+            if (swapType === 'swap') {
+                const origDate = document.getElementById('swapOriginalDate').value;
+                const origPeriod = document.getElementById('swapOriginalPeriod').value;
+                const facName = document.getElementById('swapFacultyName').value.trim();
+                if (!origDate || !origPeriod) {
+                    alert('Please select original date and period for the swap');
+                    return;
+                }
+                if (!facName) {
+                    alert('Please enter the faculty name you are swapping with');
+                    return;
+                }
+            }
+            
+            if (swapType === 'substitution') {
+                const facName = document.getElementById('swapFacultyName').value.trim();
+                if (!facName) {
+                    alert('Please enter the faculty name you are substituting for');
+                    return;
+                }
             }
             
             const data = {
+                swap_type: swapType,
+                new_date: currentScheduleDate,
+                new_period: newPeriod,
                 department_id: departmentId,
-                period: period,
-                class_type: classType,
-                entry_date: currentScheduleDate,
-                subject_code: document.getElementById('extraClassSubjectCode').value,
-                subject_name: document.getElementById('extraClassSubjectName').value
+                class_type: document.getElementById('swapClassType').value,
+                subject_code: document.getElementById('swapSubjectCode').value,
+                subject_name: document.getElementById('swapSubjectName').value,
+                reason: document.getElementById('swapReason').value || null
             };
             
-            // Add class-type specific data
-            if (classType === 'theory') {
-                data.is_own_content = document.getElementById('extraIsOwnContent').checked;
-                if (data.is_own_content) {
-                    data.own_content_title = document.getElementById('extraOwnContentTitle').value || null;
-                    data.own_content_summary = document.getElementById('extraOwnContentSummary').value || null;
-                } else {
-                    data.syllabus_id = document.getElementById('extraSyllabusSelect').value ? parseInt(document.getElementById('extraSyllabusSelect').value) : null;
-                }
-                data.summary = document.getElementById('extraTheorySummary').value || null;
-            } else if (classType === 'lab') {
-                data.lab_program_id = document.getElementById('extraLabProgramSelect').value ? parseInt(document.getElementById('extraLabProgramSelect').value) : null;
-                data.lab_work_done = document.getElementById('extraLabWorkDone').value || null;
-            } else if (classType === 'mini_project') {
-                data.mini_project_progress = document.getElementById('extraMiniProjectProgress').value || null;
-                data.summary = document.getElementById('extraMiniProjectSummary').value || null;
+            if (swapType === 'swap') {
+                data.original_date = document.getElementById('swapOriginalDate').value;
+                data.original_period = parseInt(document.getElementById('swapOriginalPeriod').value);
+                data.swapped_with_faculty = document.getElementById('swapFacultyName').value.trim();
+                data.swapped_with_department = document.getElementById('swapFacultyDept').value.trim() || null;
+            }
+            
+            if (swapType === 'substitution') {
+                data.swapped_with_faculty = document.getElementById('swapFacultyName').value.trim();
+                data.swapped_with_department = document.getElementById('swapFacultyDept').value.trim() || null;
             }
             
             try {
                 showLoading();
-                const response = await apiRequest('/api/faculty/extra-class', 'POST', data, true);
+                const response = await apiRequest('/api/faculty/swap-entry', 'POST', data, true);
                 hideLoading();
-                closeExtraClassModal();
+                closeSwapModal();
                 await loadSchedule();
-                alert(`Extra class added successfully for ${response.session_date}`);
+                const typeLabel = swapType === 'swap' ? 'Swap' : swapType === 'substitution' ? 'Substitution' : 'Extra class';
+                alert(`${typeLabel} entry created successfully for ${response.session_date}. You can now fill the daily entry.`);
             } catch (error) {
                 hideLoading();
                 alert('Error: ' + error.message);
