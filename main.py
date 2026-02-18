@@ -111,6 +111,16 @@ class SwapEntryCreate(BaseModel):
     swapped_with_faculty: Optional[str] = None  # name of other faculty
     swapped_with_department: Optional[str] = None  # their department
     reason: Optional[str] = None
+    
+    # Session content fields (same as daily entry)
+    syllabus_id: Optional[int] = None
+    lab_program_id: Optional[int] = None
+    lab_work_done: Optional[str] = None
+    mini_project_progress: Optional[str] = None
+    is_own_content: bool = False
+    own_content_title: Optional[str] = None
+    own_content_summary: Optional[str] = None
+    summary: Optional[str] = None
 
 # ----- Super Admin Pydantic Models -----
 class FacultyCreate(BaseModel):
@@ -786,6 +796,14 @@ def create_swap_entry(
         date=new_date,
         period=entry.new_period,
         class_type=entry.class_type,
+        syllabus_id=entry.syllabus_id,
+        lab_program_id=entry.lab_program_id,
+        lab_work_done=entry.lab_work_done,
+        mini_project_progress=entry.mini_project_progress,
+        is_own_content=entry.is_own_content,
+        own_content_title=entry.own_content_title,
+        own_content_summary=entry.own_content_summary,
+        summary=entry.summary,
         is_absent=False,
         is_swapped=(entry.swap_type == "swap"),
         swapped_with=entry.swapped_with_faculty if entry.swap_type == "swap" else None,
@@ -963,6 +981,114 @@ def get_admin_swap_history(
     
     return {"entries": result, "total": len(result)}
 
+
+@app.get("/api/admin/all-history")
+def get_all_history(
+    start_date: Optional[str] = None,
+    end_date: Optional[str] = None,
+    faculty_id: Optional[int] = None,
+    class_type: Optional[str] = None,
+    entry_type: Optional[str] = None,  # 'regular', 'extra', 'swap', 'substitution', 'all'
+    db: Session = Depends(get_db)
+):
+    """Get comprehensive history of ALL entries (regular + swap/extra/sub) for admin"""
+    if not start_date:
+        start_date = date.today().isoformat()
+    if not end_date:
+        end_date = date.today().isoformat()
+    
+    start = datetime.strptime(start_date, "%Y-%m-%d").date()
+    end = datetime.strptime(end_date, "%Y-%m-%d").date()
+    
+    query = db.query(DailyEntry).filter(
+        DailyEntry.date >= start,
+        DailyEntry.date <= end
+    )
+    
+    if faculty_id:
+        query = query.filter(DailyEntry.faculty_id == faculty_id)
+    
+    if class_type and class_type != 'all':
+        query = query.filter(DailyEntry.class_type == class_type)
+    
+    if entry_type and entry_type != 'all':
+        if entry_type == 'regular':
+            query = query.filter(DailyEntry.is_extra_class == False)
+        elif entry_type in ['extra', 'swap', 'substitution']:
+            query = query.filter(DailyEntry.is_extra_class == True, DailyEntry.swap_type == entry_type)
+    
+    entries = query.order_by(DailyEntry.date.desc(), DailyEntry.period.asc()).all()
+    
+    result = []
+    for entry in entries:
+        faculty = db.query(Faculty).filter(Faculty.id == entry.faculty_id).first()
+        dept = db.query(Department).filter(Department.id == entry.department_id).first()
+        syllabus = db.query(Syllabus).filter(Syllabus.id == entry.syllabus_id).first() if entry.syllabus_id else None
+        lab_program = db.query(LabProgram).filter(LabProgram.id == entry.lab_program_id).first() if entry.lab_program_id else None
+        
+        # Determine topic info
+        if entry.is_own_content:
+            topic_info = f"Own Content: {entry.own_content_title or 'N/A'}"
+        elif entry.class_type == "theory" and syllabus:
+            topic_info = f"Session {syllabus.session_number}: {syllabus.session_title}"
+        elif entry.class_type == "lab" and lab_program:
+            topic_info = f"Lab {lab_program.program_number}: {lab_program.program_title}"
+        elif entry.class_type == "mini_project":
+            topic_info = "Mini Project"
+        else:
+            topic_info = "N/A"
+        
+        # Get swap entry details if applicable
+        swap_info = None
+        if entry.is_extra_class:
+            swap_entry = db.query(SwapEntry).filter(SwapEntry.daily_entry_id == entry.id).first()
+            if swap_entry:
+                swap_info = {
+                    "swap_type": swap_entry.swap_type,
+                    "original_date": swap_entry.original_date.isoformat() if swap_entry.original_date else None,
+                    "original_period": swap_entry.original_period,
+                    "swapped_with_faculty": swap_entry.swapped_with_faculty,
+                    "swapped_with_department": swap_entry.swapped_with_department,
+                    "reason": swap_entry.reason
+                }
+        
+        # Determine entry type label
+        if entry.is_extra_class:
+            etype = entry.swap_type or "extra"
+        else:
+            etype = "regular"
+        
+        result.append({
+            "id": entry.id,
+            "date": entry.date.isoformat(),
+            "period": entry.period,
+            "class_type": entry.class_type,
+            "entry_type": etype,
+            "faculty_name": faculty.name if faculty else "Unknown",
+            "faculty_id": entry.faculty_id,
+            "department_name": dept.name if dept else "Unknown",
+            "subject_code": entry.extra_class_subject_code if entry.is_extra_class else "24UCS271",
+            "subject_name": entry.extra_class_subject_name if entry.is_extra_class else "C Programming",
+            "topic": topic_info,
+            "is_absent": entry.is_absent,
+            "absent_reason": entry.absent_reason,
+            "is_swapped": entry.is_swapped,
+            "swapped_with": entry.swapped_with,
+            "summary": entry.summary,
+            "is_own_content": entry.is_own_content,
+            "own_content_title": entry.own_content_title,
+            "own_content_summary": entry.own_content_summary,
+            "lab_work_done": entry.lab_work_done,
+            "mini_project_progress": entry.mini_project_progress,
+            "ppt_url": syllabus.ppt_url if syllabus else None,
+            "moodle_url": lab_program.moodle_url if lab_program else None,
+            "swap_info": swap_info,
+            "created_at": entry.created_at.isoformat() if entry.created_at else None
+        })
+    
+    return {"entries": result, "total": len(result)}
+
+
 # ----- Admin Routes -----
 @app.get("/api/admin/report")
 def get_admin_report(
@@ -1003,11 +1129,32 @@ def get_admin_report(
         else:
             topic_info = "N/A"
         
+        # Determine entry_type label
+        if entry.is_extra_class:
+            entry_type = entry.swap_type or "extra"
+        else:
+            entry_type = "regular"
+        
+        # Get swap entry details if applicable
+        swap_info = None
+        if entry.is_extra_class:
+            swap_entry = db.query(SwapEntry).filter(SwapEntry.daily_entry_id == entry.id).first()
+            if swap_entry:
+                swap_info = {
+                    "swap_type": swap_entry.swap_type,
+                    "original_date": swap_entry.original_date.isoformat() if swap_entry.original_date else None,
+                    "original_period": swap_entry.original_period,
+                    "swapped_with_faculty": swap_entry.swapped_with_faculty,
+                    "swapped_with_department": swap_entry.swapped_with_department,
+                    "reason": swap_entry.reason
+                }
+        
         result.append({
             "id": entry.id,
             "date": entry.date.isoformat(),
             "period": entry.period,
             "class_type": entry.class_type,
+            "entry_type": entry_type,
             "faculty_name": faculty.name,
             "department_name": dept.name,
             "topic": topic_info,
@@ -1019,6 +1166,7 @@ def get_admin_report(
             "own_content_title": entry.own_content_title,
             "own_content_summary": entry.own_content_summary,
             "is_absent": entry.is_absent,
+            "absent_reason": entry.absent_reason,
             "is_swapped": entry.is_swapped,
             "swapped_with": entry.swapped_with,
             "summary": entry.summary,
@@ -1027,7 +1175,8 @@ def get_admin_report(
             "is_extra_class": entry.is_extra_class,
             "extra_class_subject_code": entry.extra_class_subject_code,
             "extra_class_subject_name": entry.extra_class_subject_name,
-            "swap_type": entry.swap_type
+            "swap_type": entry.swap_type,
+            "swap_info": swap_info
         })
     
     return {"entries": result, "total": len(result)}
@@ -2045,6 +2194,11 @@ def admin_dashboard_page(request: Request):
 @app.get("/cprog_faculties_f3k2", response_class=HTMLResponse)
 def c_faculties_page(request: Request):
     return templates.TemplateResponse("c_faculties.html", {"request": request})
+
+# Secret Admin History Page
+@app.get("/cprog_history_h4m1", response_class=HTMLResponse)
+def admin_history_page(request: Request):
+    return templates.TemplateResponse("admin_history.html", {"request": request})
 
 # Secret Super Admin Dashboard
 @app.get("/cprog_super_dash_z9y3", response_class=HTMLResponse)

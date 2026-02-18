@@ -420,7 +420,7 @@
                         <div style="display: flex; gap: 10px;">
                             <div class="form-group" style="flex: 1;">
                                 <label class="form-label">Class Type</label>
-                                <select class="form-control" id="swapClassType" required>
+                                <select class="form-control" id="swapClassType" onchange="toggleSwapClassForms()" required>
                                     <option value="theory">Theory</option>
                                     <option value="lab">Lab</option>
                                     <option value="mini_project">Mini Project</option>
@@ -437,6 +437,81 @@
                                 <label class="form-label">Subject Name</label>
                                 <input type="text" class="form-control" id="swapSubjectName" value="C Programming" required>
                             </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Session Content: Theory -->
+                    <div id="swapTheoryForm" class="form-section" style="border-left: 3px solid #10b981;">
+                        <div class="form-section-title"><i class="material-icons" style="font-size: 18px; vertical-align: middle; margin-right: 6px;">menu_book</i>Session Content (Theory)</div>
+                        
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="swapIsOwnContent" onchange="toggleSwapOwnContent()">
+                            <label for="swapIsOwnContent">Teaching Own Content (not from syllabus)</label>
+                        </div>
+                        
+                        <div id="swapSyllabusSection">
+                            <div class="form-group">
+                                <label class="form-label">Select Session</label>
+                                <select class="form-control" id="swapSyllabusSelect" onchange="showSwapSessionDetails()">
+                                    <option value="">-- Select Session --</option>
+                                </select>
+                            </div>
+                            <div id="swapSessionDetails" class="hidden" style="margin-top: 10px; padding: 10px; background: #f5f5f5; border-radius: 5px;">
+                                <p><strong>Topics:</strong> <span id="swapSessionTopics"></span></p>
+                                <p id="swapPptLinkContainer"></p>
+                            </div>
+                        </div>
+                        
+                        <div id="swapOwnContentSection" class="hidden">
+                            <div class="form-group">
+                                <label class="form-label">Content Title</label>
+                                <input type="text" class="form-control" id="swapOwnContentTitle" placeholder="What topic are you teaching?">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Content Summary</label>
+                                <textarea class="form-control" id="swapOwnContentSummary" placeholder="Brief description of the content..."></textarea>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Class Summary</label>
+                            <textarea class="form-control" id="swapTheorySummary" placeholder="What was/will be covered in this class?"></textarea>
+                        </div>
+                    </div>
+                    
+                    <!-- Session Content: Lab -->
+                    <div id="swapLabForm" class="form-section hidden" style="border-left: 3px solid #10b981;">
+                        <div class="form-section-title"><i class="material-icons" style="font-size: 18px; vertical-align: middle; margin-right: 6px;">science</i>Session Content (Lab)</div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Select Lab Program</label>
+                            <select class="form-control" id="swapLabProgramSelect" onchange="showSwapLabDetails()">
+                                <option value="">-- Select Lab Program --</option>
+                            </select>
+                        </div>
+                        <div id="swapLabProgramDetails" class="hidden" style="margin-top: 10px; padding: 10px; background: #f5f5f5; border-radius: 5px;">
+                            <p><strong>Description:</strong> <span id="swapLabDescription"></span></p>
+                            <p id="swapMoodleLinkContainer"></p>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">What was done in this lab?</label>
+                            <textarea class="form-control" id="swapLabWorkDone" placeholder="Explain, demo, practice, completion status..."></textarea>
+                        </div>
+                    </div>
+                    
+                    <!-- Session Content: Mini Project -->
+                    <div id="swapMiniProjectForm" class="form-section hidden" style="border-left: 3px solid #10b981;">
+                        <div class="form-section-title"><i class="material-icons" style="font-size: 18px; vertical-align: middle; margin-right: 6px;">rocket_launch</i>Session Content (Mini Project)</div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Project Progress & Activities</label>
+                            <textarea class="form-control" id="swapMiniProjectProgress" placeholder="What progress was made? What activities?"></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Summary</label>
+                            <textarea class="form-control" id="swapMiniProjectSummary" placeholder="Brief summary of the mini project session..."></textarea>
                         </div>
                     </div>
                     
@@ -1004,6 +1079,37 @@
                 deptSelect.appendChild(option);
             });
             
+            // Populate syllabus dropdown for swap modal
+            const swapSyllabusSelect = document.getElementById('swapSyllabusSelect');
+            swapSyllabusSelect.innerHTML = '<option value="">-- Select Session --</option>';
+            let currentUnit = 0;
+            let optgroup = null;
+            syllabusData.forEach(session => {
+                if (session.unit !== currentUnit) {
+                    optgroup = document.createElement('optgroup');
+                    optgroup.label = `Unit ${session.unit}`;
+                    swapSyllabusSelect.appendChild(optgroup);
+                    currentUnit = session.unit;
+                }
+                const opt = document.createElement('option');
+                opt.value = session.id;
+                opt.textContent = `Session ${session.session_number}: ${session.session_title}`;
+                if (optgroup) optgroup.appendChild(opt); else swapSyllabusSelect.appendChild(opt);
+            });
+            
+            // Populate lab programs dropdown for swap modal
+            const swapLabSelect = document.getElementById('swapLabProgramSelect');
+            swapLabSelect.innerHTML = '<option value="">-- Select Lab Program --</option>';
+            labProgramsData.forEach(program => {
+                const opt = document.createElement('option');
+                opt.value = program.id;
+                opt.textContent = `${program.program_number}. ${program.program_title}`;
+                swapLabSelect.appendChild(opt);
+            });
+            
+            // Reset session form visibility
+            toggleSwapClassForms();
+            
             document.getElementById('extraClassModal').classList.add('active');
         }
         
@@ -1059,6 +1165,62 @@
             } catch (error) {
                 console.error('Error loading free periods:', error);
                 document.getElementById('swapFreePeriodInfo').textContent = 'Error loading free periods';
+            }
+        }
+        
+        function toggleSwapClassForms() {
+            const classType = document.getElementById('swapClassType').value;
+            document.getElementById('swapTheoryForm').classList.add('hidden');
+            document.getElementById('swapLabForm').classList.add('hidden');
+            document.getElementById('swapMiniProjectForm').classList.add('hidden');
+            
+            if (classType === 'theory') {
+                document.getElementById('swapTheoryForm').classList.remove('hidden');
+            } else if (classType === 'lab') {
+                document.getElementById('swapLabForm').classList.remove('hidden');
+            } else if (classType === 'mini_project') {
+                document.getElementById('swapMiniProjectForm').classList.remove('hidden');
+            }
+        }
+        
+        function toggleSwapOwnContent() {
+            const isOwn = document.getElementById('swapIsOwnContent').checked;
+            if (isOwn) {
+                document.getElementById('swapSyllabusSection').classList.add('hidden');
+                document.getElementById('swapOwnContentSection').classList.remove('hidden');
+            } else {
+                document.getElementById('swapSyllabusSection').classList.remove('hidden');
+                document.getElementById('swapOwnContentSection').classList.add('hidden');
+            }
+        }
+        
+        function showSwapSessionDetails() {
+            const sessionId = document.getElementById('swapSyllabusSelect').value;
+            const detailsDiv = document.getElementById('swapSessionDetails');
+            if (!sessionId) { detailsDiv.classList.add('hidden'); return; }
+            const session = syllabusData.find(s => s.id == sessionId);
+            if (session) {
+                document.getElementById('swapSessionTopics').textContent = session.topics || 'No topics listed';
+                const pptC = document.getElementById('swapPptLinkContainer');
+                pptC.innerHTML = session.ppt_url 
+                    ? `<a href="${session.ppt_url}" target="_blank" class="ppt-link"><i class="material-icons" style="font-size: 14px; vertical-align: middle;">slideshow</i> Open PPT</a>` 
+                    : '<span style="color: #999;">No PPT available</span>';
+                detailsDiv.classList.remove('hidden');
+            }
+        }
+        
+        function showSwapLabDetails() {
+            const programId = document.getElementById('swapLabProgramSelect').value;
+            const detailsDiv = document.getElementById('swapLabProgramDetails');
+            if (!programId) { detailsDiv.classList.add('hidden'); return; }
+            const program = labProgramsData.find(p => p.id == programId);
+            if (program) {
+                document.getElementById('swapLabDescription').textContent = program.description || 'No description';
+                const mc = document.getElementById('swapMoodleLinkContainer');
+                mc.innerHTML = program.moodle_url 
+                    ? `<a href="${program.moodle_url}" target="_blank" class="ppt-link"><i class="material-icons" style="font-size: 14px; vertical-align: middle;">language</i> Open Moodle Link</a>` 
+                    : '<span style="color: #999;">No Moodle link available</span>';
+                detailsDiv.classList.remove('hidden');
             }
         }
         
@@ -1128,6 +1290,25 @@
                 subject_name: document.getElementById('swapSubjectName').value,
                 reason: document.getElementById('swapReason').value || null
             };
+            
+            // Add session content based on class type
+            const ct = data.class_type;
+            if (ct === 'theory') {
+                data.is_own_content = document.getElementById('swapIsOwnContent').checked;
+                if (data.is_own_content) {
+                    data.own_content_title = document.getElementById('swapOwnContentTitle').value || null;
+                    data.own_content_summary = document.getElementById('swapOwnContentSummary').value || null;
+                } else {
+                    data.syllabus_id = document.getElementById('swapSyllabusSelect').value ? parseInt(document.getElementById('swapSyllabusSelect').value) : null;
+                }
+                data.summary = document.getElementById('swapTheorySummary').value || null;
+            } else if (ct === 'lab') {
+                data.lab_program_id = document.getElementById('swapLabProgramSelect').value ? parseInt(document.getElementById('swapLabProgramSelect').value) : null;
+                data.lab_work_done = document.getElementById('swapLabWorkDone').value || null;
+            } else if (ct === 'mini_project') {
+                data.mini_project_progress = document.getElementById('swapMiniProjectProgress').value || null;
+                data.summary = document.getElementById('swapMiniProjectSummary').value || null;
+            }
             
             if (swapType === 'swap') {
                 data.original_date = document.getElementById('swapOriginalDate').value;
