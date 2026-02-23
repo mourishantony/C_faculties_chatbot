@@ -224,7 +224,7 @@ This project is for educational purposes.
 
 ##  Author
 
-C Programming Faculty Management System - KG College of Arts and Science
+C Programming Faculty Management System - KG Institute of Technology
 
 ---
 
