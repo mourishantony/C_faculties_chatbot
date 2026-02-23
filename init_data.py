@@ -686,7 +686,6 @@ def _init_all_data(db):
         {"faculty_id": 1, "dept_code": "AIDS-A", "day": "Wednesday", "period": 8, "class_type": "lab"},
         # Thursday: Theory(2 periods)
         {"faculty_id": 1, "dept_code": "AIDS-A", "day": "Thursday", "period": 8, "class_type": "theory"},
-        {"faculty_id": 1, "dept_code": "AIDS-A", "day": "Thursday", "period": 9, "class_type": "theory"},
         # Friday: Theory
         {"faculty_id": 1, "dept_code": "AIDS-A", "day": "Friday", "period": 5, "class_type": "theory"},
         # Saturday: Theory
@@ -699,7 +698,6 @@ def _init_all_data(db):
         {"faculty_id": 2, "dept_code": "AIDS-B", "day": "Wednesday", "period": 5, "class_type": "lab"},
         {"faculty_id": 2, "dept_code": "AIDS-B", "day": "Wednesday", "period": 7, "class_type": "mini_project"},
         {"faculty_id": 2, "dept_code": "AIDS-B", "day": "Thursday", "period": 2, "class_type": "theory"},
-        {"faculty_id": 2, "dept_code": "AIDS-B", "day": "Thursday", "period": 9, "class_type": "theory"},
         {"faculty_id": 2, "dept_code": "AIDS-B", "day": "Friday", "period": 4, "class_type": "theory"},
         {"faculty_id": 2, "dept_code": "AIDS-B", "day": "Saturday", "period": 5, "class_type": "theory"},
         
@@ -711,12 +709,10 @@ def _init_all_data(db):
         {"faculty_id": 3, "dept_code": "AIML-A", "day": "Thursday", "period": 4, "class_type": "lab"},
         {"faculty_id": 3, "dept_code": "AIML-A", "day": "Thursday", "period": 5, "class_type": "lab"},
         {"faculty_id": 3, "dept_code": "AIML-A", "day": "Friday", "period": 2, "class_type": "theory"},
-        {"faculty_id": 3, "dept_code": "AIML-A", "day": "Friday", "period": 9, "class_type": "theory"},
         {"faculty_id": 3, "dept_code": "AIML-A", "day": "Saturday", "period": 8, "class_type": "theory"},
         
         # Faculty 4 - Dr. Aruna R handles AIML-B
         {"faculty_id": 4, "dept_code": "AIML-B", "day": "Monday", "period": 5, "class_type": "theory"},
-        {"faculty_id": 4, "dept_code": "AIML-B", "day": "Monday", "period": 9, "class_type": "theory"},
         {"faculty_id": 4, "dept_code": "AIML-B", "day": "Tuesday", "period": 6, "class_type": "theory"},
         {"faculty_id": 4, "dept_code": "AIML-B", "day": "Wednesday", "period": 7, "class_type": "mini_project"},
         {"faculty_id": 4, "dept_code": "AIML-B", "day": "Wednesday", "period": 8, "class_type": "theory"},
@@ -727,7 +723,6 @@ def _init_all_data(db):
         
         # Faculty 5 - Ms. Janani S handles CSE-A
         {"faculty_id": 5, "dept_code": "CSE-A", "day": "Monday", "period": 2, "class_type": "theory"},
-        {"faculty_id": 5, "dept_code": "CSE-A", "day": "Tuesday", "period": 4, "class_type": "theory"},
         {"faculty_id": 5, "dept_code": "CSE-A", "day": "Wednesday", "period": 2, "class_type": "mini_project"},
         {"faculty_id": 5, "dept_code": "CSE-A", "day": "Wednesday", "period": 6, "class_type": "lab"},
         {"faculty_id": 5, "dept_code": "CSE-A", "day": "Wednesday", "period": 7, "class_type": "lab"},
@@ -737,7 +732,6 @@ def _init_all_data(db):
         {"faculty_id": 5, "dept_code": "CSE-A", "day": "Saturday", "period": 6, "class_type": "theory"},
         # Faculty 6 - Ms. Indhumathi S handles CSE-B
         {"faculty_id": 6, "dept_code": "CSE-B", "day": "Monday", "period": 2, "class_type": "theory"},
-        {"faculty_id": 6, "dept_code": "CSE-B", "day": "Tuesday", "period": 9, "class_type": "theory"},
         {"faculty_id": 6, "dept_code": "CSE-B", "day": "Wednesday", "period": 5, "class_type": "theory"},
         {"faculty_id": 6, "dept_code": "CSE-B", "day": "Thursday", "period": 3, "class_type": "theory"},
         {"faculty_id": 6, "dept_code": "CSE-B", "day": "Friday", "period": 2, "class_type": "mini_project"},
@@ -747,7 +741,6 @@ def _init_all_data(db):
         {"faculty_id": 6, "dept_code": "CSE-B", "day": "Saturday", "period": 7, "class_type": "theory"},
         
         # Faculty 7 - Ms. Saranya S handles CSBS
-        {"faculty_id": 7, "dept_code": "CSBS", "day": "Monday", "period": 9, "class_type": "theory"},
         {"faculty_id": 7, "dept_code": "CSBS", "day": "Tuesday", "period": 2, "class_type": "theory"},
         {"faculty_id": 7, "dept_code": "CSBS", "day": "Wednesday", "period": 2, "class_type": "mini_project"},
         {"faculty_id": 7, "dept_code": "CSBS", "day": "Wednesday", "period": 3, "class_type": "lab"},
@@ -759,7 +752,6 @@ def _init_all_data(db):
         
         # Faculty 8 - Ms. Anusha S handles CYS
         {"faculty_id": 8, "dept_code": "CYS", "day": "Monday", "period": 8, "class_type": "theory"},
-        {"faculty_id": 8, "dept_code": "CYS", "day": "Tuesday", "period": 9, "class_type": "theory"},
         {"faculty_id": 8, "dept_code": "CYS", "day": "Wednesday", "period": 3, "class_type": "theory"},
         {"faculty_id": 8, "dept_code": "CYS", "day": "Thursday", "period": 2, "class_type": "mini_project"},
         {"faculty_id": 8, "dept_code": "CYS", "day": "Thursday", "period": 3, "class_type": "lab"},
@@ -776,7 +768,6 @@ def _init_all_data(db):
         {"faculty_id": 9, "dept_code": "ECE-A", "day": "Tuesday", "period": 6, "class_type": "mini_project"},
 
         {"faculty_id": 9, "dept_code": "ECE-A", "day": "Wednesday", "period": 2, "class_type": "theory"},
-        {"faculty_id": 9, "dept_code": "ECE-A", "day": "Wednesday", "period": 9, "class_type": "theory"},
 
         {"faculty_id": 9, "dept_code": "ECE-A", "day": "Thursday", "period": 6, "class_type": "theory"},
 
@@ -793,7 +784,6 @@ def _init_all_data(db):
         {"faculty_id": 10, "dept_code": "ECE-B", "day": "Wednesday", "period": 7, "class_type": "lab"},
         {"faculty_id": 10, "dept_code": "ECE-B", "day": "Wednesday", "period": 8, "class_type": "lab"},
         {"faculty_id": 10, "dept_code": "ECE-B", "day": "Thursday", "period": 2, "class_type": "theory"},
-        {"faculty_id": 10, "dept_code": "ECE-B", "day": "Friday", "period": 9, "class_type": "theory"},
         {"faculty_id": 10, "dept_code": "ECE-B", "day": "Saturday", "period": 5, "class_type": "theory"},
         
         # Faculty 11 - Mr. Venkatesh Babu S handles IT-A
@@ -803,13 +793,11 @@ def _init_all_data(db):
         {"faculty_id": 11, "dept_code": "IT-A", "day": "Tuesday", "period": 7, "class_type": "lab"},
         {"faculty_id": 11, "dept_code": "IT-A", "day": "Tuesday", "period": 8, "class_type": "lab"},
         {"faculty_id": 11, "dept_code": "IT-A", "day": "Wednesday", "period": 5, "class_type": "theory"},
-        {"faculty_id": 11, "dept_code": "IT-A", "day": "Thursday", "period": 9, "class_type": "theory"},
         {"faculty_id": 11, "dept_code": "IT-A", "day": "Friday", "period": 6, "class_type": "theory"},
         {"faculty_id": 11, "dept_code": "IT-A", "day": "Saturday", "period": 8, "class_type": "theory"},
         
         # Faculty 12 - Ms. Dhamayanthi P handles IT-B   
         {"faculty_id": 12, "dept_code": "IT-B", "day": "Monday", "period": 8, "class_type": "theory"},
-        {"faculty_id": 12, "dept_code": "IT-B", "day": "Tuesday", "period": 9, "class_type": "theory"},
         {"faculty_id": 12, "dept_code": "IT-B", "day": "Wednesday", "period": 2, "class_type": "theory"},
         {"faculty_id": 12, "dept_code": "IT-B", "day": "Thursday", "period": 5, "class_type": "mini_project"},
         {"faculty_id": 12, "dept_code": "IT-B", "day": "Thursday", "period": 6, "class_type": "lab"},
@@ -821,7 +809,6 @@ def _init_all_data(db):
         # Faculty 13 - Mr. Pradeep G handles MECH
         {"faculty_id": 13, "dept_code": "MECH", "day": "Monday", "period": 3, "class_type": "theory"},
         {"faculty_id": 13, "dept_code": "MECH", "day": "Monday", "period": 7, "class_type": "theory"},
-        {"faculty_id": 13, "dept_code": "MECH", "day": "Tuesday", "period": 9, "class_type": "theory"},
         {"faculty_id": 13, "dept_code": "MECH", "day": "Thursday", "period": 6, "class_type": "theory"},
         {"faculty_id": 13, "dept_code": "MECH", "day": "Friday", "period": 5, "class_type": "mini_project"},
         {"faculty_id": 13, "dept_code": "MECH", "day": "Friday", "period": 6, "class_type": "lab"},
@@ -833,7 +820,6 @@ def _init_all_data(db):
         {"faculty_id": 14, "dept_code": "RA", "day": "Monday", "period": 2, "class_type": "theory"},
         {"faculty_id": 14, "dept_code": "RA", "day": "Tuesday", "period": 4, "class_type": "theory"},
         {"faculty_id": 14, "dept_code": "RA", "day": "Tuesday", "period": 8, "class_type": "theory"},
-        {"faculty_id": 14, "dept_code": "RA", "day": "Wednesday", "period": 9, "class_type": "theory"},
         {"faculty_id": 14, "dept_code": "RA", "day": "Friday", "period": 5, "class_type": "mini_project"},
         {"faculty_id": 14, "dept_code": "RA", "day": "Friday", "period": 6, "class_type": "lab"},
         {"faculty_id": 14, "dept_code": "RA", "day": "Friday", "period": 7, "class_type": "lab"},
