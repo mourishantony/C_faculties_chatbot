@@ -1415,11 +1415,41 @@ def get_classes_by_department(date_offset: int = 0, db: Session = Depends(get_db
         ).first()
         
         status = "pending"
+        report_summary = None
+        session_topic = None
+        resource_url = None
+        session_date = target_date.isoformat()
+        
         if daily_entry:
             if daily_entry.is_absent:
                 status = "absent"
+                report_summary = daily_entry.absent_reason
             else:
                 status = "filled"
+                # Get summary based on class type
+                if entry.class_type == "lab":
+                    report_summary = daily_entry.lab_work_done or daily_entry.summary
+                    # Get lab program details
+                    if daily_entry.lab_program_id:
+                        lab_program = db.query(LabProgram).filter(LabProgram.id == daily_entry.lab_program_id).first()
+                        if lab_program:
+                            session_topic = lab_program.program_title
+                            resource_url = lab_program.moodle_url
+                elif entry.class_type == "mini_project":
+                    report_summary = daily_entry.mini_project_progress or daily_entry.summary
+                    session_topic = "Mini Project Work"
+                else:  # theory
+                    if daily_entry.is_own_content:
+                        report_summary = daily_entry.own_content_summary or daily_entry.summary
+                        session_topic = daily_entry.own_content_title or "Own Content"
+                    else:
+                        report_summary = daily_entry.summary
+                        # Get syllabus details
+                        if daily_entry.syllabus_id:
+                            syllabus = db.query(Syllabus).filter(Syllabus.id == daily_entry.syllabus_id).first()
+                            if syllabus:
+                                session_topic = syllabus.session_title
+                                resource_url = syllabus.ppt_url
         
         class_info = {
             "id": entry.id,
@@ -1428,7 +1458,11 @@ def get_classes_by_department(date_offset: int = 0, db: Session = Depends(get_db
             "faculty_id": entry.faculty_id,
             "faculty_name": faculty.name if faculty else "Unknown",
             "faculty_email": faculty.email if faculty else None,
-            "status": status
+            "status": status,
+            "session_date": session_date,
+            "topic": session_topic,
+            "resource": resource_url,
+            "summary": report_summary
         }
         
         if dept.code not in dept_classes:
