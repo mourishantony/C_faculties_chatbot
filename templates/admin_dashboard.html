@@ -885,16 +885,16 @@
         }
         
         .dept-info-row .info-label {
-            font-size: 9px;
+            font-size: 11px;
             color: #64748b;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            margin-bottom: 1px;
+            margin-bottom: 2px;
             font-weight: 600;
         }
         
         .dept-info-row .info-value {
-            font-size: 13px;
+            font-size: 15px;
             color: #1e293b;
             font-weight: 600;
         }
@@ -999,6 +999,76 @@
         
         .period-detail strong {
             color: #1e293b;
+        }
+        
+        .daily-report-section {
+            grid-column: 1 / -1;
+            margin-top: 12px;
+            padding: 14px;
+            background: linear-gradient(135deg, #eff6ff, #dbeafe);
+            border-left: 4px solid #3b82f6;
+            border-radius: 8px;
+        }
+        
+        .daily-report-section.absent-report {
+            background: linear-gradient(135deg, #fef2f2, #fee2e2);
+            border-left-color: #ef4444;
+        }
+        
+        .report-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #1e40af;
+            font-size: 14px;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+        
+        .absent-report .report-header {
+            color: #dc2626;
+        }
+        
+        .report-header i {
+            font-size: 18px;
+        }
+        
+        .report-details {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .report-row {
+            display: flex;
+            gap: 8px;
+            font-size: 13px;
+            align-items: flex-start;
+        }
+        
+        .report-row.full-width {
+            flex-direction: column;
+            gap: 4px;
+        }
+        
+        .report-label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: #1e40af;
+            font-weight: 600;
+            min-width: 130px;
+            flex-shrink: 0;
+        }
+        
+        .report-label i {
+            font-size: 16px;
+        }
+        
+        .report-value {
+            color: #1e293b;
+            line-height: 1.6;
+            flex: 1;
         }
         
         .no-classes-message {
@@ -2666,7 +2736,7 @@
             filteredDepartments.forEach(dept => {
                 const hasClasses = dept.has_classes;
                 const buttonClass = hasClasses ? '' : 'no-classes';
-                const buttonText = hasClasses ? `View Classes (${dept.total_classes})` : 'No Classes Today';
+                const buttonText = hasClasses ? 'View Classes' : 'No Classes Today';
                 const buttonIcon = hasClasses ? 'visibility' : 'event_busy';
                 const buttonOnClick = hasClasses ? `showPeriodsModal('${dept.department_code}')` : '';
                 
@@ -2680,14 +2750,12 @@
                         </div>
                         <div class="dept-card-body">
                             <div class="dept-info-row">
-                                <span class="info-icon"><i class="material-icons">person</i></span>
                                 <div class="info-content">
                                     <div class="info-label">Faculty</div>
                                     <div class="info-value">${dept.display_faculty}</div>
                                 </div>
                             </div>
                             <div class="dept-info-row">
-                                <span class="info-icon"><i class="material-icons">meeting_room</i></span>
                                 <div class="info-content">
                                     <div class="info-label">Classroom</div>
                                     <div class="info-value">${dept.room_number || 'Not Assigned'}</div>
@@ -2814,6 +2882,59 @@
                     classes.forEach(cls => {
                         const statusBadge = getStatusBadge(cls.status);
                         
+                        // Build daily report section if status is filled
+                        let reportSection = '';
+                        if (cls.status === 'filled' && (cls.topic || cls.summary)) {
+                            reportSection = `
+                                <div class="daily-report-section">
+                                    <div class="report-header">
+                                        <i class="material-icons">assignment</i>
+                                        <strong>Daily Report</strong>
+                                    </div>
+                                    <div class="report-details">
+                                        ${cls.session_date ? `
+                                        <div class="report-row">
+                                            <span class="report-label"><i class="material-icons">event</i> Session Date:</span>
+                                            <span class="report-value">${cls.session_date}</span>
+                                        </div>
+                                        ` : ''}
+                                        ${cls.topic ? `
+                                        <div class="report-row">
+                                            <span class="report-label"><i class="material-icons">topic</i> Topic:</span>
+                                            <span class="report-value">${cls.topic}</span>
+                                        </div>
+                                        ` : ''}
+                                        ${cls.resource ? `
+                                        <div class="report-row">
+                                            <span class="report-label"><i class="material-icons">link</i> Resource:</span>
+                                            <span class="report-value"><a href="${cls.resource}" target="_blank" style="color: #0284c7; text-decoration: none;">View Resource</a></span>
+                                        </div>
+                                        ` : ''}
+                                        ${cls.summary ? `
+                                        <div class="report-row full-width">
+                                            <span class="report-label"><i class="material-icons">notes</i> Summary:</span>
+                                            <span class="report-value">${cls.summary}</span>
+                                        </div>
+                                        ` : ''}
+                                    </div>
+                                </div>
+                            `;
+                        } else if (cls.status === 'absent' && cls.summary) {
+                            reportSection = `
+                                <div class="daily-report-section absent-report">
+                                    <div class="report-header">
+                                        <i class="material-icons">info</i>
+                                        <strong>Absent Reason</strong>
+                                    </div>
+                                    <div class="report-details">
+                                        <div class="report-row full-width">
+                                            <span class="report-value">${cls.summary}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                        }
+                        
                         html += `
                             <div class="period-item">
                                 <div class="period-item-header">
@@ -2829,6 +2950,7 @@
                                         <i class="material-icons">email</i>
                                         <a href="mailto:${cls.faculty_email}" style="color: #1e3a8a; text-decoration: none;">${cls.faculty_email || 'N/A'}</a>
                                     </div>
+                                    ${reportSection}
                                 </div>
                             </div>
                         `;
