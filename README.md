@@ -107,10 +107,10 @@ docker-compose up --build
 
 | # | Name | Department | Email |
 |---|------|------------|-------|
-| 1 | Sathish R | AIDS-A | r.sathish@kgkite.ac.in |
-| 2 | Sikkandhar Batcha J | AIDS-B | sikkandharbatcha.j@kgkite.ac.in |
-| 3 | Thilak S | AIML-A | thilak.s@kgkite.ac.in |
-| 4 | Sivakumar T | AIML-B | sivakumar.t@kgkite.ac.in |
+| 1 | Sathish R | AI&DS-A | r.sathish@kgkite.ac.in |
+| 2 | Sikkandhar Batcha J | AI&DS-B | sikkandharbatcha.j@kgkite.ac.in |
+| 3 | Thilak S | AI&ML-A | thilak.s@kgkite.ac.in |
+| 4 | Sivakumar T | AI&ML-B | sivakumar.t@kgkite.ac.in |
 | 5 | Logeshwari S | CSBS | logeshwari.s@kgkite.ac.in |
 | 6 | Priyanka G | CSE-A | priyanka.g@kgkite.ac.in |
 | 7 | Swetha M | CSE-B | swetha.m@kgkite.ac.in |
@@ -172,7 +172,7 @@ The chatbot responds to natural language queries:
 
 **Faculty:**
 - "List all faculty"
-- "Who teaches AIDS-A?"
+- "Who teaches AI&DS-A?"
 - "Sathish schedule"
 
 **Lab Programs:**

@@ -8,10 +8,10 @@ from models import Department
 
 # Room number mapping
 ROOM_NUMBERS = {
-    "AIDS-A": "315(2nd floor)",
-    "AIDS-B": "316(2nd floor)",
-    "AIML-A": "414(3rd floor)",
-    "AIML-B": "415(3rd floor)",
+    "AI&DS-A": "315(2nd floor)",
+    "AI&DS-B": "316(2nd floor)",
+    "AI&ML-A": "414(3rd floor)",
+    "AI&ML-B": "415(3rd floor)",
     "CSBS": "416(3rd floor)",
     "CSE-A": "411A(3rd floor)",
     "CSE-B": "412(3rd floor)",

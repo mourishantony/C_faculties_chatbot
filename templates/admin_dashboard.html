@@ -212,8 +212,8 @@
                         <span>What topics are being taught today?</span>
                         <span class="faq-arrow">›</span>
                     </div>
-                    <div class="faq-item" data-category="schedule" onclick="askFaq('When is the C class for AIDS-A?')">
-                        <span>When is the C class for AIDS-A?</span>
+                    <div class="faq-item" data-category="schedule" onclick="askFaq('When is the C class for AI&DS-A?')">
+                        <span>When is the C class for AI&DS-A?</span>
                         <span class="faq-arrow">›</span>
                     </div>
                     <div class="faq-item" data-category="faculty" onclick="askFaq('Who has class today?')">
@@ -3035,7 +3035,7 @@
                 if (!filterLabels[currentClassTypeFilter]) filterLabel += ')';
             }
             
-            titleEl.textContent = `${dept.department_name} (${dept.department_code})`;
+            titleEl.textContent = `${dept.department_name}`;
             subtitleEl.textContent = `${totalFiltered} class${totalFiltered !== 1 ? 'es' : ''}${filterLabel} scheduled for ${currentClassesData.day}`;
             
             if (totalFiltered === 0) {

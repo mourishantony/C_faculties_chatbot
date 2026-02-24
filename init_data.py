@@ -106,10 +106,10 @@ def _add_missing_data(db):
 def _update_department_room_numbers(db):
     """Update existing departments with room numbers"""
     room_numbers = {
-        "AIDS-A": "315(2nd floor)",
-        "AIDS-B": "316(2nd floor)",
-        "AIML-A": "414(3rd floor)",
-        "AIML-B": "415(3rd floor)",
+        "AI&DS-A": "315(2nd floor)",
+        "AI&DS-B": "316(2nd floor)",
+        "AI&ML-A": "414(3rd floor)",
+        "AI&ML-B": "415(3rd floor)",
         "CSBS": "416(3rd floor)",
         "CSE-A": "411A(3rd floor)",
         "CSE-B": "412(3rd floor)",
@@ -141,10 +141,10 @@ def _add_default_faqs(db):
         # Class Schedule & Timing FAQs - General guidance only (dynamic queries handle specifics)
         {"question": "What are today's C programming classes?", "answer": "Type 'show schedule' or 'today classes' to see today's C programming classes with faculty and periods.", "category": "schedule"},
         {"question": "Who has class in a specific period?", "answer": "Type 'period [number]' (e.g., 'period 3', 'period 4', '5th period') to see who has class in that period.", "category": "schedule"},
-        {"question": "When is the C programming class for a department?", "answer": "Type the department code (e.g., 'AIDS-A', 'CSE-B', 'IT-A') to see their C programming schedule.", "category": "schedule"},
+        {"question": "When is the C programming class for a department?", "answer": "Type the department code (e.g., 'AI&DS-A', 'CSE-B', 'IT-A') to see their C programming schedule.", "category": "schedule"},
         {"question": "What time does the 1st period start?", "answer": "The 1st period starts at 08:00 AM and ends at 08:45 AM.", "category": "schedule"},
         {"question": "Show me the complete timetable for a day", "answer": "Type the day name (e.g., 'Monday', 'Tuesday schedule', 'Wednesday classes') to see the complete schedule for that day.", "category": "schedule"},
-        {"question": "Which faculty is teaching a department?", "answer": "Type the department code (e.g., 'CSE-B', 'AIDS-A') to see which faculty is assigned.", "category": "schedule"},
+        {"question": "Which faculty is teaching a department?", "answer": "Type the department code (e.g., 'CSE-B', 'AI&DS-A') to see which faculty is assigned.", "category": "schedule"},
         {"question": "Is there any lab class today?", "answer": "Lab classes are typically scheduled for 2-3 consecutive periods. Check today's schedule to see lab sessions.", "category": "schedule"},
         {"question": "What are the theory class timings?", "answer": "Theory classes are 45 minutes each. Periods: 1(8:00-8:45), 2(8:45-9:30), 3(9:45-10:30), 4(10:30-11:15), 5(11:15-12:00), 6(1:00-1:45), 7(1:45-2:30), 8(2:30-3:15), 9(3:30-4:15).", "category": "schedule"},
         {"question": "How many periods are there in a day?", "answer": "There are 9 periods in a day. Morning: Periods 1-5 (8:00 AM - 12:00 PM), Afternoon: Periods 6-9 (1:00 PM - 4:15 PM).", "category": "schedule"},
@@ -160,7 +160,7 @@ def _add_default_faqs(db):
         # Faculty FAQs
         {"question": "Who is teaching C programming?", "answer": "We have 14 dedicated faculty members teaching C programming across different departments. Type 'list all faculty' to see them.", "category": "faculty"},
         {"question": "List all faculty members", "answer": "Type 'list all faculty' to see all 14 faculty members with their departments.", "category": "faculty"},
-        {"question": "Who teaches AIDS-A?", "answer": "Type 'AIDS-A' to see the faculty assigned to AIDS-A department for C programming.", "category": "faculty"},
+        {"question": "Who teaches AI&DS-A?", "answer": "Type 'AI&DS-A' to see the faculty assigned to AI&DS-A department for C programming.", "category": "faculty"},
         
         # Topics & Syllabus FAQs
         {"question": "What topics are covered in Unit 1?", "answer": "Unit 1 covers Basics of C Programming: Introduction to C, History, Features, Structure of C program, Compilation Process, Tokens, Keywords, Identifiers, Variables, Data Types, Operators, and Control Flow.", "category": "topics"},
@@ -190,10 +190,10 @@ def _init_all_data(db):
     """Initialize all data for a fresh database"""
     # Add Departments with Room Numbers
     departments = [
-        {"name": " AI&DS - A", "code": "AIDS-A", "room_number": "315(2nd floor)"},
-        {"name": " AI&DS - B", "code": "AIDS-B", "room_number": "316(2nd floor)"},
-        {"name": " AI&ML - A", "code": "AIML-A", "room_number": "414(3rd floor)"},
-        {"name": " AI&ML - B", "code": "AIML-B", "room_number": "415(3rd floor)"},
+        {"name": " AI&DS - A", "code": "AI&DS-A", "room_number": "315(2nd floor)"},
+        {"name": " AI&DS - B", "code": "AI&DS-B", "room_number": "316(2nd floor)"},
+        {"name": " AI&ML - A", "code": "AI&ML-A", "room_number": "414(3rd floor)"},
+        {"name": " AI&ML - B", "code": "AI&ML-B", "room_number": "415(3rd floor)"},
         {"name": " CSBS", "code": "CSBS", "room_number": "416(3rd floor)"},
         {"name": " CSE - A", "code": "CSE-A", "room_number": "411A(3rd floor)"},
         {"name": " CSE - B", "code": "CSE-B", "room_number": "412(3rd floor)"},
@@ -446,7 +446,7 @@ def _init_all_data(db):
             "name": "Sathish R",
             "email": "r.sathish@kgkite.ac.in",
             "phone": "9791406167",
-            "dept": "AIDS-A",
+            "dept": "AI&DS-A",
             "image": "faculty1.jpg",
             "linkedin": "https://www.linkedin.com/in/sathish-ramanujam-96545313a",
             "github": "https://github.com/Professor-Sathish",
@@ -460,7 +460,7 @@ def _init_all_data(db):
             "name": "Sikkandhar Batcha J",
             "email": "sikkandharbatcha.j@kgkite.ac.in",
             "phone": "9486429598",
-            "dept": "AIDS-B",
+            "dept": "AI&DS-B",
             "image": "faculty2.jpg",
             "linkedin": "https://www.linkedin.com/in/sikkandhar-batcha-j-bb585271",
             "github": "https://github.com/sssbatcha",
@@ -474,7 +474,7 @@ def _init_all_data(db):
             "name": "Raakesh M",
             "email": "raakesh.m@kgkite.ac.in",
             "phone": "9360758406",
-            "dept": "AIML-A",
+            "dept": "AI&ML-A",
             "image": "faculty3.jpg",
             "linkedin": "https://www.linkedin.com/in/raakesh-muthuvel",
             "github": "https://github.com/Raa96",
@@ -488,7 +488,7 @@ def _init_all_data(db):
             "name": "Aruna R",
             "email": "aruna.r@kgkite.ac.in",
             "phone": "9585458088",
-            "dept": "AIML-B",
+            "dept": "AI&ML-B",
             "image": "faculty4.jpg",
             "linkedin": "https://www.linkedin.com/in/aruna-deepa-0957b9201/",
             "github": "https://github.com/arunacse867-design",
@@ -667,50 +667,50 @@ def _init_all_data(db):
         
     # class_type: "theory" (1 period), "lab" (3 consecutive periods), "mini_project" (1 period)
     mock_timetable = [
-        # Faculty 1 - Mr. Sathish R handles AIDS-A
+        # Faculty 1 - Mr. Sathish R handles AI&DS-A
         # Tuesday: Theory (1 period)
-        {"faculty_id": 1, "dept_code": "AIDS-A", "day": "Tuesday", "period": 7, "class_type": "theory"},
+        {"faculty_id": 1, "dept_code": "AI&DS-A", "day": "Tuesday", "period": 7, "class_type": "theory"},
         # Wednesday: mini_project (1 period) + Lab (3 periods)                  
-        {"faculty_id": 1, "dept_code": "AIDS-A", "day": "Wednesday", "period": 5, "class_type": "mini_project"},
-        {"faculty_id": 1, "dept_code": "AIDS-A", "day": "Wednesday", "period": 6, "class_type": "lab"},
-        {"faculty_id": 1, "dept_code": "AIDS-A", "day": "Wednesday", "period": 7, "class_type": "lab"},
-        {"faculty_id": 1, "dept_code": "AIDS-A", "day": "Wednesday", "period": 8, "class_type": "lab"},
+        {"faculty_id": 1, "dept_code": "AI&DS-A", "day": "Wednesday", "period": 5, "class_type": "mini_project"},
+        {"faculty_id": 1, "dept_code": "AI&DS-A", "day": "Wednesday", "period": 6, "class_type": "lab"},
+        {"faculty_id": 1, "dept_code": "AI&DS-A", "day": "Wednesday", "period": 7, "class_type": "lab"},
+        {"faculty_id": 1, "dept_code": "AI&DS-A", "day": "Wednesday", "period": 8, "class_type": "lab"},
         # Thursday: Theory(2 periods)
-        {"faculty_id": 1, "dept_code": "AIDS-A", "day": "Thursday", "period": 8, "class_type": "theory"},
+        {"faculty_id": 1, "dept_code": "AI&DS-A", "day": "Thursday", "period": 8, "class_type": "theory"},
         # Friday: Theory
-        {"faculty_id": 1, "dept_code": "AIDS-A", "day": "Friday", "period": 5, "class_type": "theory"},
+        {"faculty_id": 1, "dept_code": "AI&DS-A", "day": "Friday", "period": 5, "class_type": "theory"},
         # Saturday: Theory
-        {"faculty_id": 1, "dept_code": "AIDS-A", "day": "Saturday", "period": 7, "class_type": "theory"},
+        {"faculty_id": 1, "dept_code": "AI&DS-A", "day": "Saturday", "period": 7, "class_type": "theory"},
         
-        # Faculty 2 - Dr. Sikkandhar Batcha J handles AIDS-B
-        {"faculty_id": 2, "dept_code": "AIDS-B", "day": "Monday", "period": 5, "class_type": "theory"},
-        {"faculty_id": 2, "dept_code": "AIDS-B", "day": "Wednesday", "period": 3, "class_type": "lab"},
-        {"faculty_id": 2, "dept_code": "AIDS-B", "day": "Wednesday", "period": 4, "class_type": "lab"},
-        {"faculty_id": 2, "dept_code": "AIDS-B", "day": "Wednesday", "period": 5, "class_type": "lab"},
-        {"faculty_id": 2, "dept_code": "AIDS-B", "day": "Wednesday", "period": 7, "class_type": "mini_project"},
-        {"faculty_id": 2, "dept_code": "AIDS-B", "day": "Thursday", "period": 2, "class_type": "theory"},
-        {"faculty_id": 2, "dept_code": "AIDS-B", "day": "Friday", "period": 4, "class_type": "theory"},
-        {"faculty_id": 2, "dept_code": "AIDS-B", "day": "Saturday", "period": 5, "class_type": "theory"},
+        # Faculty 2 - Dr. Sikkandhar Batcha J handles AI&DS-B
+        {"faculty_id": 2, "dept_code": "AI&DS-B", "day": "Monday", "period": 5, "class_type": "theory"},
+        {"faculty_id": 2, "dept_code": "AI&DS-B", "day": "Wednesday", "period": 3, "class_type": "lab"},
+        {"faculty_id": 2, "dept_code": "AI&DS-B", "day": "Wednesday", "period": 4, "class_type": "lab"},
+        {"faculty_id": 2, "dept_code": "AI&DS-B", "day": "Wednesday", "period": 5, "class_type": "lab"},
+        {"faculty_id": 2, "dept_code": "AI&DS-B", "day": "Wednesday", "period": 7, "class_type": "mini_project"},
+        {"faculty_id": 2, "dept_code": "AI&DS-B", "day": "Thursday", "period": 2, "class_type": "theory"},
+        {"faculty_id": 2, "dept_code": "AI&DS-B", "day": "Friday", "period": 4, "class_type": "theory"},
+        {"faculty_id": 2, "dept_code": "AI&DS-B", "day": "Saturday", "period": 5, "class_type": "theory"},
         
-        # Faculty 3 - Mr. Raakesh M handles AIML-A
-        {"faculty_id": 3, "dept_code": "AIML-A", "day": "Monday", "period": 5, "class_type": "theory"},
-        {"faculty_id": 3, "dept_code": "AIML-A", "day": "Tuesday", "period": 7, "class_type": "theory"},
-        {"faculty_id": 3, "dept_code": "AIML-A", "day": "Thursday", "period": 2, "class_type": "mini_project"},
-        {"faculty_id": 3, "dept_code": "AIML-A", "day": "Thursday", "period": 3, "class_type": "lab"},
-        {"faculty_id": 3, "dept_code": "AIML-A", "day": "Thursday", "period": 4, "class_type": "lab"},
-        {"faculty_id": 3, "dept_code": "AIML-A", "day": "Thursday", "period": 5, "class_type": "lab"},
-        {"faculty_id": 3, "dept_code": "AIML-A", "day": "Friday", "period": 2, "class_type": "theory"},
-        {"faculty_id": 3, "dept_code": "AIML-A", "day": "Saturday", "period": 8, "class_type": "theory"},
+        # Faculty 3 - Mr. Raakesh M handles AI&ML-A
+        {"faculty_id": 3, "dept_code": "AI&ML-A", "day": "Monday", "period": 5, "class_type": "theory"},
+        {"faculty_id": 3, "dept_code": "AI&ML-A", "day": "Tuesday", "period": 7, "class_type": "theory"},
+        {"faculty_id": 3, "dept_code": "AI&ML-A", "day": "Thursday", "period": 2, "class_type": "mini_project"},
+        {"faculty_id": 3, "dept_code": "AI&ML-A", "day": "Thursday", "period": 3, "class_type": "lab"},
+        {"faculty_id": 3, "dept_code": "AI&ML-A", "day": "Thursday", "period": 4, "class_type": "lab"},
+        {"faculty_id": 3, "dept_code": "AI&ML-A", "day": "Thursday", "period": 5, "class_type": "lab"},
+        {"faculty_id": 3, "dept_code": "AI&ML-A", "day": "Friday", "period": 2, "class_type": "theory"},
+        {"faculty_id": 3, "dept_code": "AI&ML-A", "day": "Saturday", "period": 8, "class_type": "theory"},
         
-        # Faculty 4 - Dr. Aruna R handles AIML-B
-        {"faculty_id": 4, "dept_code": "AIML-B", "day": "Monday", "period": 5, "class_type": "theory"},
-        {"faculty_id": 4, "dept_code": "AIML-B", "day": "Tuesday", "period": 6, "class_type": "theory"},
-        {"faculty_id": 4, "dept_code": "AIML-B", "day": "Wednesday", "period": 7, "class_type": "mini_project"},
-        {"faculty_id": 4, "dept_code": "AIML-B", "day": "Wednesday", "period": 8, "class_type": "theory"},
-        {"faculty_id": 4, "dept_code": "AIML-B", "day": "Thursday", "period": 6, "class_type": "lab"},
-        {"faculty_id": 4, "dept_code": "AIML-B", "day": "Thursday", "period": 7, "class_type": "lab"},
-        {"faculty_id": 4, "dept_code": "AIML-B", "day": "Thursday", "period": 8, "class_type": "lab"},
-        {"faculty_id": 4, "dept_code": "AIML-B", "day": "Saturday", "period": 2, "class_type": "theory"},
+        # Faculty 4 - Dr. Aruna R handles AI&ML-B
+        {"faculty_id": 4, "dept_code": "AI&ML-B", "day": "Monday", "period": 5, "class_type": "theory"},
+        {"faculty_id": 4, "dept_code": "AI&ML-B", "day": "Tuesday", "period": 6, "class_type": "theory"},
+        {"faculty_id": 4, "dept_code": "AI&ML-B", "day": "Wednesday", "period": 7, "class_type": "mini_project"},
+        {"faculty_id": 4, "dept_code": "AI&ML-B", "day": "Wednesday", "period": 8, "class_type": "theory"},
+        {"faculty_id": 4, "dept_code": "AI&ML-B", "day": "Thursday", "period": 6, "class_type": "lab"},
+        {"faculty_id": 4, "dept_code": "AI&ML-B", "day": "Thursday", "period": 7, "class_type": "lab"},
+        {"faculty_id": 4, "dept_code": "AI&ML-B", "day": "Thursday", "period": 8, "class_type": "lab"},
+        {"faculty_id": 4, "dept_code": "AI&ML-B", "day": "Saturday", "period": 2, "class_type": "theory"},
         
         # Faculty 5 - Ms. Janani S handles CSE-A
         {"faculty_id": 5, "dept_code": "CSE-A", "day": "Monday", "period": 2, "class_type": "theory"},

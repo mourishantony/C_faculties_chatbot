@@ -1364,9 +1364,9 @@ def get_classes_by_department(date_offset: int = 0, db: Session = Depends(get_db
     target_date = date.today() + timedelta(days=date_offset)
     day_name = get_day_name(target_date)
     
-    # Define department order: AIDS-A to RA
+    # Define department order: AI&DS-A to RA
     department_order = [
-        "AIDS-A", "AIDS-B", "AIML-A", "AIML-B", "CSBS", 
+        "AI&DS-A", "AI&DS-B", "AI&ML-A", "AI&ML-B", "CSBS", 
         "CSE-A", "CSE-B", "CYS", "ECE-A", "ECE-B", 
         "IT-A", "IT-B", "MECH", "RA"
     ]

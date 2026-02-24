@@ -241,7 +241,7 @@ class FAQChatbot:
     def _check_department_query(self, question: str, day_name: str) -> str:
         """Check if question asks about a specific department"""
         # Full department codes with hyphens
-        dept_codes_with_hyphen = ["AIDS-A", "AIDS-B", "AIML-A", "AIML-B", "CSE-A", "CSE-B", 
+        dept_codes_with_hyphen = ["AI&DS-A", "AI&DS-B", "AI&ML-A", "AI&ML-B", "CSE-A", "CSE-B", 
                                   "ECE-A", "ECE-B", "IT-A", "IT-B"]
         
         # Single word department codes (need word boundary check)
@@ -528,11 +528,11 @@ Type **help** to see all commands!"""
 **Lab/Theory Queries:**
 • "Lab today" or "Who has lab today?"
 • "Theory classes today"
-• "[Department] schedule" - e.g., "AIDS-A", "CSE-B"
+• "[Department] schedule" - e.g., "AI&DS-A", "CSE-B"
 
 **Faculty Queries:**
 • "List all faculty"
-• "Who teaches AIDS-A?"
+• "Who teaches AI&DS-A?"
 
 **Lab Programs:**
 • "Lab program week 3"
@@ -589,7 +589,7 @@ Or type **help** for more options!"""
     def _get_faculty_response(self, question: str, day_name: str) -> str:
         """Get faculty information"""
         # Check if asking for specific department
-        dept_codes = ["AIDS-A", "AIDS-B", "AIML-A", "AIML-B", "CSE-A", "CSE-B", 
+        dept_codes = ["AI&DS-A", "AI&DS-B", "AI&ML-A", "AI&ML-B", "CSE-A", "CSE-B", 
                      "CSBS", "CYS", "ECE-A", "ECE-B", "IT-A", "IT-B", "MECH", "RA"]
         
         for code in dept_codes:
