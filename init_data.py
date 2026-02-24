@@ -1,8 +1,15 @@
 from database import engine, SessionLocal
 from models import Base, Department, Syllabus, Admin, Faculty, TimetableEntry, PeriodTiming, LabProgram, SuperAdmin, FAQ
 from passlib.context import CryptContext
+from sqlalchemy import inspect, text
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+def _column_exists(table_name, column_name):
+    """Check if a column exists in a table (works for both SQLite and PostgreSQL)"""
+    inspector = inspect(engine)
+    columns = [col["name"] for col in inspector.get_columns(table_name)]
+    return column_name in columns
 
 def init_database():
     """Initialize database with all tables and seed data.
@@ -36,48 +43,34 @@ def init_database():
 
 def _add_room_number_column_if_missing():
     """Add room_number column to departments table if it doesn't exist"""
-    import sqlite3
-    conn = sqlite3.connect('c_faculties.db')
-    cursor = conn.cursor()
-    
-    # Check if room_number column exists
-    cursor.execute("PRAGMA table_info(departments)")
-    columns = [column[1] for column in cursor.fetchall()]
-    
-    if 'room_number' not in columns:
-        cursor.execute("ALTER TABLE departments ADD COLUMN room_number VARCHAR(20)")
-        conn.commit()
-        print("✓ Added room_number column to departments table")
-    
-    conn.close()
+    if not _column_exists("departments", "room_number"):
+        with engine.connect() as conn:
+            conn.execute(text("ALTER TABLE departments ADD COLUMN room_number VARCHAR(20)"))
+            conn.commit()
+            print("✓ Added room_number column to departments table")
 
 def _add_extra_class_columns_if_missing():
     """Add extra class columns to daily_entries table if they don't exist"""
-    import sqlite3
-    conn = sqlite3.connect('c_faculties.db')
-    cursor = conn.cursor()
-    
-    # Check existing columns in daily_entries table
-    cursor.execute("PRAGMA table_info(daily_entries)")
-    columns = [column[1] for column in cursor.fetchall()]
-    
     # Add is_extra_class column if missing
-    if 'is_extra_class' not in columns:
-        cursor.execute("ALTER TABLE daily_entries ADD COLUMN is_extra_class BOOLEAN DEFAULT 0")
-        conn.commit()
-        print("✓ Added is_extra_class column to daily_entries table")
+    if not _column_exists("daily_entries", "is_extra_class"):
+        with engine.connect() as conn:
+            conn.execute(text("ALTER TABLE daily_entries ADD COLUMN is_extra_class BOOLEAN DEFAULT FALSE"))
+            conn.commit()
+            print("✓ Added is_extra_class column to daily_entries table")
     
     # Add extra_class_subject_code column if missing
-    if 'extra_class_subject_code' not in columns:
-        cursor.execute("ALTER TABLE daily_entries ADD COLUMN extra_class_subject_code VARCHAR(20)")
-        conn.commit()
-        print("✓ Added extra_class_subject_code column to daily_entries table")
+    if not _column_exists("daily_entries", "extra_class_subject_code"):
+        with engine.connect() as conn:
+            conn.execute(text("ALTER TABLE daily_entries ADD COLUMN extra_class_subject_code VARCHAR(20)"))
+            conn.commit()
+            print("✓ Added extra_class_subject_code column to daily_entries table")
     
     # Add extra_class_subject_name column if missing
-    if 'extra_class_subject_name' not in columns:
-        cursor.execute("ALTER TABLE daily_entries ADD COLUMN extra_class_subject_name VARCHAR(50)")
-        conn.commit()
-        print("✓ Added extra_class_subject_name column to daily_entries table")
+    if not _column_exists("daily_entries", "extra_class_subject_name"):
+        with engine.connect() as conn:
+            conn.execute(text("ALTER TABLE daily_entries ADD COLUMN extra_class_subject_name VARCHAR(50)"))
+            conn.commit()
+            print("✓ Added extra_class_subject_name column to daily_entries table")
     
     conn.close()
 

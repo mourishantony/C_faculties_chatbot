@@ -29,19 +29,19 @@ def update_room_numbers():
     db = SessionLocal()
     
     try:
-        # Check if room_number column exists
-        with engine.connect() as conn:
-            # For SQLite, check table info
-            result = conn.execute(text("PRAGMA table_info(departments)"))
-            columns = [row[1] for row in result.fetchall()]
-            
-            if 'room_number' not in columns:
-                print("Adding room_number column to departments table...")
+        # Check if room_number column exists using SQLAlchemy inspect (works for both SQLite and PostgreSQL)
+        from sqlalchemy import inspect as sa_inspect
+        inspector = sa_inspect(engine)
+        columns = [col["name"] for col in inspector.get_columns("departments")]
+        
+        if 'room_number' not in columns:
+            print("Adding room_number column to departments table...")
+            with engine.connect() as conn:
                 conn.execute(text("ALTER TABLE departments ADD COLUMN room_number VARCHAR(20)"))
                 conn.commit()
-                print("✓ Column added successfully")
-            else:
-                print("✓ room_number column already exists")
+            print("✓ Column added successfully")
+        else:
+            print("✓ room_number column already exists")
         
         # Update room numbers for all departments
         print("\nUpdating room numbers...")
