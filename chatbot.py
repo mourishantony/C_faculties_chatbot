@@ -33,8 +33,7 @@ def get_period_time(period: int, db: Session = None) -> str:
         5: "11:15 AM - 12:00 PM",
         6: "01:00 PM - 01:45 PM",
         7: "01:45 PM - 02:30 PM",
-        8: "02:30 PM - 03:15 PM",
-        9: "03:30 PM - 04:15 PM"
+        8: "02:30 PM - 03:15 PM"
     }
     return period_times.get(period, "Unknown")
 

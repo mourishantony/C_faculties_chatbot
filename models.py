@@ -68,7 +68,7 @@ class TimetableEntry(Base):
     faculty_id = Column(Integer, ForeignKey("faculties.id"), nullable=False)
     department_id = Column(Integer, ForeignKey("departments.id"), nullable=False)
     day = Column(String(20), nullable=False)  # Monday, Tuesday, etc.
-    period = Column(Integer, nullable=False)  # 1-9
+    period = Column(Integer, nullable=False)  # 1-8
     subject_code = Column(String(20), default="24UCS271")
     subject_name = Column(String(50), default="PROG C")
     class_type = Column(String(20), default="theory")  # theory, lab, mini_project
@@ -99,7 +99,7 @@ class PeriodTiming(Base):
     __tablename__ = "period_timings"
     
     id = Column(Integer, primary_key=True, index=True)
-    period = Column(Integer, unique=True, nullable=False)  # 1-9
+    period = Column(Integer, unique=True, nullable=False)  # 1-8
     start_time = Column(String(20), nullable=False)  # e.g., "08:00 AM"
     end_time = Column(String(20), nullable=False)  # e.g., "08:45 AM"
     display_time = Column(String(50), nullable=False)  # e.g., "08:00 AM - 08:45 AM"

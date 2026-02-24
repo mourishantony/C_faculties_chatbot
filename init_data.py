@@ -146,9 +146,9 @@ def _add_default_faqs(db):
         {"question": "Show me the complete timetable for a day", "answer": "Type the day name (e.g., 'Monday', 'Tuesday schedule', 'Wednesday classes') to see the complete schedule for that day.", "category": "schedule"},
         {"question": "Which faculty is teaching a department?", "answer": "Type the department code (e.g., 'CSE-B', 'AI&DS-A') to see which faculty is assigned.", "category": "schedule"},
         {"question": "Is there any lab class today?", "answer": "Lab classes are typically scheduled for 2-3 consecutive periods. Check today's schedule to see lab sessions.", "category": "schedule"},
-        {"question": "What are the theory class timings?", "answer": "Theory classes are 45 minutes each. Periods: 1(8:00-8:45), 2(8:45-9:30), 3(9:45-10:30), 4(10:30-11:15), 5(11:15-12:00), 6(1:00-1:45), 7(1:45-2:30), 8(2:30-3:15), 9(3:30-4:15).", "category": "schedule"},
-        {"question": "How many periods are there in a day?", "answer": "There are 9 periods in a day. Morning: Periods 1-5 (8:00 AM - 12:00 PM), Afternoon: Periods 6-9 (1:00 PM - 4:15 PM).", "category": "schedule"},
-        {"question": "When does the college start and end?", "answer": "College starts at 8:00 AM (1st period) and ends at 4:15 PM (9th period).", "category": "schedule"},
+        {"question": "What are the theory class timings?", "answer": "Theory classes are 45 minutes each. Periods: 1(8:00-8:45), 2(8:45-9:30), 3(9:45-10:30), 4(10:30-11:15), 5(11:15-12:00), 6(1:00-1:45), 7(1:45-2:30), 8(2:30-3:15).", "category": "schedule"},
+        {"question": "How many periods are there in a day?", "answer": "There are 8 periods in a day. Morning: Periods 1-5 (8:00 AM - 12:00 PM), Afternoon: Periods 6-8 (1:00 PM - 3:15 PM).", "category": "schedule"},
+        {"question": "When does the college start and end?", "answer": "College starts at 8:00 AM (1st period) and ends at 3:15 PM (8th period).", "category": "schedule"},
         {"question": "Is there class on Saturday?", "answer": "Saturday classes depend on the timetable. Type 'Saturday' to check if there are any C programming classes.", "category": "schedule"},
         {"question": "What is the lunch break timing?", "answer": "Lunch break is from 12:00 PM to 1:00 PM (between 5th and 6th periods).", "category": "schedule"},
         {"question": "Show me all classes for this week", "answer": "Type the day name (Monday, Tuesday, etc.) to see classes for that day, or 'show schedule' for today.", "category": "schedule"},
@@ -219,7 +219,6 @@ def _init_all_data(db):
         {"period": 6, "start_time": "01:00 PM", "end_time": "01:45 PM", "display_time": "01:00 PM - 01:45 PM"},
         {"period": 7, "start_time": "01:45 PM", "end_time": "02:30 PM", "display_time": "01:45 PM - 02:30 PM"},
         {"period": 8, "start_time": "02:30 PM", "end_time": "03:15 PM", "display_time": "02:30 PM - 03:15 PM"},
-        {"period": 9, "start_time": "03:30 PM", "end_time": "04:15 PM", "display_time": "03:30 PM - 04:15 PM"},
     ]
     
     for timing in period_timings:

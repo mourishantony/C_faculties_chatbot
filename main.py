@@ -508,15 +508,15 @@ def get_free_periods(
     faculty: Faculty = Depends(get_current_faculty),
     db: Session = Depends(get_db)
 ):
-    """Get available (free) periods for faculty to add extra classes
+    """Get available periods for faculty to add extra classes
     date_offset: 0 for today, 1 for tomorrow
-    Returns periods where faculty doesn't have a scheduled class or extra class
+    Returns all periods (including scheduled ones) except those that already have an extra class entry
     """
     target_date = date.today() + timedelta(days=date_offset)
     day_name = get_day_name(target_date)
     
-    # Get all periods (1-9)
-    all_periods = set(range(1, 10))
+    # Get all periods (1-8)
+    all_periods = set(range(1, 9))
     
     # Get scheduled periods from timetable
     scheduled = db.query(TimetableEntry.period).filter(
@@ -533,18 +533,21 @@ def get_free_periods(
     ).all()
     extra_periods = {e.period for e in extra_classes}
     
-    # Free periods = all periods - scheduled - extra classes
-    free_periods = all_periods - scheduled_periods - extra_periods
+    # Available periods = all periods minus those already having an extra class entry
+    # Faculty CAN select a period that is already in their timetable (e.g. taking two sessions)
+    available_periods = all_periods - extra_periods
     
     # Get period timings
     timings = db.query(PeriodTiming).all()
     timing_map = {t.period: t.display_time for t in timings}
     
     result = []
-    for period in sorted(free_periods):
+    for period in sorted(available_periods):
+        is_scheduled = period in scheduled_periods
         result.append({
             "period": period,
-            "display_time": timing_map.get(period, f"Period {period}")
+            "display_time": timing_map.get(period, f"Period {period}"),
+            "is_scheduled": is_scheduled
         })
     
     return {
@@ -574,19 +577,6 @@ def add_extra_class(
         raise HTTPException(
             status_code=400, 
             detail="Extra classes can only be added for today or tomorrow"
-        )
-    
-    # Check if period is free (not in timetable)
-    scheduled = db.query(TimetableEntry).filter(
-        TimetableEntry.faculty_id == faculty.id,
-        TimetableEntry.day == day_name,
-        TimetableEntry.period == entry.period
-    ).first()
-    
-    if scheduled:
-        raise HTTPException(
-            status_code=400,
-            detail=f"Period {entry.period} is already scheduled in your timetable. Use regular entry submission."
         )
     
     # Check if extra class already exists for this period
@@ -761,19 +751,7 @@ def create_swap_entry(
         if not entry.swapped_with_faculty:
             raise HTTPException(status_code=400, detail="Faculty name being substituted is required")
     
-    # Check if the new period is free
     day_name = get_day_name(new_date)
-    scheduled = db.query(TimetableEntry).filter(
-        TimetableEntry.faculty_id == faculty.id,
-        TimetableEntry.day == day_name,
-        TimetableEntry.period == entry.new_period
-    ).first()
-    
-    if scheduled:
-        raise HTTPException(
-            status_code=400,
-            detail=f"Period {entry.new_period} is already in your timetable for {day_name}. Choose a free period."
-        )
     
     # Check if period already has an extra/swap entry
     existing = db.query(DailyEntry).filter(

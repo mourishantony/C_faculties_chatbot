@@ -354,7 +354,7 @@
                             <option value="swap">Swap</option>
                             <option value="substitution">Substitution</option>
                         </select>
-                        <small style="color: #64748b;" id="swapTypeHint">Adding an additional class in a free period</small>
+                        <small style="color: #64748b;" id="swapTypeHint">Adding an additional class in any period</small>
                     </div>
                     
                     <!-- Original Date & Period (for Swap type) -->
@@ -379,7 +379,6 @@
                                     <option value="6">6th Period</option>
                                     <option value="7">7th Period</option>
                                     <option value="8">8th Period</option>
-                                    <option value="9">9th Period</option>
                                 </select>
                             </div>
                         </div>
@@ -404,7 +403,7 @@
                         <div class="form-section-title"><i class="material-icons" style="font-size: 18px; vertical-align: middle; margin-right: 6px;">event</i>New Class Details</div>
                         
                         <div class="form-group">
-                            <label class="form-label">Select Free Period</label>
+                            <label class="form-label">Select Period</label>
                             <select class="form-control" id="swapNewPeriod" required>
                                 <option value="">-- Select Period --</option>
                             </select>
@@ -1140,7 +1139,7 @@
             } else {
                 originalGroup.classList.add('hidden');
                 facultyGroup.classList.add('hidden');
-                hint.textContent = 'Adding an additional class in a free period';
+                hint.textContent = 'Adding an additional class in any period';
                 submitBtn.style.background = 'linear-gradient(135deg, #059669, #10b981)';
                 submitBtn.textContent = 'Create Extra Class';
             }
@@ -1153,15 +1152,18 @@
                 periodSelect.innerHTML = '<option value="">-- Select Period --</option>';
                 
                 if (data.free_periods.length === 0) {
-                    document.getElementById('swapFreePeriodInfo').textContent = 'No free periods available for this day.';
+                    document.getElementById('swapFreePeriodInfo').textContent = 'No periods available for this day.';
                 } else {
                     data.free_periods.forEach(p => {
                         const option = document.createElement('option');
                         option.value = p.period;
-                        option.textContent = `${getOrdinal(p.period)} Period - ${p.display_time}`;
+                        const label = p.is_scheduled
+                            ? `${getOrdinal(p.period)} Period - ${p.display_time} (Scheduled)`
+                            : `${getOrdinal(p.period)} Period - ${p.display_time}`;
+                        option.textContent = label;
                         periodSelect.appendChild(option);
                     });
-                    document.getElementById('swapFreePeriodInfo').textContent = `${data.free_periods.length} free period(s) available`;
+                    document.getElementById('swapFreePeriodInfo').textContent = `${data.free_periods.length} period(s) available`;
                 }
             } catch (error) {
                 console.error('Error loading free periods:', error);
