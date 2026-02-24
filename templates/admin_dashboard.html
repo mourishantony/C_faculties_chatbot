@@ -549,24 +549,30 @@
                 justify-content: center;
                 width: 100%;
                 padding: 10px 0;
+                flex-wrap: wrap;
+                align-items: center;
             }
             
             .day-btn {
                 padding: 8px 10px;
                 font-size: 12px;
                 min-width: 42px;
+                flex-shrink: 0;
             }
             
             .class-type-filter-container {
                 justify-content: center;
                 width: 100%;
                 padding: 10px 0;
+                flex-wrap: wrap;
+                align-items: center;
             }
             
             .class-filter-btn {
-                padding: 8px 10px;
+                padding: 8px 12px;
                 font-size: 12px;
                 min-width: auto;
+                flex-shrink: 0;
             }
             
             .report-type-filter-container {
@@ -633,34 +639,49 @@
                 justify-content: center;
                 width: 100%;
                 padding: 10px 0;
+                flex-wrap: wrap;
+                align-items: center;
             }
             
             .period-btn {
                 padding: 8px 10px;
                 font-size: 12px;
                 min-width: 42px;
+                flex-shrink: 0;
             }
         }
         
         @media (max-width: 480px) {
             .day-buttons-container {
-                gap: 4px;
+                gap: 5px;
+                padding: 8px 0;
             }
             
             .day-btn {
-                padding: 6px 8px;
+                padding: 7px 9px;
                 font-size: 11px;
                 min-width: 38px;
             }
             
+            .class-type-filter-container {
+                gap: 5px;
+                padding: 8px 0;
+            }
+            
+            .class-filter-btn {
+                padding: 7px 10px;
+                font-size: 11px;
+            }
+            
             .period-buttons-container {
                 gap: 4px;
+                padding: 8px 0;
             }
             
             .period-btn {
                 padding: 6px 8px;
                 font-size: 11px;
-                min-width: 38px;
+                min-width: 35px;
             }
             
             .classes-grid {
@@ -1097,30 +1118,118 @@
         /* Mobile responsive for dept cards */
         @media (max-width: 768px) {
             .dept-cards-grid {
-                grid-template-columns: 1fr;
-                gap: 15px;
+                flex-direction: column;
+                gap: 10px;
                 padding: 0 5px;
             }
             
+            .dept-card {
+                flex-direction: column !important;
+                width: 100%;
+            }
+            
             .dept-card-header {
-                padding: 14px 16px;
+                padding: 10px 14px;
+                min-width: 100% !important;
+                border-radius: 12px 12px 0 0 !important;
             }
             
             .dept-card-header h4 {
-                font-size: 16px;
+                font-size: 14px;
             }
             
             .dept-card-body {
-                padding: 14px;
+                padding: 8px 14px !important;
+                flex-direction: column !important;
+                gap: 8px !important;
             }
             
             .dept-info-row {
-                padding: 8px 10px;
-                margin-bottom: 10px;
+                flex-direction: row !important;
+                align-items: center !important;
+                gap: 8px;
+            }
+            
+            .info-label {
+                font-size: 9px;
+                margin-bottom: 0;
+            }
+            
+            .info-value {
+                font-size: 13px;
+            }
+            
+            .dept-card-footer {
+                padding: 8px 14px;
+                justify-content: center;
+            }
+            
+            .view-classes-btn {
+                padding: 8px 16px;
+                font-size: 12px;
             }
             
             .period-item-body {
                 grid-template-columns: 1fr;
+                gap: 12px;
+            }
+            
+            .daily-report-section {
+                padding: 12px;
+            }
+            
+            .report-row {
+                flex-direction: column;
+                gap: 4px;
+            }
+            
+            .report-label {
+                min-width: auto;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .dept-card-header {
+                padding: 8px 12px;
+            }
+            
+            .dept-card-header h4 {
+                font-size: 13px;
+            }
+            
+            .dept-card-body {
+                padding: 6px 12px !important;
+                gap: 6px !important;
+            }
+            
+            .info-label {
+                font-size: 8px;
+            }
+            
+            .info-value {
+                font-size: 12px;
+            }
+            
+            .dept-card-footer {
+                padding: 6px 12px;
+            }
+            
+            .view-classes-btn {
+                width: 100%;
+                padding: 7px 14px;
+                font-size: 11px;
+            }
+            
+            .daily-report-section {
+                padding: 10px;
+            }
+            
+            .report-header {
+                font-size: 12px;
+            }
+            
+            .report-row {
+                font-size: 12px;
             }
         }
 
@@ -1507,12 +1616,75 @@
         
         /* ========== Mobile Responsiveness ========== */
         @media (max-width: 768px) {
+            /* Navbar */
+            .navbar {
+                padding: 12px 15px;
+            }
+            
+            .navbar-brand {
+                font-size: 16px;
+            }
+            
+            .navbar-brand .material-icons {
+                font-size: 20px;
+                margin-right: 6px;
+            }
+            
+            .nav-link {
+                font-size: 13px;
+                padding: 8px 12px;
+                margin: 0 3px;
+            }
+            
+            /* Dashboard */
             .dashboard {
                 padding: 10px;
             }
             
             .dashboard-title {
                 font-size: 1.5rem;
+            }
+            
+            /* Card */
+            .card {
+                margin-bottom: 15px;
+            }
+            
+            .card-header h3 {
+                font-size: 16px;
+            }
+            
+            /* Filter buttons */
+            .class-type-filter-container {
+                flex-wrap: wrap;
+                gap: 6px;
+            }
+            
+            .class-filter-btn {
+                font-size: 12px;
+                padding: 8px 12px;
+            }
+            
+            .day-buttons-container {
+                flex-wrap: wrap;
+                gap: 5px;
+            }
+            
+            .day-btn {
+                font-size: 12px;
+                padding: 8px 10px;
+                min-width: 40px;
+            }
+            
+            .period-buttons-container {
+                flex-wrap: wrap;
+                gap: 5px;
+            }
+            
+            .period-btn {
+                font-size: 11px;
+                padding: 7px 10px;
+                min-width: 38px;
             }
             
             .stats-grid {
@@ -1542,6 +1714,52 @@
                 width: 120px;
                 height: 120px;
                 font-size: 50px;
+            }
+            
+            /* Modal responsive */
+            .modal-content {
+                width: 95%;
+                max-width: 95%;
+                max-height: 90vh;
+                margin: 20px auto;
+                border-radius: 12px;
+            }
+            
+            .modal-header {
+                padding: 14px 16px;
+            }
+            
+            .modal-header h3 {
+                font-size: 16px;
+            }
+            
+            .modal-header p {
+                font-size: 12px;
+            }
+            
+            .modal-body {
+                padding: 12px;
+            }
+            
+            .period-item {
+                padding: 12px;
+                margin-bottom: 12px;
+            }
+            
+            .period-badge-modal {
+                font-size: 11px;
+                padding: 5px 12px;
+            }
+            
+            .class-type-badge {
+                font-size: 10px;
+                padding: 4px 10px;
+            }
+            
+            .close-modal-btn {
+                width: 32px;
+                height: 32px;
+                font-size: 20px;
             }
             
             /* Tablet chatbot styles */

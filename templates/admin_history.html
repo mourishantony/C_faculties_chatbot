@@ -505,25 +505,180 @@
 
         /* Responsive */
         @media (max-width: 768px) {
-            .page-header { flex-direction: column; align-items: flex-start; }
-            .filters-row { flex-direction: column; }
-            .filter-group select, .filter-group input { min-width: 100%; }
-            .history-table { font-size: 0.8rem; }
-            .history-table th, .history-table td { padding: 8px 10px; }
-            .stats-row { gap: 10px; }
-            .stat-mini { min-width: 100px; padding: 10px 12px; }
-            .stat-mini .stat-num { font-size: 1.3rem; }
-            .navbar-brand { font-size: 1.1rem; }
-            .navbar-nav { gap: 2px; }
-            .nav-link { padding: 6px 10px; font-size: 0.82rem; }
-            .results-card { border-radius: 12px; }
-            .results-header { padding: 14px 18px; }
+            /* Navbar */
+            .navbar { padding: 10px 0; }
+            .navbar-brand { font-size: 1rem; }
+            .navbar-brand img { height: 28px; }
+            .navbar-nav { gap: 3px; }
+            .nav-link { padding: 6px 12px; font-size: 0.8rem; }
+            
+            /* Container */
+            .container { padding: 0 15px; }
+            .dashboard { padding: 15px 0; }
+            
+            /* Page Header */
+            .page-header { 
+                flex-direction: column; 
+                align-items: flex-start;
+                margin-bottom: 20px;
+            }
+            .page-title { font-size: 1.3rem; }
+            
+            /* Filters */
+            .filters-card { padding: 15px; }
+            .filters-row { 
+                flex-direction: column;
+                gap: 12px;
+            }
+            .filter-group { 
+                width: 100%;
+                min-width: 100%;
+            }
+            .filter-group select, 
+            .filter-group input { 
+                min-width: 100%;
+                width: 100%;
+                font-size: 0.85rem;
+                padding: 8px 12px;
+            }
+            
+            /* Type Chips */
+            .type-chips {
+                justify-content: center;
+                gap: 6px;
+            }
+            .type-chip {
+                padding: 6px 14px;
+                font-size: 0.75rem;
+            }
+            
+            /* Buttons */
+            .btn {
+                width: 100%;
+                justify-content: center;
+                padding: 10px 18px;
+                font-size: 0.85rem;
+            }
+            
+            /* Stats */
+            .stats-row { 
+                gap: 8px;
+                flex-wrap: wrap;
+            }
+            .stat-mini { 
+                min-width: calc(50% - 4px);
+                padding: 12px 14px;
+                flex: 1 1 calc(50% - 4px);
+            }
+            .stat-mini .stat-num { font-size: 1.4rem; }
+            .stat-mini .stat-label { font-size: 0.7rem; }
+            
+            /* Results Card */
+            .results-card { 
+                border-radius: 12px;
+                margin-top: 15px;
+            }
+            .results-header { 
+                padding: 14px 18px;
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .results-count { font-size: 0.85rem; }
+            
+            /* Table */
+            .history-table { 
+                font-size: 0.75rem;
+                display: block;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            .history-table thead,
+            .history-table tbody,
+            .history-table tr {
+                display: block;
+            }
+            .history-table thead {
+                display: none;
+            }
+            .history-table tr {
+                margin-bottom: 12px;
+                border: 1px solid #e2e8f0;
+                border-radius: 8px;
+                padding: 12px;
+                background: white;
+            }
+            .history-table td {
+                display: flex;
+                justify-content: space-between;
+                padding: 8px 0;
+                border: none;
+                text-align: right;
+            }
+            .history-table td::before {
+                content: attr(data-label);
+                font-weight: 600;
+                color: #475569;
+                text-align: left;
+                flex: 0 0 40%;
+            }
+            .history-table td:first-child {
+                border-top: none;
+            }
+            
+            /* Faculty Dropdown */
+            .faculty-filter {
+                margin-bottom: 12px;
+            }
         }
 
         @media (max-width: 480px) {
-            .container { padding: 0 12px; }
-            .filters-card { padding: 15px; }
-            .stat-mini { min-width: 80px; }
+            /* Navbar */
+            .navbar-brand { font-size: 0.9rem; }
+            .navbar-nav { 
+                flex-direction: column;
+                gap: 2px;
+                width: 100%;
+            }
+            .nav-link { 
+                padding: 6px 10px; 
+                font-size: 0.75rem;
+                width: 100%;
+                text-align: center;
+            }
+            
+            /* Container */
+            .container { padding: 0 10px; }
+            .dashboard { padding: 12px 0; }
+            
+            /* Page Header */
+            .page-title { font-size: 1.1rem; }
+            .page-title .material-icons { font-size: 20px; }
+            
+            /* Filters */
+            .filters-card { padding: 12px; }
+            .type-chips { gap: 4px; }
+            .type-chip { 
+                padding: 5px 12px;
+                font-size: 0.7rem;
+            }
+            
+            /* Stats */
+            .stats-row { gap: 6px; }
+            .stat-mini { 
+                min-width: calc(50% - 3px);
+                padding: 10px 12px;
+            }
+            .stat-mini .stat-num { font-size: 1.2rem; }
+            .stat-mini .stat-label { font-size: 0.65rem; }
+            
+            /* Results */
+            .results-header { padding: 12px 14px; }
+            .results-count { font-size: 0.75rem; }
+            
+            /* Table */
+            .history-table { font-size: 0.7rem; }
+            .history-table tr { padding: 10px; }
+            .history-table td { padding: 6px 0; }
         }
     </style>
 </head>
@@ -857,14 +1012,14 @@
                     const topicShort = entry.topic.length > 35 ? entry.topic.substring(0, 35) + '...' : entry.topic;
 
                     html += `<tr>
-                        <td><span class="period-badge">${entry.period}</span></td>
-                        <td>${typeBadge}${swapDetail}</td>
-                        <td><strong>${entry.faculty_name}</strong></td>
-                        <td>${entry.department_name}</td>
-                        <td>${classBadge}</td>
-                        <td title="${entry.topic.replace(/"/g, '&quot;')}">${topicShort}</td>
-                        <td>${statusBadge}</td>
-                        <td>${detailBtns}</td>
+                        <td data-label="Period"><span class="period-badge">${entry.period}</span></td>
+                        <td data-label="Type">${typeBadge}${swapDetail}</td>
+                        <td data-label="Faculty"><strong>${entry.faculty_name}</strong></td>
+                        <td data-label="Department">${entry.department_name}</td>
+                        <td data-label="Class">${classBadge}</td>
+                        <td data-label="Topic" title="${entry.topic.replace(/"/g, '&quot;')}">${topicShort}</td>
+                        <td data-label="Status">${statusBadge}</td>
+                        <td data-label="Actions">${detailBtns}</td>
                     </tr>`;
                 });
 
