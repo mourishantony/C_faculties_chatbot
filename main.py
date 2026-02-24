@@ -269,7 +269,7 @@ def get_period_timings(db: Session = Depends(get_db)):
 # ----- Authentication -----
 @app.post("/api/faculty/login")
 def login_faculty(data: FacultyLogin, db: Session = Depends(get_db)):
-    faculty = db.query(Faculty).filter(Faculty.email == data.email).first()
+    faculty = db.query(Faculty).filter(func.lower(Faculty.email) == data.email.lower()).first()
     if not faculty or not verify_password(data.password, faculty.password):
         raise HTTPException(status_code=401, detail="Invalid credentials")
     
@@ -302,7 +302,7 @@ def unified_login(data: UnifiedLogin, db: Session = Depends(get_db)):
         }
     
     # Try faculty
-    faculty = db.query(Faculty).filter(Faculty.email == data.email).first()
+    faculty = db.query(Faculty).filter(func.lower(Faculty.email) == data.email.lower()).first()
     if faculty and verify_password(data.password, faculty.password):
         token = create_access_token({"sub": str(faculty.id), "type": "faculty"})
         return {
@@ -1556,7 +1556,7 @@ def super_admin_create_faculty(
     db: Session = Depends(get_db)
 ):
     # Check if email already exists
-    existing = db.query(Faculty).filter(Faculty.email == data.email).first()
+    existing = db.query(Faculty).filter(func.lower(Faculty.email) == data.email.lower()).first()
     if existing:
         raise HTTPException(status_code=400, detail="Email already exists")
     
