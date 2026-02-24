@@ -71,8 +71,6 @@ def _add_extra_class_columns_if_missing():
             conn.execute(text("ALTER TABLE daily_entries ADD COLUMN extra_class_subject_name VARCHAR(50)"))
             conn.commit()
             print("✓ Added extra_class_subject_name column to daily_entries table")
-    
-    conn.close()
 
 def _add_missing_data(db):
     """Add missing tables/data to existing database (e.g., SuperAdmin, FAQ)"""

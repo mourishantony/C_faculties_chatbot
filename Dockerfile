@@ -19,11 +19,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy application code
 COPY . .
 
-# Initialize database with seed data
-RUN python init_data.py
-
 # Expose port
 EXPOSE 8000
 
-# Run the application
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Initialize database at startup (needs DATABASE_URL env var available at runtime), then start the app
+CMD ["sh", "-c", "python init_data.py && uvicorn main:app --host 0.0.0.0 --port 8000"]
