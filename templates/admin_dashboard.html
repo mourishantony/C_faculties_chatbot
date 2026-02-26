@@ -1,6 +1,30 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AcademicScheduler</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="icon" type="image/png" href="/static/images/images.png">
+</head>
+<body>
+    <div class="page-wrapper">
+        <!-- Navbar -->
+        <nav class="navbar">
+            <div class="container">
+                <a href="/cprog_admin_view_x7k9" class="navbar-brand">
+                    <img src="/static/images/images.png" alt="Kite Logo" />
+                    <i class="material-icons"></i>AcademicScheduler
+                </a>
+                <ul class="navbar-nav">
+                    <li><a href="/cprog_admin_view_x7k9" class="nav-link active">Dashboard</a></li>
+                    <li><a href="/cprog_faculties_f3k2" class="nav-link">C Faculties</a></li>
+                    <li><a href="/cprog_history_h4m1" class="nav-link">History</a></li>
+                </ul>
+            </div>
+        </nav>
 
-{% block content %}
         <!-- Dashboard -->
         <div class="dashboard">
             <div class="container">
@@ -120,9 +144,15 @@
                 </div>                                        -->
             </div>
         </div>
-{% endblock %}
 
-{% block modals %}
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="container">
+                <p>&copy; AcademicScheduler v.1.1</p>
+            </div>
+        </footer>
+    </div>
+
     <!-- Floating Chatbot (commented out) -->
     <!--
     <div class="chatbot-floating" id="chatbotWidget">
@@ -258,9 +288,7 @@
             </div>
         </div>
     </div>
-{% endblock %}
 
-{% block page_styles %}
     <style>
         /* ========== Material Icons Styling ========== */
         .material-icons {
@@ -2491,9 +2519,7 @@
             }
         }
     </style>
-{% endblock %}
 
-{% block scripts %}
     <script src="/static/js/app.js"></script>
     <script>
         // Global variables
@@ -3496,4 +3522,5 @@
             return '<p>' + html + '</p>';
         }
     </script>
-{% endblock %}
+</body>
+</html>
