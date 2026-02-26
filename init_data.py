@@ -72,6 +72,137 @@ def _add_extra_class_columns_if_missing():
             conn.commit()
             print("✓ Added extra_class_subject_name column to daily_entries table")
 
+def _get_expected_timetable():
+    """Return the canonical timetable data used for both fresh init and sync"""
+    return [
+        # Faculty 1 - Mr. Sathish R handles AI&DS-A
+        {"faculty_id": 1, "dept_code": "AI&DS-A", "day": "Tuesday", "period": 7, "class_type": "theory"},
+        {"faculty_id": 1, "dept_code": "AI&DS-A", "day": "Wednesday", "period": 5, "class_type": "mini_project"},
+        {"faculty_id": 1, "dept_code": "AI&DS-A", "day": "Wednesday", "period": 6, "class_type": "lab"},
+        {"faculty_id": 1, "dept_code": "AI&DS-A", "day": "Wednesday", "period": 7, "class_type": "lab"},
+        {"faculty_id": 1, "dept_code": "AI&DS-A", "day": "Wednesday", "period": 8, "class_type": "lab"},
+        {"faculty_id": 1, "dept_code": "AI&DS-A", "day": "Thursday", "period": 8, "class_type": "theory"},
+        {"faculty_id": 1, "dept_code": "AI&DS-A", "day": "Friday", "period": 5, "class_type": "theory"},
+        {"faculty_id": 1, "dept_code": "AI&DS-A", "day": "Saturday", "period": 7, "class_type": "theory"},
+        # Faculty 2 - Dr. Sikkandhar Batcha J handles AI&DS-B
+        {"faculty_id": 2, "dept_code": "AI&DS-B", "day": "Monday", "period": 5, "class_type": "theory"},
+        {"faculty_id": 2, "dept_code": "AI&DS-B", "day": "Wednesday", "period": 3, "class_type": "lab"},
+        {"faculty_id": 2, "dept_code": "AI&DS-B", "day": "Wednesday", "period": 4, "class_type": "lab"},
+        {"faculty_id": 2, "dept_code": "AI&DS-B", "day": "Wednesday", "period": 5, "class_type": "lab"},
+        {"faculty_id": 2, "dept_code": "AI&DS-B", "day": "Wednesday", "period": 7, "class_type": "mini_project"},
+        {"faculty_id": 2, "dept_code": "AI&DS-B", "day": "Thursday", "period": 2, "class_type": "theory"},
+        {"faculty_id": 2, "dept_code": "AI&DS-B", "day": "Friday", "period": 4, "class_type": "theory"},
+        {"faculty_id": 2, "dept_code": "AI&DS-B", "day": "Saturday", "period": 5, "class_type": "theory"},
+        # Faculty 3 - Mr. Raakesh M handles AI&ML-A
+        {"faculty_id": 3, "dept_code": "AI&ML-A", "day": "Monday", "period": 5, "class_type": "theory"},
+        {"faculty_id": 3, "dept_code": "AI&ML-A", "day": "Tuesday", "period": 7, "class_type": "theory"},
+        {"faculty_id": 3, "dept_code": "AI&ML-A", "day": "Thursday", "period": 2, "class_type": "mini_project"},
+        {"faculty_id": 3, "dept_code": "AI&ML-A", "day": "Thursday", "period": 3, "class_type": "lab"},
+        {"faculty_id": 3, "dept_code": "AI&ML-A", "day": "Thursday", "period": 4, "class_type": "lab"},
+        {"faculty_id": 3, "dept_code": "AI&ML-A", "day": "Thursday", "period": 5, "class_type": "lab"},
+        {"faculty_id": 3, "dept_code": "AI&ML-A", "day": "Friday", "period": 2, "class_type": "theory"},
+        {"faculty_id": 3, "dept_code": "AI&ML-A", "day": "Saturday", "period": 8, "class_type": "theory"},
+        # Faculty 4 - Dr. Aruna R handles AI&ML-B
+        {"faculty_id": 4, "dept_code": "AI&ML-B", "day": "Monday", "period": 5, "class_type": "theory"},
+        {"faculty_id": 4, "dept_code": "AI&ML-B", "day": "Tuesday", "period": 6, "class_type": "theory"},
+        {"faculty_id": 4, "dept_code": "AI&ML-B", "day": "Wednesday", "period": 7, "class_type": "mini_project"},
+        {"faculty_id": 4, "dept_code": "AI&ML-B", "day": "Wednesday", "period": 8, "class_type": "theory"},
+        {"faculty_id": 4, "dept_code": "AI&ML-B", "day": "Thursday", "period": 6, "class_type": "lab"},
+        {"faculty_id": 4, "dept_code": "AI&ML-B", "day": "Thursday", "period": 7, "class_type": "lab"},
+        {"faculty_id": 4, "dept_code": "AI&ML-B", "day": "Thursday", "period": 8, "class_type": "lab"},
+        {"faculty_id": 4, "dept_code": "AI&ML-B", "day": "Saturday", "period": 2, "class_type": "theory"},
+        # Faculty 5 - Ms. Janani S handles CSE-A
+        {"faculty_id": 5, "dept_code": "CSE-A", "day": "Monday", "period": 2, "class_type": "theory"},
+        {"faculty_id": 5, "dept_code": "CSE-A", "day": "Wednesday", "period": 2, "class_type": "mini_project"},
+        {"faculty_id": 5, "dept_code": "CSE-A", "day": "Wednesday", "period": 6, "class_type": "lab"},
+        {"faculty_id": 5, "dept_code": "CSE-A", "day": "Wednesday", "period": 7, "class_type": "lab"},
+        {"faculty_id": 5, "dept_code": "CSE-A", "day": "Wednesday", "period": 8, "class_type": "lab"},
+        {"faculty_id": 5, "dept_code": "CSE-A", "day": "Thursday", "period": 3, "class_type": "theory"},
+        {"faculty_id": 5, "dept_code": "CSE-A", "day": "Friday", "period": 6, "class_type": "theory"},
+        {"faculty_id": 5, "dept_code": "CSE-A", "day": "Saturday", "period": 6, "class_type": "theory"},
+        # Faculty 6 - Ms. Indhumathi S handles CSE-B
+        {"faculty_id": 6, "dept_code": "CSE-B", "day": "Monday", "period": 2, "class_type": "theory"},
+        {"faculty_id": 6, "dept_code": "CSE-B", "day": "Wednesday", "period": 5, "class_type": "theory"},
+        {"faculty_id": 6, "dept_code": "CSE-B", "day": "Thursday", "period": 3, "class_type": "theory"},
+        {"faculty_id": 6, "dept_code": "CSE-B", "day": "Friday", "period": 2, "class_type": "mini_project"},
+        {"faculty_id": 6, "dept_code": "CSE-B", "day": "Friday", "period": 3, "class_type": "lab"},
+        {"faculty_id": 6, "dept_code": "CSE-B", "day": "Friday", "period": 4, "class_type": "lab"},
+        {"faculty_id": 6, "dept_code": "CSE-B", "day": "Friday", "period": 5, "class_type": "lab"},
+        {"faculty_id": 6, "dept_code": "CSE-B", "day": "Saturday", "period": 7, "class_type": "theory"},
+        # Faculty 7 - Ms. Saranya S handles CSBS
+        {"faculty_id": 7, "dept_code": "CSBS", "day": "Tuesday", "period": 2, "class_type": "theory"},
+        {"faculty_id": 7, "dept_code": "CSBS", "day": "Wednesday", "period": 2, "class_type": "mini_project"},
+        {"faculty_id": 7, "dept_code": "CSBS", "day": "Wednesday", "period": 3, "class_type": "lab"},
+        {"faculty_id": 7, "dept_code": "CSBS", "day": "Wednesday", "period": 4, "class_type": "lab"},
+        {"faculty_id": 7, "dept_code": "CSBS", "day": "Wednesday", "period": 5, "class_type": "lab"},
+        {"faculty_id": 7, "dept_code": "CSBS", "day": "Thursday", "period": 8, "class_type": "theory"},
+        {"faculty_id": 7, "dept_code": "CSBS", "day": "Friday", "period": 5, "class_type": "theory"},
+        {"faculty_id": 7, "dept_code": "CSBS", "day": "Saturday", "period": 7, "class_type": "theory"},
+        # Faculty 8 - Ms. Anusha S handles CYS
+        {"faculty_id": 8, "dept_code": "CYS", "day": "Monday", "period": 8, "class_type": "theory"},
+        {"faculty_id": 8, "dept_code": "CYS", "day": "Wednesday", "period": 3, "class_type": "theory"},
+        {"faculty_id": 8, "dept_code": "CYS", "day": "Thursday", "period": 2, "class_type": "mini_project"},
+        {"faculty_id": 8, "dept_code": "CYS", "day": "Thursday", "period": 3, "class_type": "lab"},
+        {"faculty_id": 8, "dept_code": "CYS", "day": "Thursday", "period": 4, "class_type": "lab"},
+        {"faculty_id": 8, "dept_code": "CYS", "day": "Thursday", "period": 5, "class_type": "lab"},
+        {"faculty_id": 8, "dept_code": "CYS", "day": "Friday", "period": 6, "class_type": "theory"},
+        {"faculty_id": 8, "dept_code": "CYS", "day": "Saturday", "period": 3, "class_type": "theory"},
+        # Faculty 9 - Ms. Kiruthikaa R handles ECE-A
+        {"faculty_id": 9, "dept_code": "ECE-A", "day": "Tuesday", "period": 3, "class_type": "lab"},
+        {"faculty_id": 9, "dept_code": "ECE-A", "day": "Tuesday", "period": 4, "class_type": "lab"},
+        {"faculty_id": 9, "dept_code": "ECE-A", "day": "Tuesday", "period": 5, "class_type": "lab"},
+        {"faculty_id": 9, "dept_code": "ECE-A", "day": "Tuesday", "period": 6, "class_type": "mini_project"},
+        {"faculty_id": 9, "dept_code": "ECE-A", "day": "Wednesday", "period": 2, "class_type": "theory"},
+        {"faculty_id": 9, "dept_code": "ECE-A", "day": "Thursday", "period": 6, "class_type": "theory"},
+        {"faculty_id": 9, "dept_code": "ECE-A", "day": "Friday", "period": 5, "class_type": "theory"},
+        {"faculty_id": 9, "dept_code": "ECE-A", "day": "Saturday", "period": 6, "class_type": "theory"},
+        # Faculty 10 - Ms. Janani R handles ECE-B
+        {"faculty_id": 10, "dept_code": "ECE-B", "day": "Monday", "period": 6, "class_type": "theory"},
+        {"faculty_id": 10, "dept_code": "ECE-B", "day": "Tuesday", "period": 7, "class_type": "theory"},
+        {"faculty_id": 10, "dept_code": "ECE-B", "day": "Wednesday", "period": 5, "class_type": "mini_project"},
+        {"faculty_id": 10, "dept_code": "ECE-B", "day": "Wednesday", "period": 6, "class_type": "lab"},
+        {"faculty_id": 10, "dept_code": "ECE-B", "day": "Wednesday", "period": 7, "class_type": "lab"},
+        {"faculty_id": 10, "dept_code": "ECE-B", "day": "Wednesday", "period": 8, "class_type": "lab"},
+        {"faculty_id": 10, "dept_code": "ECE-B", "day": "Thursday", "period": 2, "class_type": "theory"},
+        {"faculty_id": 10, "dept_code": "ECE-B", "day": "Saturday", "period": 5, "class_type": "theory"},
+        # Faculty 11 - Mr. Venkatesh Babu S handles IT-A
+        {"faculty_id": 11, "dept_code": "IT-A", "day": "Tuesday", "period": 2, "class_type": "theory"},
+        {"faculty_id": 11, "dept_code": "IT-A", "day": "Tuesday", "period": 5, "class_type": "mini_project"},
+        {"faculty_id": 11, "dept_code": "IT-A", "day": "Tuesday", "period": 6, "class_type": "lab"},
+        {"faculty_id": 11, "dept_code": "IT-A", "day": "Tuesday", "period": 7, "class_type": "lab"},
+        {"faculty_id": 11, "dept_code": "IT-A", "day": "Tuesday", "period": 8, "class_type": "lab"},
+        {"faculty_id": 11, "dept_code": "IT-A", "day": "Wednesday", "period": 5, "class_type": "theory"},
+        {"faculty_id": 11, "dept_code": "IT-A", "day": "Friday", "period": 6, "class_type": "theory"},
+        {"faculty_id": 11, "dept_code": "IT-A", "day": "Saturday", "period": 8, "class_type": "theory"},
+        # Faculty 12 - Ms. Dhamayanthi P handles IT-B
+        {"faculty_id": 12, "dept_code": "IT-B", "day": "Monday", "period": 8, "class_type": "theory"},
+        {"faculty_id": 12, "dept_code": "IT-B", "day": "Wednesday", "period": 2, "class_type": "theory"},
+        {"faculty_id": 12, "dept_code": "IT-B", "day": "Thursday", "period": 5, "class_type": "mini_project"},
+        {"faculty_id": 12, "dept_code": "IT-B", "day": "Thursday", "period": 6, "class_type": "lab"},
+        {"faculty_id": 12, "dept_code": "IT-B", "day": "Thursday", "period": 7, "class_type": "lab"},
+        {"faculty_id": 12, "dept_code": "IT-B", "day": "Thursday", "period": 8, "class_type": "lab"},
+        {"faculty_id": 12, "dept_code": "IT-B", "day": "Friday", "period": 6, "class_type": "theory"},
+        {"faculty_id": 12, "dept_code": "IT-B", "day": "Saturday", "period": 7, "class_type": "theory"},
+        # Faculty 13 - Mr. Pradeep G handles MECH
+        {"faculty_id": 13, "dept_code": "MECH", "day": "Monday", "period": 3, "class_type": "theory"},
+        {"faculty_id": 13, "dept_code": "MECH", "day": "Monday", "period": 7, "class_type": "theory"},
+        {"faculty_id": 13, "dept_code": "MECH", "day": "Thursday", "period": 6, "class_type": "theory"},
+        {"faculty_id": 13, "dept_code": "MECH", "day": "Friday", "period": 5, "class_type": "mini_project"},
+        {"faculty_id": 13, "dept_code": "MECH", "day": "Friday", "period": 6, "class_type": "lab"},
+        {"faculty_id": 13, "dept_code": "MECH", "day": "Friday", "period": 7, "class_type": "lab"},
+        {"faculty_id": 13, "dept_code": "MECH", "day": "Friday", "period": 8, "class_type": "lab"},
+        {"faculty_id": 13, "dept_code": "MECH", "day": "Saturday", "period": 4, "class_type": "theory"},
+        # Faculty 14 - Mr. Madhan S handles RA
+        {"faculty_id": 14, "dept_code": "RA", "day": "Monday", "period": 2, "class_type": "theory"},
+        {"faculty_id": 14, "dept_code": "RA", "day": "Tuesday", "period": 4, "class_type": "theory"},
+        {"faculty_id": 14, "dept_code": "RA", "day": "Tuesday", "period": 8, "class_type": "theory"},
+        {"faculty_id": 14, "dept_code": "RA", "day": "Friday", "period": 5, "class_type": "mini_project"},
+        {"faculty_id": 14, "dept_code": "RA", "day": "Friday", "period": 6, "class_type": "lab"},
+        {"faculty_id": 14, "dept_code": "RA", "day": "Friday", "period": 7, "class_type": "lab"},
+        {"faculty_id": 14, "dept_code": "RA", "day": "Friday", "period": 8, "class_type": "lab"},
+        {"faculty_id": 14, "dept_code": "RA", "day": "Saturday", "period": 2, "class_type": "theory"},
+    ]
+
 def _add_missing_data(db):
     """Add missing tables/data to existing database (e.g., SuperAdmin, FAQ)"""
     added_something = False
@@ -99,6 +230,9 @@ def _add_missing_data(db):
     
     # Update department room numbers if missing
     _update_department_room_numbers(db)
+    
+    # Sync timetable entries (replace old with current canonical timetable)
+    _sync_timetable_entries(db)
     
     if not added_something:
         print("All data is up to date!")
@@ -134,6 +268,45 @@ def _update_department_room_numbers(db):
         print(f"✓ Updated room numbers for {updated_count} department(s)")
     else:
         print("✓ Department room numbers already up to date")
+
+def _sync_timetable_entries(db):
+    """Sync timetable entries: clear old entries and re-seed from canonical data.
+    This ensures the deployed DB always matches the latest timetable."""
+    expected_timetable = _get_expected_timetable()
+    
+    # Check if timetable count matches expected
+    current_count = db.query(TimetableEntry).count()
+    expected_count = len(expected_timetable)
+    
+    if current_count == expected_count:
+        print(f"✓ Timetable entries already up to date ({current_count} entries)")
+        return
+    
+    print(f"  Timetable mismatch: found {current_count}, expected {expected_count}. Re-syncing...")
+    
+    # Delete all existing timetable entries
+    db.query(TimetableEntry).delete()
+    db.commit()
+    
+    # Build department code -> id mapping
+    departments = db.query(Department).all()
+    dept_map = {d.code: d.id for d in departments}
+    
+    # Re-insert all timetable entries
+    for entry in expected_timetable:
+        timetable = TimetableEntry(
+            faculty_id=entry["faculty_id"],
+            department_id=dept_map[entry["dept_code"]],
+            day=entry["day"],
+            period=entry["period"],
+            subject_code="24UCS271",
+            subject_name="C Programming",
+            class_type=entry["class_type"]
+        )
+        db.add(timetable)
+    
+    db.commit()
+    print(f"✓ Timetable re-synced: {expected_count} entries added")
 
 def _add_default_faqs(db):
     """Add default FAQ entries"""
@@ -664,158 +837,8 @@ def _init_all_data(db):
     faculties = db.query(Faculty).all()
     departments = db.query(Department).all()
         
-    # class_type: "theory" (1 period), "lab" (3 consecutive periods), "mini_project" (1 period)
-    mock_timetable = [
-        # Faculty 1 - Mr. Sathish R handles AI&DS-A
-        # Tuesday: Theory (1 period)
-        {"faculty_id": 1, "dept_code": "AI&DS-A", "day": "Tuesday", "period": 7, "class_type": "theory"},
-        # Wednesday: mini_project (1 period) + Lab (3 periods)                  
-        {"faculty_id": 1, "dept_code": "AI&DS-A", "day": "Wednesday", "period": 5, "class_type": "mini_project"},
-        {"faculty_id": 1, "dept_code": "AI&DS-A", "day": "Wednesday", "period": 6, "class_type": "lab"},
-        {"faculty_id": 1, "dept_code": "AI&DS-A", "day": "Wednesday", "period": 7, "class_type": "lab"},
-        {"faculty_id": 1, "dept_code": "AI&DS-A", "day": "Wednesday", "period": 8, "class_type": "lab"},
-        # Thursday: Theory(2 periods)
-        {"faculty_id": 1, "dept_code": "AI&DS-A", "day": "Thursday", "period": 8, "class_type": "theory"},
-        # Friday: Theory
-        {"faculty_id": 1, "dept_code": "AI&DS-A", "day": "Friday", "period": 5, "class_type": "theory"},
-        # Saturday: Theory
-        {"faculty_id": 1, "dept_code": "AI&DS-A", "day": "Saturday", "period": 7, "class_type": "theory"},
-        
-        # Faculty 2 - Dr. Sikkandhar Batcha J handles AI&DS-B
-        {"faculty_id": 2, "dept_code": "AI&DS-B", "day": "Monday", "period": 5, "class_type": "theory"},
-        {"faculty_id": 2, "dept_code": "AI&DS-B", "day": "Wednesday", "period": 3, "class_type": "lab"},
-        {"faculty_id": 2, "dept_code": "AI&DS-B", "day": "Wednesday", "period": 4, "class_type": "lab"},
-        {"faculty_id": 2, "dept_code": "AI&DS-B", "day": "Wednesday", "period": 5, "class_type": "lab"},
-        {"faculty_id": 2, "dept_code": "AI&DS-B", "day": "Wednesday", "period": 7, "class_type": "mini_project"},
-        {"faculty_id": 2, "dept_code": "AI&DS-B", "day": "Thursday", "period": 2, "class_type": "theory"},
-        {"faculty_id": 2, "dept_code": "AI&DS-B", "day": "Friday", "period": 4, "class_type": "theory"},
-        {"faculty_id": 2, "dept_code": "AI&DS-B", "day": "Saturday", "period": 5, "class_type": "theory"},
-        
-        # Faculty 3 - Mr. Raakesh M handles AI&ML-A
-        {"faculty_id": 3, "dept_code": "AI&ML-A", "day": "Monday", "period": 5, "class_type": "theory"},
-        {"faculty_id": 3, "dept_code": "AI&ML-A", "day": "Tuesday", "period": 7, "class_type": "theory"},
-        {"faculty_id": 3, "dept_code": "AI&ML-A", "day": "Thursday", "period": 2, "class_type": "mini_project"},
-        {"faculty_id": 3, "dept_code": "AI&ML-A", "day": "Thursday", "period": 3, "class_type": "lab"},
-        {"faculty_id": 3, "dept_code": "AI&ML-A", "day": "Thursday", "period": 4, "class_type": "lab"},
-        {"faculty_id": 3, "dept_code": "AI&ML-A", "day": "Thursday", "period": 5, "class_type": "lab"},
-        {"faculty_id": 3, "dept_code": "AI&ML-A", "day": "Friday", "period": 2, "class_type": "theory"},
-        {"faculty_id": 3, "dept_code": "AI&ML-A", "day": "Saturday", "period": 8, "class_type": "theory"},
-        
-        # Faculty 4 - Dr. Aruna R handles AI&ML-B
-        {"faculty_id": 4, "dept_code": "AI&ML-B", "day": "Monday", "period": 5, "class_type": "theory"},
-        {"faculty_id": 4, "dept_code": "AI&ML-B", "day": "Tuesday", "period": 6, "class_type": "theory"},
-        {"faculty_id": 4, "dept_code": "AI&ML-B", "day": "Wednesday", "period": 7, "class_type": "mini_project"},
-        {"faculty_id": 4, "dept_code": "AI&ML-B", "day": "Wednesday", "period": 8, "class_type": "theory"},
-        {"faculty_id": 4, "dept_code": "AI&ML-B", "day": "Thursday", "period": 6, "class_type": "lab"},
-        {"faculty_id": 4, "dept_code": "AI&ML-B", "day": "Thursday", "period": 7, "class_type": "lab"},
-        {"faculty_id": 4, "dept_code": "AI&ML-B", "day": "Thursday", "period": 8, "class_type": "lab"},
-        {"faculty_id": 4, "dept_code": "AI&ML-B", "day": "Saturday", "period": 2, "class_type": "theory"},
-        
-        # Faculty 5 - Ms. Janani S handles CSE-A
-        {"faculty_id": 5, "dept_code": "CSE-A", "day": "Monday", "period": 2, "class_type": "theory"},
-        {"faculty_id": 5, "dept_code": "CSE-A", "day": "Wednesday", "period": 2, "class_type": "mini_project"},
-        {"faculty_id": 5, "dept_code": "CSE-A", "day": "Wednesday", "period": 6, "class_type": "lab"},
-        {"faculty_id": 5, "dept_code": "CSE-A", "day": "Wednesday", "period": 7, "class_type": "lab"},
-        {"faculty_id": 5, "dept_code": "CSE-A", "day": "Wednesday", "period": 8, "class_type": "lab"},
-        {"faculty_id": 5, "dept_code": "CSE-A", "day": "Thursday", "period": 3, "class_type": "theory"},
-        {"faculty_id": 5, "dept_code": "CSE-A", "day": "Friday", "period": 6, "class_type": "theory"},
-        {"faculty_id": 5, "dept_code": "CSE-A", "day": "Saturday", "period": 6, "class_type": "theory"},
-        # Faculty 6 - Ms. Indhumathi S handles CSE-B
-        {"faculty_id": 6, "dept_code": "CSE-B", "day": "Monday", "period": 2, "class_type": "theory"},
-        {"faculty_id": 6, "dept_code": "CSE-B", "day": "Wednesday", "period": 5, "class_type": "theory"},
-        {"faculty_id": 6, "dept_code": "CSE-B", "day": "Thursday", "period": 3, "class_type": "theory"},
-        {"faculty_id": 6, "dept_code": "CSE-B", "day": "Friday", "period": 2, "class_type": "mini_project"},
-        {"faculty_id": 6, "dept_code": "CSE-B", "day": "Friday", "period": 3, "class_type": "lab"},
-        {"faculty_id": 6, "dept_code": "CSE-B", "day": "Friday", "period": 4, "class_type": "lab"},
-        {"faculty_id": 6, "dept_code": "CSE-B", "day": "Friday", "period": 5, "class_type": "lab"},
-        {"faculty_id": 6, "dept_code": "CSE-B", "day": "Saturday", "period": 7, "class_type": "theory"},
-        
-        # Faculty 7 - Ms. Saranya S handles CSBS
-        {"faculty_id": 7, "dept_code": "CSBS", "day": "Tuesday", "period": 2, "class_type": "theory"},
-        {"faculty_id": 7, "dept_code": "CSBS", "day": "Wednesday", "period": 2, "class_type": "mini_project"},
-        {"faculty_id": 7, "dept_code": "CSBS", "day": "Wednesday", "period": 3, "class_type": "lab"},
-        {"faculty_id": 7, "dept_code": "CSBS", "day": "Wednesday", "period": 4, "class_type": "lab"},
-        {"faculty_id": 7, "dept_code": "CSBS", "day": "Wednesday", "period": 5, "class_type": "lab"},
-        {"faculty_id": 7, "dept_code": "CSBS", "day": "Thursday", "period": 8, "class_type": "theory"},
-        {"faculty_id": 7, "dept_code": "CSBS", "day": "Friday", "period": 5, "class_type": "theory"},
-        {"faculty_id": 7, "dept_code": "CSBS", "day": "Saturday", "period": 7, "class_type": "theory"},
-        
-        # Faculty 8 - Ms. Anusha S handles CYS
-        {"faculty_id": 8, "dept_code": "CYS", "day": "Monday", "period": 8, "class_type": "theory"},
-        {"faculty_id": 8, "dept_code": "CYS", "day": "Wednesday", "period": 3, "class_type": "theory"},
-        {"faculty_id": 8, "dept_code": "CYS", "day": "Thursday", "period": 2, "class_type": "mini_project"},
-        {"faculty_id": 8, "dept_code": "CYS", "day": "Thursday", "period": 3, "class_type": "lab"},
-        {"faculty_id": 8, "dept_code": "CYS", "day": "Thursday", "period": 4, "class_type": "lab"},
-        {"faculty_id": 8, "dept_code": "CYS", "day": "Thursday", "period": 5, "class_type": "lab"},
-        {"faculty_id": 8, "dept_code": "CYS", "day": "Friday", "period": 6, "class_type": "theory"},
-        {"faculty_id": 8, "dept_code": "CYS", "day": "Saturday", "period": 3, "class_type": "theory"},
-        
-        # Faculty 9 - Ms. Kiruthikaa R handles ECE-A
-        {"faculty_id": 9, "dept_code": "ECE-A", "day": "Tuesday", "period": 3, "class_type": "lab"},
-        {"faculty_id": 9, "dept_code": "ECE-A", "day": "Tuesday", "period": 4, "class_type": "lab"},
-        {"faculty_id": 9, "dept_code": "ECE-A", "day": "Tuesday", "period": 5, "class_type": "lab"},
-
-        {"faculty_id": 9, "dept_code": "ECE-A", "day": "Tuesday", "period": 6, "class_type": "mini_project"},
-
-        {"faculty_id": 9, "dept_code": "ECE-A", "day": "Wednesday", "period": 2, "class_type": "theory"},
-
-        {"faculty_id": 9, "dept_code": "ECE-A", "day": "Thursday", "period": 6, "class_type": "theory"},
-
-        {"faculty_id": 9, "dept_code": "ECE-A", "day": "Friday", "period": 5, "class_type": "theory"},
-
-        {"faculty_id": 9, "dept_code": "ECE-A", "day": "Saturday", "period": 6, "class_type": "theory"},
-
-        
-        # Faculty 10 - Ms. Janani R handles ECE-B
-        {"faculty_id": 10, "dept_code": "ECE-B", "day": "Monday", "period": 6, "class_type": "theory"},
-        {"faculty_id": 10, "dept_code": "ECE-B", "day": "Tuesday", "period": 7, "class_type": "theory"},
-        {"faculty_id": 10, "dept_code": "ECE-B", "day": "Wednesday", "period": 5, "class_type": "mini_project"},
-        {"faculty_id": 10, "dept_code": "ECE-B", "day": "Wednesday", "period": 6, "class_type": "lab"},
-        {"faculty_id": 10, "dept_code": "ECE-B", "day": "Wednesday", "period": 7, "class_type": "lab"},
-        {"faculty_id": 10, "dept_code": "ECE-B", "day": "Wednesday", "period": 8, "class_type": "lab"},
-        {"faculty_id": 10, "dept_code": "ECE-B", "day": "Thursday", "period": 2, "class_type": "theory"},
-        {"faculty_id": 10, "dept_code": "ECE-B", "day": "Saturday", "period": 5, "class_type": "theory"},
-        
-        # Faculty 11 - Mr. Venkatesh Babu S handles IT-A
-        {"faculty_id": 11, "dept_code": "IT-A", "day": "Tuesday", "period": 2, "class_type": "theory"},
-        {"faculty_id": 11, "dept_code": "IT-A", "day": "Tuesday", "period": 5, "class_type": "mini_project"},
-        {"faculty_id": 11, "dept_code": "IT-A", "day": "Tuesday", "period": 6, "class_type": "lab"},
-        {"faculty_id": 11, "dept_code": "IT-A", "day": "Tuesday", "period": 7, "class_type": "lab"},
-        {"faculty_id": 11, "dept_code": "IT-A", "day": "Tuesday", "period": 8, "class_type": "lab"},
-        {"faculty_id": 11, "dept_code": "IT-A", "day": "Wednesday", "period": 5, "class_type": "theory"},
-        {"faculty_id": 11, "dept_code": "IT-A", "day": "Friday", "period": 6, "class_type": "theory"},
-        {"faculty_id": 11, "dept_code": "IT-A", "day": "Saturday", "period": 8, "class_type": "theory"},
-        
-        # Faculty 12 - Ms. Dhamayanthi P handles IT-B   
-        {"faculty_id": 12, "dept_code": "IT-B", "day": "Monday", "period": 8, "class_type": "theory"},
-        {"faculty_id": 12, "dept_code": "IT-B", "day": "Wednesday", "period": 2, "class_type": "theory"},
-        {"faculty_id": 12, "dept_code": "IT-B", "day": "Thursday", "period": 5, "class_type": "mini_project"},
-        {"faculty_id": 12, "dept_code": "IT-B", "day": "Thursday", "period": 6, "class_type": "lab"},
-        {"faculty_id": 12, "dept_code": "IT-B", "day": "Thursday", "period": 7, "class_type": "lab"},
-        {"faculty_id": 12, "dept_code": "IT-B", "day": "Thursday", "period": 8, "class_type": "lab"},
-        {"faculty_id": 12, "dept_code": "IT-B", "day": "Friday", "period": 6, "class_type": "theory"},
-        {"faculty_id": 12, "dept_code": "IT-B", "day": "Saturday", "period":7, "class_type": "theory"},
-        
-        # Faculty 13 - Mr. Pradeep G handles MECH
-        {"faculty_id": 13, "dept_code": "MECH", "day": "Monday", "period": 3, "class_type": "theory"},
-        {"faculty_id": 13, "dept_code": "MECH", "day": "Monday", "period": 7, "class_type": "theory"},
-        {"faculty_id": 13, "dept_code": "MECH", "day": "Thursday", "period": 6, "class_type": "theory"},
-        {"faculty_id": 13, "dept_code": "MECH", "day": "Friday", "period": 5, "class_type": "mini_project"},
-        {"faculty_id": 13, "dept_code": "MECH", "day": "Friday", "period": 6, "class_type": "lab"},
-        {"faculty_id": 13, "dept_code": "MECH", "day": "Friday", "period": 7, "class_type": "lab"},
-        {"faculty_id": 13, "dept_code": "MECH", "day": "Friday", "period": 8, "class_type": "lab"},
-        {"faculty_id": 13, "dept_code": "MECH", "day": "Saturday", "period": 4, "class_type": "theory"},
-
-        # Faculty 14 - Mr. Madhan S handles RA
-        {"faculty_id": 14, "dept_code": "RA", "day": "Monday", "period": 2, "class_type": "theory"},
-        {"faculty_id": 14, "dept_code": "RA", "day": "Tuesday", "period": 4, "class_type": "theory"},
-        {"faculty_id": 14, "dept_code": "RA", "day": "Tuesday", "period": 8, "class_type": "theory"},
-        {"faculty_id": 14, "dept_code": "RA", "day": "Friday", "period": 5, "class_type": "mini_project"},
-        {"faculty_id": 14, "dept_code": "RA", "day": "Friday", "period": 6, "class_type": "lab"},
-        {"faculty_id": 14, "dept_code": "RA", "day": "Friday", "period": 7, "class_type": "lab"},
-        {"faculty_id": 14, "dept_code": "RA", "day": "Friday", "period": 8, "class_type": "lab"},
-        {"faculty_id": 14, "dept_code": "RA", "day": "Saturday", "period": 2, "class_type": "theory"},              
-    ]
+    # Use the shared canonical timetable data
+    mock_timetable = _get_expected_timetable()
     
     dept_map = {d.code: d.id for d in departments}
     
