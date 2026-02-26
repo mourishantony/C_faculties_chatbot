@@ -82,6 +82,9 @@ a:hover {
     color: white;
     padding: 15px 0;
     box-shadow: var(--shadow);
+    position: sticky;
+    top: 0;
+    z-index: 100;
 }
 
 .navbar .container {
@@ -94,6 +97,7 @@ a:hover {
     font-size: 1.5rem;
     font-weight: 700;
     color: white;
+    text-decoration: none;
     display: flex;
     align-items: center;
     gap: 10px;
@@ -105,24 +109,29 @@ a:hover {
 
 .navbar-brand img {
     height: 40px;
+    width: auto;
+    border-radius: 5px;
 }
 
 .navbar-nav {
     display: flex;
-    gap: 20px;
+    gap: 8px;
     list-style: none;
 }
 
 .navbar-nav a {
-    color: white;
+    color: rgba(255, 255, 255, 0.85);
+    text-decoration: none;
     font-weight: 500;
     padding: 8px 16px;
-    border-radius: 6px;
-    transition: background 0.3s;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    transition: all 0.2s;
 }
 
-.navbar-nav a:hover {
-    background: rgba(255, 255, 255, 0.2);
+.navbar-nav a:hover,
+.navbar-nav a.active {
+    background: rgba(255, 255, 255, 0.15);
     color: white;
 }
 
@@ -866,24 +875,23 @@ textarea.form-control {
         padding: 10px 0;
     }
     
-    .navbar .container {
-        flex-direction: column;
-        gap: 10px;
+    .navbar-brand {
+        font-size: 1.1rem;
     }
     
-    .navbar-brand {
-        font-size: 1.2rem;
+    .navbar-brand img {
+        height: 30px;
     }
     
     .navbar-nav {
         flex-wrap: wrap;
         justify-content: center;
-        gap: 8px;
+        gap: 5px;
     }
     
     .navbar-nav a {
         padding: 6px 12px;
-        font-size: 0.9rem;
+        font-size: 0.85rem;
     }
     
     .hero {
@@ -1029,13 +1037,21 @@ textarea.form-control {
         grid-template-columns: 1fr;
     }
     
+    .navbar-brand {
+        font-size: 0.95rem;
+    }
+    
     .navbar-nav {
-        gap: 5px;
+        flex-direction: column;
+        gap: 2px;
+        width: 100%;
     }
     
     .navbar-nav a {
-        padding: 5px 10px;
-        font-size: 0.85rem;
+        padding: 6px 10px;
+        font-size: 0.8rem;
+        width: 100%;
+        text-align: center;
     }
     
     .auth-card {

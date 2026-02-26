@@ -16,64 +16,6 @@
             min-height: 100vh;
         }
 
-        .page-wrapper {
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
-
-        .navbar {
-            background: linear-gradient(135deg, #0f172a, #1e3a8a);
-            padding: 12px 0;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        .navbar .container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .navbar-brand {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: white;
-            text-decoration: none;
-            font-weight: 700;
-            font-size: 1.3rem;
-        }
-
-        .navbar-brand img {
-            height: 35px;
-            width: auto;
-            border-radius: 5px;
-        }
-
-        .navbar-nav {
-            list-style: none;
-            display: flex;
-            gap: 5px;
-        }
-
-        .nav-link {
-            color: rgba(255,255,255,0.8);
-            text-decoration: none;
-            padding: 8px 16px;
-            border-radius: 8px;
-            font-size: 0.9rem;
-            font-weight: 500;
-            transition: all 0.2s;
-        }
-
-        .nav-link:hover, .nav-link.active {
-            color: white;
-            background: rgba(255,255,255,0.15);
-        }
-
         .container {
             max-width: 1400px;
             margin: 0 auto;
@@ -505,13 +447,6 @@
 
         /* Responsive */
         @media (max-width: 768px) {
-            /* Navbar */
-            .navbar { padding: 10px 0; }
-            .navbar-brand { font-size: 1rem; }
-            .navbar-brand img { height: 28px; }
-            .navbar-nav { gap: 3px; }
-            .nav-link { padding: 6px 12px; font-size: 0.8rem; }
-            
             /* Container */
             .container { padding: 0 15px; }
             .dashboard { padding: 15px 0; }
@@ -632,20 +567,6 @@
         }
 
         @media (max-width: 480px) {
-            /* Navbar */
-            .navbar-brand { font-size: 0.9rem; }
-            .navbar-nav { 
-                flex-direction: column;
-                gap: 2px;
-                width: 100%;
-            }
-            .nav-link { 
-                padding: 6px 10px; 
-                font-size: 0.75rem;
-                width: 100%;
-                text-align: center;
-            }
-            
             /* Container */
             .container { padding: 0 10px; }
             .dashboard { padding: 12px 0; }
