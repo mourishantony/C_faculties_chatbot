@@ -2,6 +2,8 @@ from database import engine, SessionLocal
 from models import Base, Department, Syllabus, Admin, Faculty, TimetableEntry, PeriodTiming, LabProgram, SuperAdmin, FAQ
 from passlib.context import CryptContext
 from sqlalchemy import inspect, text
+import hashlib
+import json
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -270,27 +272,52 @@ def _update_department_room_numbers(db):
         print("✓ Department room numbers already up to date")
 
 def _sync_timetable_entries(db):
-    """Sync timetable entries: clear old entries and re-seed from canonical data.
+    """Sync timetable entries: compare content hash and re-seed if changed.
     This ensures the deployed DB always matches the latest timetable."""
     expected_timetable = _get_expected_timetable()
     
-    # Check if timetable count matches expected
-    current_count = db.query(TimetableEntry).count()
-    expected_count = len(expected_timetable)
+    # Sort expected timetable for consistent comparison
+    sort_key = lambda x: (x["faculty_id"], x["day"], x["period"])
+    expected_sorted = sorted(expected_timetable, key=sort_key)
     
-    if current_count == expected_count:
-        print(f"✓ Timetable entries already up to date ({current_count} entries)")
+    # Build a hash of expected timetable content
+    expected_hash = hashlib.md5(
+        json.dumps(expected_sorted, sort_keys=True).encode()
+    ).hexdigest()
+    
+    # Build a hash of current DB timetable content
+    current_entries = db.query(TimetableEntry).order_by(
+        TimetableEntry.faculty_id, TimetableEntry.day, TimetableEntry.period
+    ).all()
+    
+    departments = db.query(Department).all()
+    dept_id_to_code = {d.id: d.code for d in departments}
+    dept_map = {d.code: d.id for d in departments}
+    
+    current_data = []
+    for e in current_entries:
+        current_data.append({
+            "faculty_id": e.faculty_id,
+            "dept_code": dept_id_to_code.get(e.department_id, ""),
+            "day": e.day,
+            "period": e.period,
+            "class_type": e.class_type
+        })
+    
+    # current_data is already sorted by (faculty_id, day, period) from the query
+    current_hash = hashlib.md5(
+        json.dumps(current_data, sort_keys=True).encode()
+    ).hexdigest()
+    
+    if current_hash == expected_hash:
+        print(f"✓ Timetable entries already up to date ({len(current_entries)} entries)")
         return
     
-    print(f"  Timetable mismatch: found {current_count}, expected {expected_count}. Re-syncing...")
+    print(f"  Timetable content changed (hash mismatch). Re-syncing {len(expected_timetable)} entries...")
     
     # Delete all existing timetable entries
     db.query(TimetableEntry).delete()
     db.commit()
-    
-    # Build department code -> id mapping
-    departments = db.query(Department).all()
-    dept_map = {d.code: d.id for d in departments}
     
     # Re-insert all timetable entries
     for entry in expected_timetable:
@@ -306,7 +333,7 @@ def _sync_timetable_entries(db):
         db.add(timetable)
     
     db.commit()
-    print(f"✓ Timetable re-synced: {expected_count} entries added")
+    print(f"✓ Timetable re-synced: {len(expected_timetable)} entries added")
 
 def _add_default_faqs(db):
     """Add default FAQ entries"""
