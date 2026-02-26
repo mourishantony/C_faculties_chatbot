@@ -56,7 +56,6 @@
                             
                             <!-- Day Filter -->
                             <div id="dateToggleContainer" class="day-buttons-container">
-                                <button id="sunBtn" class="day-btn" data-day="0" onclick="switchToDay(0)">Sun</button>
                                 <button id="monBtn" class="day-btn" data-day="1" onclick="switchToDay(1)">Mon</button>
                                 <button id="tueBtn" class="day-btn" data-day="2" onclick="switchToDay(2)">Tue</button>
                                 <button id="wedBtn" class="day-btn" data-day="3" onclick="switchToDay(3)">Wed</button>
@@ -69,15 +68,14 @@
                         <!-- Period Filter -->
                         <div class="filter-group" style="display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 20px; align-items: center; justify-content: center;">
                             <div class="period-buttons-container">
-                                <button id="allPeriodsBtn" class="period-btn active" onclick="filterByPeriod('all')">All Periods</button>
-                                <button id="period1Btn" class="period-btn" onclick="filterByPeriod(1)">1st</button>
-                                <button id="period2Btn" class="period-btn" onclick="filterByPeriod(2)">2nd</button>
-                                <button id="period3Btn" class="period-btn" onclick="filterByPeriod(3)">3rd</button>
-                                <button id="period4Btn" class="period-btn" onclick="filterByPeriod(4)">4th</button>
-                                <button id="period5Btn" class="period-btn" onclick="filterByPeriod(5)">5th</button>
-                                <button id="period6Btn" class="period-btn" onclick="filterByPeriod(6)">6th</button>
-                                <button id="period7Btn" class="period-btn" onclick="filterByPeriod(7)">7th</button>
-                                <button id="period8Btn" class="period-btn" onclick="filterByPeriod(8)">8th</button>
+                                <button id="period1Btn" class="period-btn" onclick="filterByPeriod(1)" data-tooltip="08:00 AM - 08:45 AM">1st</button>
+                                <button id="period2Btn" class="period-btn" onclick="filterByPeriod(2)" data-tooltip="08:45 AM - 09:30 AM">2nd</button>
+                                <button id="period3Btn" class="period-btn" onclick="filterByPeriod(3)" data-tooltip="09:45 AM - 10:30 AM">3rd</button>
+                                <button id="period4Btn" class="period-btn" onclick="filterByPeriod(4)" data-tooltip="10:30 AM - 11:15 AM">4th</button>
+                                <button id="period5Btn" class="period-btn" onclick="filterByPeriod(5)" data-tooltip="11:15 AM - 12:00 PM">5th</button>
+                                <button id="period6Btn" class="period-btn" onclick="filterByPeriod(6)" data-tooltip="01:00 PM - 01:45 PM">6th</button>
+                                <button id="period7Btn" class="period-btn" onclick="filterByPeriod(7)" data-tooltip="01:45 PM - 02:30 PM">7th</button>
+                                <button id="period8Btn" class="period-btn" onclick="filterByPeriod(8)" data-tooltip="02:30 PM - 03:15 PM">8th</button>
                             </div>
                         </div>
                         
@@ -393,8 +391,9 @@
             cursor: pointer;
             font-weight: 600;
             font-size: 13px;
-            transition: all 0.2s ease;
+            transition: all 0.1s ease;
             min-width: 50px;
+            position: relative;
         }
         
         .period-btn:hover {
@@ -407,6 +406,68 @@
             color: white;
             border: none;
             box-shadow: 0 2px 8px rgba(30, 58, 138, 0.4);
+        }
+        
+        /* Custom Tooltip Styles */
+        .period-btn::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%) translateY(-8px);
+            background: rgba(15, 23, 42, 0.95);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 500;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.15s ease, transform 0.15s ease;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+        
+        .period-btn::before {
+            content: '';
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%) translateY(-2px);
+            border: 5px solid transparent;
+            border-top-color: rgba(15, 23, 42, 0.95);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.15s ease, transform 0.15s ease;
+            z-index: 1000;
+        }
+        
+        .period-btn:hover::after,
+        .period-btn:hover::before {
+            opacity: 1;
+        }
+        
+        .period-btn:hover::after {
+            transform: translateX(-50%) translateY(-12px);
+        }
+        
+        .period-btn:hover::before {
+            transform: translateX(-50%) translateY(-6px);
+        }
+        
+        /* Mobile: Show tooltip on tap/touch */
+        .period-btn.show-tooltip::after,
+        .period-btn.show-tooltip::before {
+            opacity: 1;
+        }
+        
+        .period-btn.show-tooltip::after {
+            transform: translateX(-50%) translateY(-12px);
+        }
+        
+        .period-btn.show-tooltip::before {
+            transform: translateX(-50%) translateY(-6px);
         }
         
         /* ========== Class Type Filter Buttons ========== */
@@ -675,6 +736,23 @@
                 padding: 6px 8px;
                 font-size: 11px;
                 min-width: 35px;
+            }
+            
+            /* Adjust tooltip for mobile */
+            .period-btn::after {
+                font-size: 10px;
+                padding: 5px 10px;
+                bottom: calc(100% + 2px);
+            }
+            
+            .period-btn:hover::after,
+            .period-btn.show-tooltip::after {
+                transform: translateX(-50%) translateY(-8px);
+            }
+            
+            .period-btn:hover::before,
+            .period-btn.show-tooltip::before {
+                transform: translateX(-50%) translateY(-2px);
             }
             
             .classes-grid {
@@ -2492,6 +2570,13 @@
             
             // Initialize day buttons with today selected
             initializeDayButtons();
+            
+            // Set current period as active
+            initializeCurrentPeriod();
+            
+            // Initialize period button tooltips for mobile
+            initializePeriodTooltips();
+            
             await loadTodayClasses(); // Load today's classes by default
             
             // Add touch support for flip cards on mobile
@@ -2756,7 +2841,7 @@
         let currentDateOffset = 0; // Offset from today (0 = today)
         let currentSelectedDayOfWeek = new Date().getDay(); // 0 = Sunday, 6 = Saturday
         let currentClassTypeFilter = 'all'; // Filter: 'all', 'theory', 'lab', 'mini_project'
-        let currentPeriodFilter = 'all'; // Filter: 'all' or period number 1-7
+        let currentPeriodFilter = getCurrentPeriod(); // Initialize with current period based on time
         
         // Store loaded report data globally for filtering
         let currentReportData = null;
@@ -2764,7 +2849,50 @@
         let currentReportEntryTypeFilter = 'all'; // Filter: 'all', 'regular', 'extra', 'swap', 'substitution'
         
         const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-        const dayBtnIds = ['sunBtn', 'monBtn', 'tueBtn', 'wedBtn', 'thuBtn', 'friBtn', 'satBtn'];
+        const dayBtnIds = ['monBtn', 'tueBtn', 'wedBtn', 'thuBtn', 'friBtn', 'satBtn'];
+        
+        // Get current period based on current time
+        function getCurrentPeriod() {
+            const now = new Date();
+            const hours = now.getHours();
+            const minutes = now.getMinutes();
+            const timeInMinutes = hours * 60 + minutes;
+            
+            // Period timings in minutes from midnight
+            const periods = [
+                { period: 1, start: 8 * 60, end: 8 * 60 + 45 },       // 08:00 - 08:45
+                { period: 2, start: 8 * 60 + 45, end: 9 * 60 + 30 },  // 08:45 - 09:30
+                { period: 3, start: 9 * 60 + 45, end: 10 * 60 + 30 }, // 09:45 - 10:30 (after break)
+                { period: 4, start: 10 * 60 + 30, end: 11 * 60 + 15 },// 10:30 - 11:15
+                { period: 5, start: 11 * 60 + 15, end: 12 * 60 },     // 11:15 - 12:00
+                { period: 6, start: 13 * 60, end: 13 * 60 + 45 },     // 01:00 - 01:45 (after lunch)
+                { period: 7, start: 13 * 60 + 45, end: 14 * 60 + 30 },// 01:45 - 02:30
+                { period: 8, start: 14 * 60 + 30, end: 15 * 60 + 15 } // 02:30 - 03:15
+            ];
+            
+            // Find the current period
+            for (const p of periods) {
+                if (timeInMinutes >= p.start && timeInMinutes < p.end) {
+                    return p.period;
+                }
+            }
+            
+            // If outside class hours, return the next upcoming period or last period
+            if (timeInMinutes < periods[0].start) {
+                return 1; // Before classes start, show 1st period
+            } else if (timeInMinutes >= periods[periods.length - 1].end) {
+                return 8; // After classes end, show 8th period
+            } else {
+                // During break time, find the next period
+                for (const p of periods) {
+                    if (timeInMinutes < p.start) {
+                        return p.period;
+                    }
+                }
+            }
+            
+            return 1; // Fallback to 1st period
+        }
         
         // Calculate date offset from today based on selected day of week
         function calculateDateOffset(targetDayOfWeek) {
@@ -2787,7 +2915,7 @@
         
         function updateDayButtons() {
             // Remove active class from all buttons
-            dayBtnIds.forEach((btnId, index) => {
+            dayBtnIds.forEach((btnId) => {
                 const btn = document.getElementById(btnId);
                 if (btn) {
                     btn.classList.remove('active');
@@ -2795,20 +2923,103 @@
             });
             
             // Add active class to selected button
-            const selectedBtnId = dayBtnIds[currentSelectedDayOfWeek];
-            const selectedBtn = document.getElementById(selectedBtnId);
-            if (selectedBtn) {
-                selectedBtn.classList.add('active');
+            // Map day of week (0=Sun, 1=Mon, ... 6=Sat) to button index
+            // Since we removed Sunday, Mon=1 maps to index 0, Tue=2 to index 1, etc.
+            const buttonIndex = currentSelectedDayOfWeek - 1;
+            if (buttonIndex >= 0 && buttonIndex < dayBtnIds.length) {
+                const selectedBtnId = dayBtnIds[buttonIndex];
+                const selectedBtn = document.getElementById(selectedBtnId);
+                if (selectedBtn) {
+                    selectedBtn.classList.add('active');
+                }
             }
         }
         
         // Initialize with today's day selected on page load
         function initializeDayButtons() {
             const today = new Date();
-            const todayDay = today.getDay();
+            let todayDay = today.getDay();
+            
+            // If today is Sunday (0), default to Monday (1) since we don't show Sunday
+            if (todayDay === 0) {
+                todayDay = 1;
+            }
+            
             currentSelectedDayOfWeek = todayDay;
-            currentDateOffset = 0;
+            currentDateOffset = calculateDateOffset(todayDay);
             updateDayButtons();
+        }
+        
+        // Initialize current period button as active
+        function initializeCurrentPeriod() {
+            const period = getCurrentPeriod();
+            currentPeriodFilter = period;
+            
+            // Update active state on period filter buttons
+            document.querySelectorAll('.period-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            const periodBtn = document.getElementById(`period${period}Btn`);
+            if (periodBtn) {
+                periodBtn.classList.add('active');
+            }
+        }
+        
+        // Initialize period button tooltips for mobile touch support
+        function initializePeriodTooltips() {
+            const periodButtons = document.querySelectorAll('.period-btn');
+            let activeTooltipBtn = null;
+            let touchTimeout = null;
+            
+            periodButtons.forEach(btn => {
+                // Touch events for mobile
+                btn.addEventListener('touchstart', (e) => {
+                    // Extract period number from button ID (e.g., "period1Btn" -> 1)
+                    const periodMatch = btn.id.match(/period(\d+)Btn/);
+                    const period = periodMatch ? parseInt(periodMatch[1]) : null;
+                    
+                    // Hide any previously shown tooltip
+                    if (activeTooltipBtn && activeTooltipBtn !== btn) {
+                        activeTooltipBtn.classList.remove('show-tooltip');
+                    }
+                    
+                    // Show tooltip
+                    btn.classList.add('show-tooltip');
+                    activeTooltipBtn = btn;
+                    
+                    // Clear any existing timeout
+                    if (touchTimeout) {
+                        clearTimeout(touchTimeout);
+                    }
+                    
+                    // Hide tooltip after 1.5 seconds
+                    touchTimeout = setTimeout(() => {
+                        btn.classList.remove('show-tooltip');
+                        if (activeTooltipBtn === btn) {
+                            activeTooltipBtn = null;
+                        }
+                    }, 1500);
+                    
+                    // Manually trigger the filter function after showing tooltip
+                    if (period) {
+                        setTimeout(() => {
+                            filterByPeriod(period);
+                        }, 50); // Small delay to show tooltip first
+                    }
+                });
+            });
+            
+            // Hide tooltip when touching outside
+            document.addEventListener('touchstart', (e) => {
+                if (activeTooltipBtn && !e.target.closest('.period-btn')) {
+                    activeTooltipBtn.classList.remove('show-tooltip');
+                    activeTooltipBtn = null;
+                    if (touchTimeout) {
+                        clearTimeout(touchTimeout);
+                    }
+                }
+            });
         }
         
         // Filter department cards by class type
@@ -2839,11 +3050,7 @@
                 btn.classList.remove('active');
             });
             
-            if (period === 'all') {
-                document.getElementById('allPeriodsBtn').classList.add('active');
-            } else {
-                document.getElementById(`period${period}Btn`).classList.add('active');
-            }
+            document.getElementById(`period${period}Btn`).classList.add('active');
             
             // Re-render department cards with filter applied
             if (currentClassesData) {
@@ -2885,7 +3092,8 @@
             const container = document.getElementById('classesByTypeContainer');
             const { departments, date, day } = data;
             
-            const scheduleLabel = currentDateOffset === 0 ? 'Today\'s Schedule' : `${dayNames[currentSelectedDayOfWeek]}'s Schedule`;
+            // Dynamic schedule label based on date and period
+            let scheduleLabel = currentDateOffset === 0 ? 'Today' : dayNames[currentSelectedDayOfWeek];
             
             // Apply class type AND period filters to departments
             let filteredDepartments = departments.map(dept => {
@@ -2922,23 +3130,32 @@
                 'lab': 'Lab Classes',
                 'mini_project': 'Mini Project Classes'
             };
-            let filterLabel = '';
-            if (currentClassTypeFilter !== 'all') {
-                filterLabel = ` - ${filterLabels[currentClassTypeFilter]}`;
-            }
+            const ordinals = ['', '1st', '2nd', '3rd', '4th', '5th', '6th', '7th', '8th', '9th'];
+            
+            // Build dynamic title
+            let titleParts = [];
             if (currentPeriodFilter !== 'all') {
-                const ordinals = ['', '1st', '2nd', '3rd', '4th', '5th', '6th', '7th', '8th', '9th'];
-                filterLabel += ` - ${ordinals[currentPeriodFilter]} Period`;
+                const periodTime = getPeriodTime(currentPeriodFilter);
+                titleParts.push(`${ordinals[currentPeriodFilter]} Period (${periodTime})`);
+            } else {
+                titleParts.push('All Periods');
             }
             
+            if (currentClassTypeFilter !== 'all') {
+                titleParts.push(filterLabels[currentClassTypeFilter]);
+            }
+            
+            const title = titleParts.join(' - ');
+            
             let html = `
-                <div style="background: linear-gradient(135deg, #0f172a, #1e3a8a); color: white; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
-                    <h3 style="margin: 0 0 5px 0; display: flex; align-items: center; gap: 10px;">
-                        <i class="material-icons" style="font-size: 28px;">event</i>
-                        <span>${scheduleLabel}${filterLabel}</span>
+                <div style="background: linear-gradient(135deg, #0f172a, #1e3a8a); color: white; padding: 16px 20px; border-radius: 10px; margin-bottom: 20px;">
+                    <h3 style="margin: 0 0 6px 0; display: flex; align-items: center; gap: 6px; font-size: 18px; font-weight: 700;">
+                        <i class="material-icons" style="font-size: 20px;">calendar_today</i>
+                        <span>${scheduleLabel}, ${date} (${day})</span>
                     </h3>
-                    <p style="margin: 0; opacity: 0.9; font-size: 14px;">
-                        ${totalClasses} class${totalClasses !== 1 ? 'es' : ''} scheduled for ${date} (${day})
+                    <p style="margin: 0; opacity: 0.9; font-size: 14px; font-weight: 500; display: flex; align-items: center; gap: 5px; padding-left: 26px;">
+                        <i class="material-icons" style="font-size: 16px;">schedule</i>
+                        <span>${title}</span>
                     </p>
                 </div>
                 <div class="dept-cards-grid">
