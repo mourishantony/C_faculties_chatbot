@@ -2707,7 +2707,7 @@
                 html += `
                     <tr>
                         <td>${formatDate(entry.date)}</td>
-                        <td><span class="period-badge">${getOrdinal(entry.period)}</span></td>
+                        <td><span class="period-badge">${getOrdinal(entry.period)}</span><div style="font-size: 11px; color: #64748b; margin-top: 3px;">${getPeriodTime(entry.period)}</div></td>
                         <td><strong>${entry.faculty_name}</strong></td>
                         <td>${entry.department_name}</td>
                         <td>${entry.topic}</td>
@@ -3149,7 +3149,7 @@
                         html += `
                             <div class="period-item">
                                 <div class="period-item-header">
-                                    <span class="period-badge-modal">${getOrdinal(cls.period)} Period</span>
+                                    <span class="period-badge-modal">${getOrdinal(cls.period)} Period <span style="font-weight: 400; font-size: 11px; opacity: 0.85;">(${getPeriodTime(cls.period)})</span></span>
                                     ${statusBadge}
                                 </div>
                                 <div class="period-item-body">
