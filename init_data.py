@@ -74,6 +74,25 @@ def _add_extra_class_columns_if_missing():
             conn.commit()
             print("✓ Added extra_class_subject_name column to daily_entries table")
 
+def _get_expected_departments():
+    """Return the canonical department data used for both fresh init and sync"""
+    return [
+        {"name": " AI&DS - A", "code": "AI&DS-A", "room_number": "315(2nd floor)"},
+        {"name": " AI&DS - B", "code": "AI&DS-B", "room_number": "316(2nd floor)"},
+        {"name": " AI&ML - A", "code": "AI&ML-A", "room_number": "414(3rd floor)"},
+        {"name": " AI&ML - B", "code": "AI&ML-B", "room_number": "415(3rd floor)"},
+        {"name": " CSBS", "code": "CSBS", "room_number": "416(3rd floor)"},
+        {"name": " CSE - A", "code": "CSE-A", "room_number": "411A(3rd floor)"},
+        {"name": " CSE - B", "code": "CSE-B", "room_number": "412(3rd floor)"},
+        {"name": " CYS", "code": "CYS", "room_number": "301(2nd floor)"},
+        {"name": " ECE - A", "code": "ECE-A", "room_number": "312(2nd floor)"},
+        {"name": " ECE - B", "code": "ECE-B", "room_number": "313(2nd floor)"},
+        {"name": " IT - A", "code": "IT-A", "room_number": "310A1(2nd floor)"},
+        {"name": " IT - B", "code": "IT-B", "room_number": "311(2nd floor)"},
+        {"name": " MECH", "code": "MECH", "room_number": "303(2nd floor)"},
+        {"name": " RA", "code": "RA", "room_number": "302(2nd floor)"}
+    ]
+
 def _get_expected_timetable():
     """Return the canonical timetable data used for both fresh init and sync"""
     return [
@@ -230,6 +249,12 @@ def _add_missing_data(db):
     else:
         print("✓ FAQs already exist")
     
+    # Migrate old department codes (AIDS→AI&DS, AIML→AI&ML)
+    _migrate_department_codes(db)
+    
+    # Sync departments (ensure all expected departments exist with correct codes)
+    _sync_departments(db)
+    
     # Update department room numbers if missing
     _update_department_room_numbers(db)
     
@@ -238,6 +263,58 @@ def _add_missing_data(db):
     
     if not added_something:
         print("All data is up to date!")
+
+def _migrate_department_codes(db):
+    """Migrate old department codes to new ones (one-time migration).
+    Old DB had: AIDS-A, AIDS-B, AIML-A, AIML-B
+    New codes:  AI&DS-A, AI&DS-B, AI&ML-A, AI&ML-B"""
+    code_renames = {
+        "AIDS-A":  {"code": "AI&DS-A", "name": " AI&DS - A"},
+        "AIDS-B":  {"code": "AI&DS-B", "name": " AI&DS - B"},
+        "AIML-A":  {"code": "AI&ML-A", "name": " AI&ML - A"},
+        "AIML-B":  {"code": "AI&ML-B", "name": " AI&ML - B"},
+    }
+    migrated = 0
+    for old_code, new_data in code_renames.items():
+        dept = db.query(Department).filter(Department.code == old_code).first()
+        if dept:
+            dept.code = new_data["code"]
+            dept.name = new_data["name"]
+            migrated += 1
+    if migrated:
+        db.commit()
+        print(f"✓ Migrated {migrated} department code(s): AIDS→AI&DS, AIML→AI&ML")
+    else:
+        print("✓ No old department codes to migrate")
+
+def _sync_departments(db):
+    """Ensure all expected departments exist with correct codes, names, and room numbers.
+    Creates missing departments; updates existing ones if name/room differs."""
+    expected = _get_expected_departments()
+    existing = {d.code: d for d in db.query(Department).all()}
+    added = 0
+    updated = 0
+    for dept_data in expected:
+        code = dept_data["code"]
+        if code not in existing:
+            db.add(Department(**dept_data))
+            added += 1
+        else:
+            d = existing[code]
+            changed = False
+            if d.name != dept_data["name"]:
+                d.name = dept_data["name"]
+                changed = True
+            if d.room_number != dept_data["room_number"]:
+                d.room_number = dept_data["room_number"]
+                changed = True
+            if changed:
+                updated += 1
+    if added or updated:
+        db.commit()
+        print(f"✓ Departments synced: {added} added, {updated} updated")
+    else:
+        print("✓ Departments already up to date")
 
 def _update_department_room_numbers(db):
     """Update existing departments with room numbers"""
@@ -389,22 +466,7 @@ def _add_default_faqs(db):
 def _init_all_data(db):
     """Initialize all data for a fresh database"""
     # Add Departments with Room Numbers
-    departments = [
-        {"name": " AI&DS - A", "code": "AI&DS-A", "room_number": "315(2nd floor)"},
-        {"name": " AI&DS - B", "code": "AI&DS-B", "room_number": "316(2nd floor)"},
-        {"name": " AI&ML - A", "code": "AI&ML-A", "room_number": "414(3rd floor)"},
-        {"name": " AI&ML - B", "code": "AI&ML-B", "room_number": "415(3rd floor)"},
-        {"name": " CSBS", "code": "CSBS", "room_number": "416(3rd floor)"},
-        {"name": " CSE - A", "code": "CSE-A", "room_number": "411A(3rd floor)"},
-        {"name": " CSE - B", "code": "CSE-B", "room_number": "412(3rd floor)"},
-        {"name": " CYS", "code": "CYS", "room_number": "301(2nd floor)"},
-        {"name": " ECE - A", "code": "ECE-A", "room_number": "312(2nd floor)"},
-        {"name": " ECE - B", "code": "ECE-B", "room_number": "313(2nd floor)"},
-        {"name": " IT - A", "code": "IT-A", "room_number": "310A1(2nd floor)"},
-        {"name": " IT - B", "code": "IT-B", "room_number": "311(2nd floor)"},
-        {"name": " MECH", "code": "MECH", "room_number": "303(2nd floor)"},
-        {"name": " RA", "code": "RA", "room_number": "302(2nd floor)"}
-    ]
+    departments = _get_expected_departments()
     
     for dept in departments:
         db.add(Department(**dept))
