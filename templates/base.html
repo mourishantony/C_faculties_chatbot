@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AcademicScheduler</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="icon" type="image/png" href="/static/images/images.png">
+    {% block head_styles %}{% endblock %}
+</head>
+<body>
+    <div class="page-wrapper">
+        <!-- Navbar -->
+        <nav class="navbar">
+            <div class="container">
+                <a href="/cprog_admin_view_x7k9" class="navbar-brand">
+                    <img src="/static/images/images.png" alt="Kite Logo" />
+                    <i class="material-icons"></i>AcademicScheduler
+                </a>
+                <ul class="navbar-nav">
+                    <li><a href="/cprog_admin_view_x7k9" class="nav-link {% if active_page == 'dashboard' %}active{% endif %}">Dashboard</a></li>
+                    <li><a href="/cprog_faculties_f3k2" class="nav-link {% if active_page == 'faculties' %}active{% endif %}">C Faculties</a></li>
+                    <li><a href="/cprog_history_h4m1" class="nav-link {% if active_page == 'history' %}active{% endif %}">History</a></li>
+                </ul>
+            </div>
+        </nav>
+
+        {% block content %}{% endblock %}
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="container">
+                <p>&copy; AcademicScheduler v.1.1</p>
+            </div>
+        </footer>
+    </div>
+
+    {% block modals %}{% endblock %}
+    {% block page_styles %}{% endblock %}
+    {% block scripts %}{% endblock %}
+</body>
+</html>

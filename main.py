@@ -2200,17 +2200,17 @@ def faculty_dashboard_page(request: Request):
 # Secret Admin Dashboard (Public View)
 @app.get("/cprog_admin_view_x7k9", response_class=HTMLResponse)
 def admin_dashboard_page(request: Request):
-    return templates.TemplateResponse("admin_dashboard.html", {"request": request})
+    return templates.TemplateResponse("admin_dashboard.html", {"request": request, "active_page": "dashboard"})
 
 # Secret C Faculties Page (Public View)
 @app.get("/cprog_faculties_f3k2", response_class=HTMLResponse)
 def c_faculties_page(request: Request):
-    return templates.TemplateResponse("c_faculties.html", {"request": request})
+    return templates.TemplateResponse("c_faculties.html", {"request": request, "active_page": "faculties"})
 
 # Secret Admin History Page
 @app.get("/cprog_history_h4m1", response_class=HTMLResponse)
 def admin_history_page(request: Request):
-    return templates.TemplateResponse("admin_history.html", {"request": request})
+    return templates.TemplateResponse("admin_history.html", {"request": request, "active_page": "history"})
 
 # Secret Super Admin Dashboard
 @app.get("/cprog_super_dash_z9y3", response_class=HTMLResponse)
