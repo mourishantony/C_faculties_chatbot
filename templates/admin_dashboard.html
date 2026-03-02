@@ -3278,6 +3278,21 @@
                     classes.forEach(cls => {
                         const statusBadge = getStatusBadge(cls.status);
                         
+                        // Show badge if class type was changed (e.g., lab → theory)
+                        let classTypeChangedBadge = '';
+                        if (cls.class_type_changed) {
+                            const originalLabel = cls.original_class_type === 'lab' ? 'Lab' : cls.original_class_type === 'theory' ? 'Theory' : cls.original_class_type;
+                            const newLabel = cls.class_type === 'lab' ? 'Lab' : cls.class_type === 'theory' ? 'Theory' : cls.class_type;
+                            classTypeChangedBadge = `
+                                <div style="margin-top: 6px; display: flex; align-items: center; gap: 5px;">
+                                    <span style="background: #fef3c7; color: #92400e; font-size: 0.72rem; padding: 3px 8px; border-radius: 6px; font-weight: 600; display: inline-flex; align-items: center; gap: 3px;">
+                                        <i class="material-icons" style="font-size: 13px;">swap_horiz</i>
+                                        Originally ${originalLabel} → Conducted as ${newLabel}
+                                    </span>
+                                </div>
+                            `;
+                        }
+                        
                         // Build daily report section if status is filled
                         let reportSection = '';
                         if (cls.status === 'filled' && (cls.topic || cls.summary)) {
@@ -3337,6 +3352,7 @@
                                     <span class="period-badge-modal">${getOrdinal(cls.period)} Period <span style="font-weight: 400; font-size: 11px; opacity: 0.85;">(${getPeriodTime(cls.period)})</span></span>
                                     ${statusBadge}
                                 </div>
+                                ${classTypeChangedBadge}
                                 <div class="period-item-body">
                                     <div class="period-detail">
                                         <i class="material-icons">person</i>

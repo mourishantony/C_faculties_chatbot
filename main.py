@@ -1398,14 +1398,21 @@ def get_classes_by_department(date_offset: int = 0, db: Session = Depends(get_db
         resource_url = None
         session_date = target_date.isoformat()
         
+        # Use the daily entry's class_type if it exists (faculty may have changed lab to theory)
+        effective_class_type = entry.class_type
+        original_class_type = entry.class_type  # From timetable
+        
         if daily_entry:
+            # If the faculty changed the class type (e.g., lab → theory), use that
+            effective_class_type = daily_entry.class_type or entry.class_type
+            
             if daily_entry.is_absent:
                 status = "absent"
                 report_summary = daily_entry.absent_reason
             else:
                 status = "filled"
-                # Get summary based on class type
-                if entry.class_type == "lab":
+                # Get summary based on effective class type (what was actually conducted)
+                if effective_class_type == "lab":
                     report_summary = daily_entry.lab_work_done or daily_entry.summary
                     # Get lab program details
                     if daily_entry.lab_program_id:
@@ -1413,7 +1420,7 @@ def get_classes_by_department(date_offset: int = 0, db: Session = Depends(get_db
                         if lab_program:
                             session_topic = lab_program.program_title
                             resource_url = lab_program.moodle_url
-                elif entry.class_type == "mini_project":
+                elif effective_class_type == "mini_project":
                     report_summary = daily_entry.mini_project_progress or daily_entry.summary
                     session_topic = "Mini Project Work"
                 else:  # theory
@@ -1432,7 +1439,9 @@ def get_classes_by_department(date_offset: int = 0, db: Session = Depends(get_db
         class_info = {
             "id": entry.id,
             "period": entry.period,
-            "class_type": entry.class_type,
+            "class_type": effective_class_type,
+            "original_class_type": original_class_type,
+            "class_type_changed": effective_class_type != original_class_type,
             "faculty_id": entry.faculty_id,
             "faculty_name": faculty.name if faculty else "Unknown",
             "faculty_email": faculty.email if faculty else None,

@@ -226,6 +226,16 @@
                         <input type="text" class="form-control" id="modalPeriodDisplay" readonly>
                     </div>
                     
+                    <!-- Lab to Theory toggle (only visible for lab classes) -->
+                    <div class="form-group" id="labToTheoryGroup" style="display: none;">
+                        <label class="form-label">Conduct Class As</label>
+                        <select class="form-control" id="labToTheorySelect" onchange="toggleLabToTheory()">
+                            <option value="lab">Lab Class</option>
+                            <option value="theory">Theory Class</option>
+                        </select>
+                        <small style="color: #64748b;">This lab period can be used as a theory class if needed</small>
+                    </div>
+                    
                     <div class="checkbox-group">
                         <input type="checkbox" id="isAbsent" onchange="toggleAbsent()">
                         <label for="isAbsent">Mark as Absent</label>
@@ -809,12 +819,19 @@
                         ? `<br><small style="color: #7c3aed;">with ${item.swapped_with_faculty}</small>` 
                         : '';
                     
+                    // Determine the effective class type (from daily entry if filled, otherwise from timetable)
+                    const effectiveType = (item.daily_entry && item.daily_entry.class_type) ? item.daily_entry.class_type : item.class_type;
+                    const classTypeChanged = item.daily_entry && item.daily_entry.class_type && item.daily_entry.class_type !== item.class_type;
+                    
                     html += `
                         <tr style="${rowStyle}">
                             <td><span class="period-badge">${getOrdinal(item.period)}</span></td>
                             <td>${getPeriodTime(item.period)}</td>
                             <td><strong>${item.department_name}</strong>${typeBadge}${swapInfo}<br><small>${item.subject_code} - ${item.subject_name}</small></td>
-                            <td><span class="class-type-badge class-type-${item.class_type}">${classTypeLabel[item.class_type] || item.class_type}</span></td>
+                            <td>
+                                <span class="class-type-badge class-type-${effectiveType}">${classTypeLabel[effectiveType] || effectiveType}</span>
+                                ${classTypeChanged ? `<br><small style="color: #92400e; font-size: 0.65rem;">was ${classTypeLabel[item.class_type] || item.class_type}</small>` : ''}
+                            </td>
                             <td><span class="status-badge ${statusClass}">${status}</span></td>
                             <td>
                                 ${item.is_extra_class ? `
@@ -895,12 +912,31 @@
             document.getElementById('labForm').classList.add('hidden');
             document.getElementById('miniProjectForm').classList.add('hidden');
             
-            // Show the relevant form based on class type
-            if (classType === 'theory') {
+            // Show/hide the lab-to-theory toggle (only for lab classes)
+            const labToTheoryGroup = document.getElementById('labToTheoryGroup');
+            const labToTheorySelect = document.getElementById('labToTheorySelect');
+            if (classType === 'lab') {
+                labToTheoryGroup.style.display = 'block';
+                // Check if existing data has class_type overridden to theory
+                if (existingData && existingData.class_type === 'theory') {
+                    labToTheorySelect.value = 'theory';
+                    document.getElementById('modalClassType').value = 'theory';
+                } else {
+                    labToTheorySelect.value = 'lab';
+                }
+            } else {
+                labToTheoryGroup.style.display = 'none';
+            }
+            
+            // Determine the effective class type (may be overridden by lab-to-theory toggle)
+            const effectiveClassType = (classType === 'lab' && existingData && existingData.class_type === 'theory') ? 'theory' : classType;
+            
+            // Show the relevant form based on effective class type
+            if (effectiveClassType === 'theory') {
                 document.getElementById('theoryForm').classList.remove('hidden');
-            } else if (classType === 'lab') {
+            } else if (effectiveClassType === 'lab') {
                 document.getElementById('labForm').classList.remove('hidden');
-            } else if (classType === 'mini_project') {
+            } else if (effectiveClassType === 'mini_project') {
                 document.getElementById('miniProjectForm').classList.remove('hidden');
             }
             
@@ -921,8 +957,9 @@
                     document.getElementById('swapReasonGroup').classList.remove('hidden');
                 }
                 
-                // Fill class-type specific data
-                if (classType === 'theory') {
+                // Fill class-type specific data based on what was actually saved
+                const savedClassType = existingData.class_type || classType;
+                if (savedClassType === 'theory') {
                     document.getElementById('isOwnContent').checked = existingData.is_own_content;
                     if (existingData.is_own_content) {
                         document.getElementById('syllabusSection').classList.add('hidden');
@@ -934,7 +971,7 @@
                         showSessionDetails();
                     }
                     document.getElementById('theorySummary').value = existingData.summary || '';
-                } else if (classType === 'lab') {
+                } else if (savedClassType === 'lab') {
                     document.getElementById('labProgramSelect').value = existingData.lab_program_id || '';
                     showLabDetails();
                     document.getElementById('labWorkDone').value = existingData.lab_work_done || '';
@@ -982,6 +1019,34 @@
                 document.getElementById('syllabusSection').classList.remove('hidden');
                 document.getElementById('ownContentSection').classList.add('hidden');
             }
+        }
+        
+        function toggleLabToTheory() {
+            const selected = document.getElementById('labToTheorySelect').value;
+            
+            // Update the hidden class type field
+            document.getElementById('modalClassType').value = selected;
+            
+            // Hide all class-type forms
+            document.getElementById('theoryForm').classList.add('hidden');
+            document.getElementById('labForm').classList.add('hidden');
+            document.getElementById('miniProjectForm').classList.add('hidden');
+            
+            // Show the selected form
+            if (selected === 'theory') {
+                document.getElementById('theoryForm').classList.remove('hidden');
+            } else {
+                document.getElementById('labForm').classList.remove('hidden');
+            }
+            
+            // Update modal title
+            const classTypeLabel = {
+                'theory': 'theory',
+                'lab': 'lab',
+                'mini_project': 'Mini Project'
+            };
+            document.getElementById('modalTitle').innerHTML = 
+                `<i class="material-icons" style="vertical-align: middle; margin-right: 6px; font-size: 20px;">edit</i>Fill ${classTypeLabel[selected] || selected} Entry`;
         }
         
         document.getElementById('entryForm').addEventListener('submit', async (e) => {
