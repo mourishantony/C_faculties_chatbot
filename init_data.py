@@ -261,6 +261,9 @@ def _add_missing_data(db):
     # Sync timetable entries (replace old with current canonical timetable)
     _sync_timetable_entries(db)
     
+    # Sync syllabus sessions (ensure PPT URLs and topics are up to date)
+    _sync_syllabus(db)
+    
     if not added_something:
         print("All data is up to date!")
 
@@ -412,82 +415,9 @@ def _sync_timetable_entries(db):
     db.commit()
     print(f"✓ Timetable re-synced: {len(expected_timetable)} entries added")
 
-def _add_default_faqs(db):
-    """Add default FAQ entries"""
-    default_faqs = [
-        # Class Schedule & Timing FAQs - General guidance only (dynamic queries handle specifics)
-        {"question": "What are today's C programming classes?", "answer": "Type 'show schedule' or 'today classes' to see today's C programming classes with faculty and periods.", "category": "schedule"},
-        {"question": "Who has class in a specific period?", "answer": "Type 'period [number]' (e.g., 'period 3', 'period 4', '5th period') to see who has class in that period.", "category": "schedule"},
-        {"question": "When is the C programming class for a department?", "answer": "Type the department code (e.g., 'AI&DS-A', 'CSE-B', 'IT-A') to see their C programming schedule.", "category": "schedule"},
-        {"question": "What time does the 1st period start?", "answer": "The 1st period starts at 08:00 AM and ends at 08:45 AM.", "category": "schedule"},
-        {"question": "Show me the complete timetable for a day", "answer": "Type the day name (e.g., 'Monday', 'Tuesday schedule', 'Wednesday classes') to see the complete schedule for that day.", "category": "schedule"},
-        {"question": "Which faculty is teaching a department?", "answer": "Type the department code (e.g., 'CSE-B', 'AI&DS-A') to see which faculty is assigned.", "category": "schedule"},
-        {"question": "Is there any lab class today?", "answer": "Lab classes are typically scheduled for 2-3 consecutive periods. Check today's schedule to see lab sessions.", "category": "schedule"},
-        {"question": "What are the theory class timings?", "answer": "Theory classes are 45 minutes each. Periods: 1(8:00-8:45), 2(8:45-9:30), 3(9:45-10:30), 4(10:30-11:15), 5(11:15-12:00), 6(1:00-1:45), 7(1:45-2:30), 8(2:30-3:15).", "category": "schedule"},
-        {"question": "How many periods are there in a day?", "answer": "There are 8 periods in a day. Morning: Periods 1-5 (8:00 AM - 12:00 PM), Afternoon: Periods 6-8 (1:00 PM - 3:15 PM).", "category": "schedule"},
-        {"question": "When does the college start and end?", "answer": "College starts at 8:00 AM (1st period) and ends at 3:15 PM (8th period).", "category": "schedule"},
-        {"question": "Is there class on Saturday?", "answer": "Saturday classes depend on the timetable. Type 'Saturday' to check if there are any C programming classes.", "category": "schedule"},
-        {"question": "What is the lunch break timing?", "answer": "Lunch break is from 12:00 PM to 1:00 PM (between 5th and 6th periods).", "category": "schedule"},
-        {"question": "Show me all classes for this week", "answer": "Type the day name (Monday, Tuesday, etc.) to see classes for that day, or 'show schedule' for today.", "category": "schedule"},
-        {"question": "Which departments have C programming today?", "answer": "Type 'show schedule' to see all departments that have C programming classes today.", "category": "schedule"},
-        {"question": "What classes are scheduled after lunch break?", "answer": "After lunch (1:00 PM onwards), periods 6-9 have classes. Type 'period 6' or 'period 7' etc. to see specific classes.", "category": "schedule"},
-        {"question": "What are the topics to be covered?", "answer": "Topics covered depend on the syllabus session. Type 'session [number]' (e.g., 'session 5') to see specific topic details.", "category": "schedule"},
-        {"question": "Which class is handling lab today?", "answer": "Lab sessions are marked as 'lab' type in the timetable. Type 'show schedule' to identify lab classes.", "category": "schedule"},
-        
-        # Faculty FAQs
-        {"question": "Who is teaching C programming?", "answer": "We have 14 dedicated faculty members teaching C programming across different departments. Type 'list all faculty' to see them.", "category": "faculty"},
-        {"question": "List all faculty members", "answer": "Type 'list all faculty' to see all 14 faculty members with their departments.", "category": "faculty"},
-        {"question": "Who teaches AI&DS-A?", "answer": "Type 'AI&DS-A' to see the faculty assigned to AI&DS-A department for C programming.", "category": "faculty"},
-        
-        # Topics & Syllabus FAQs
-        {"question": "What topics are covered in Unit 1?", "answer": "Unit 1 covers Basics of C Programming: Introduction to C, History, Features, Structure of C program, Compilation Process, Tokens, Keywords, Identifiers, Variables, Data Types, Operators, and Control Flow.", "category": "topics"},
-        {"question": "What topics are covered in Unit 2?", "answer": "Unit 2 covers Arrays and Strings: One-dimensional arrays, Multi-dimensional arrays, String handling, String functions, Array operations.", "category": "topics"},
-        {"question": "What topics are covered in Unit 3?", "answer": "Unit 3 covers Functions: Function declaration, definition, calling, recursion, storage classes, and scope rules.", "category": "topics"},
-        {"question": "What topics are covered in Unit 4?", "answer": "Unit 4 covers Pointers: Pointer basics, pointer arithmetic, pointers with arrays, pointers with functions, dynamic memory allocation.", "category": "topics"},
-        {"question": "What topics are covered in Unit 5?", "answer": "Unit 5 covers Structures and File Handling: Structures, Unions, Typedef, File operations, file pointers, reading and writing files.", "category": "topics"},
-        {"question": "How can I access the PPT materials?", "answer": "Type 'session [number] ppt' (e.g., 'session 3 ppt') to get the PPT link for that session.", "category": "topics"},
-        {"question": "What lab programs are available?", "answer": "There are 10 lab programs. Type 'week [number] lab' (e.g., 'week 3 lab') to see specific lab program details.", "category": "topics"},
-        
-        # General FAQs
-        {"question": "What is the course code?", "answer": "The course code for C Programming is 24UCS271 (PROG C).", "category": "general"},
-        {"question": "How to use this chatbot?", "answer": "You can ask about: faculty schedules (e.g., 'Sathish today'), department classes (e.g., 'CSE-A'), lab programs (e.g., 'week 3 lab'), or PPT materials (e.g., 'session 5 ppt'). Type 'help' for more commands.", "category": "general"},
-        {"question": "Who is absent today?", "answer": "Check the 'Absent Today' section in the dashboard to see which faculty members are absent today.", "category": "general"},
-    ]
-    
-    for faq_data in default_faqs:
-        faq = FAQ(
-            question=faq_data["question"],
-            answer=faq_data["answer"],
-            category=faq_data["category"]
-        )
-        db.add(faq)
-    db.commit()
-
-def _init_all_data(db):
-    """Initialize all data for a fresh database"""
-    # Add Departments with Room Numbers
-    departments = _get_expected_departments()
-    
-    for dept in departments:
-        db.add(Department(**dept))
-    
-    # Add Period Timings
-    period_timings = [
-        {"period": 1, "start_time": "08:00 AM", "end_time": "08:45 AM", "display_time": "08:00 AM - 08:45 AM"},
-        {"period": 2, "start_time": "08:45 AM", "end_time": "09:30 AM", "display_time": "08:45 AM - 09:30 AM"},
-        {"period": 3, "start_time": "09:45 AM", "end_time": "10:30 AM", "display_time": "09:45 AM - 10:30 AM"},
-        {"period": 4, "start_time": "10:30 AM", "end_time": "11:15 AM", "display_time": "10:30 AM - 11:15 AM"},
-        {"period": 5, "start_time": "11:15 AM", "end_time": "12:00 PM", "display_time": "11:15 AM - 12:00 PM"},
-        {"period": 6, "start_time": "01:00 PM", "end_time": "01:45 PM", "display_time": "01:00 PM - 01:45 PM"},
-        {"period": 7, "start_time": "01:45 PM", "end_time": "02:30 PM", "display_time": "01:45 PM - 02:30 PM"},
-        {"period": 8, "start_time": "02:30 PM", "end_time": "03:15 PM", "display_time": "02:30 PM - 03:15 PM"},
-    ]
-    
-    for timing in period_timings:
-        db.add(PeriodTiming(**timing))
-    
-    # Add C Programming Syllabus - Sessions with PPT URLs
-    syllabus_sessions = [
+def _get_expected_syllabus():
+    """Return the canonical syllabus data used for both fresh init and sync"""
+    return [
         # UNIT 1: BASICS OF C PROGRAMMING
         {"session_number": 1, "session_title": "Introduction to C Programming", "unit": 1,
          "topics": "What is C? Why C still matters (systems, OS, embedded). Difference between Python and C (compiled vs interpreted, performance, control). Structure of a C program: #include, main(), braces, statements.",
@@ -633,6 +563,154 @@ def _init_all_data(db):
          "topics": "What are command line arguments. argc and argv parameters. Accessing command line input.",
          "ppt_url": None},
     ]
+
+def _sync_syllabus(db):
+    """Sync syllabus sessions: update existing sessions and add new ones.
+    This ensures PPT URLs, topics, and titles are always up to date."""
+    expected_sessions = _get_expected_syllabus()
+    
+    # Build a hash of expected syllabus content for quick comparison
+    expected_hash = hashlib.md5(
+        json.dumps(expected_sessions, sort_keys=True, default=str).encode()
+    ).hexdigest()
+    
+    # Build a hash of current DB syllabus content
+    current_sessions = db.query(Syllabus).order_by(Syllabus.session_number).all()
+    current_data = []
+    for s in current_sessions:
+        current_data.append({
+            "session_number": s.session_number,
+            "session_title": s.session_title,
+            "unit": s.unit,
+            "topics": s.topics,
+            "ppt_url": s.ppt_url
+        })
+    
+    current_hash = hashlib.md5(
+        json.dumps(current_data, sort_keys=True, default=str).encode()
+    ).hexdigest()
+    
+    if current_hash == expected_hash:
+        print(f"✓ Syllabus already up to date ({len(current_sessions)} sessions)")
+        return
+    
+    print(f"  Syllabus content changed (hash mismatch). Syncing {len(expected_sessions)} sessions...")
+    
+    # Build lookup of existing sessions by session_number
+    existing_map = {s.session_number: s for s in current_sessions}
+    
+    added = 0
+    updated = 0
+    for expected in expected_sessions:
+        session_num = expected["session_number"]
+        if session_num in existing_map:
+            s = existing_map[session_num]
+            changed = False
+            if s.session_title != expected["session_title"]:
+                s.session_title = expected["session_title"]
+                changed = True
+            if s.unit != expected["unit"]:
+                s.unit = expected["unit"]
+                changed = True
+            if s.topics != expected["topics"]:
+                s.topics = expected["topics"]
+                changed = True
+            if s.ppt_url != expected["ppt_url"]:
+                s.ppt_url = expected["ppt_url"]
+                changed = True
+            if changed:
+                updated += 1
+        else:
+            db.add(Syllabus(**expected))
+            added += 1
+    
+    # Remove sessions that no longer exist in expected data
+    expected_numbers = {s["session_number"] for s in expected_sessions}
+    removed = 0
+    for s in current_sessions:
+        if s.session_number not in expected_numbers:
+            db.delete(s)
+            removed += 1
+    
+    db.commit()
+    print(f"✓ Syllabus synced: {added} added, {updated} updated, {removed} removed")
+
+def _add_default_faqs(db):
+    """Add default FAQ entries"""
+    default_faqs = [
+        # Class Schedule & Timing FAQs - General guidance only (dynamic queries handle specifics)
+        {"question": "What are today's C programming classes?", "answer": "Type 'show schedule' or 'today classes' to see today's C programming classes with faculty and periods.", "category": "schedule"},
+        {"question": "Who has class in a specific period?", "answer": "Type 'period [number]' (e.g., 'period 3', 'period 4', '5th period') to see who has class in that period.", "category": "schedule"},
+        {"question": "When is the C programming class for a department?", "answer": "Type the department code (e.g., 'AI&DS-A', 'CSE-B', 'IT-A') to see their C programming schedule.", "category": "schedule"},
+        {"question": "What time does the 1st period start?", "answer": "The 1st period starts at 08:00 AM and ends at 08:45 AM.", "category": "schedule"},
+        {"question": "Show me the complete timetable for a day", "answer": "Type the day name (e.g., 'Monday', 'Tuesday schedule', 'Wednesday classes') to see the complete schedule for that day.", "category": "schedule"},
+        {"question": "Which faculty is teaching a department?", "answer": "Type the department code (e.g., 'CSE-B', 'AI&DS-A') to see which faculty is assigned.", "category": "schedule"},
+        {"question": "Is there any lab class today?", "answer": "Lab classes are typically scheduled for 2-3 consecutive periods. Check today's schedule to see lab sessions.", "category": "schedule"},
+        {"question": "What are the theory class timings?", "answer": "Theory classes are 45 minutes each. Periods: 1(8:00-8:45), 2(8:45-9:30), 3(9:45-10:30), 4(10:30-11:15), 5(11:15-12:00), 6(1:00-1:45), 7(1:45-2:30), 8(2:30-3:15).", "category": "schedule"},
+        {"question": "How many periods are there in a day?", "answer": "There are 8 periods in a day. Morning: Periods 1-5 (8:00 AM - 12:00 PM), Afternoon: Periods 6-8 (1:00 PM - 3:15 PM).", "category": "schedule"},
+        {"question": "When does the college start and end?", "answer": "College starts at 8:00 AM (1st period) and ends at 3:15 PM (8th period).", "category": "schedule"},
+        {"question": "Is there class on Saturday?", "answer": "Saturday classes depend on the timetable. Type 'Saturday' to check if there are any C programming classes.", "category": "schedule"},
+        {"question": "What is the lunch break timing?", "answer": "Lunch break is from 12:00 PM to 1:00 PM (between 5th and 6th periods).", "category": "schedule"},
+        {"question": "Show me all classes for this week", "answer": "Type the day name (Monday, Tuesday, etc.) to see classes for that day, or 'show schedule' for today.", "category": "schedule"},
+        {"question": "Which departments have C programming today?", "answer": "Type 'show schedule' to see all departments that have C programming classes today.", "category": "schedule"},
+        {"question": "What classes are scheduled after lunch break?", "answer": "After lunch (1:00 PM onwards), periods 6-9 have classes. Type 'period 6' or 'period 7' etc. to see specific classes.", "category": "schedule"},
+        {"question": "What are the topics to be covered?", "answer": "Topics covered depend on the syllabus session. Type 'session [number]' (e.g., 'session 5') to see specific topic details.", "category": "schedule"},
+        {"question": "Which class is handling lab today?", "answer": "Lab sessions are marked as 'lab' type in the timetable. Type 'show schedule' to identify lab classes.", "category": "schedule"},
+        
+        # Faculty FAQs
+        {"question": "Who is teaching C programming?", "answer": "We have 14 dedicated faculty members teaching C programming across different departments. Type 'list all faculty' to see them.", "category": "faculty"},
+        {"question": "List all faculty members", "answer": "Type 'list all faculty' to see all 14 faculty members with their departments.", "category": "faculty"},
+        {"question": "Who teaches AI&DS-A?", "answer": "Type 'AI&DS-A' to see the faculty assigned to AI&DS-A department for C programming.", "category": "faculty"},
+        
+        # Topics & Syllabus FAQs
+        {"question": "What topics are covered in Unit 1?", "answer": "Unit 1 covers Basics of C Programming: Introduction to C, History, Features, Structure of C program, Compilation Process, Tokens, Keywords, Identifiers, Variables, Data Types, Operators, and Control Flow.", "category": "topics"},
+        {"question": "What topics are covered in Unit 2?", "answer": "Unit 2 covers Arrays and Strings: One-dimensional arrays, Multi-dimensional arrays, String handling, String functions, Array operations.", "category": "topics"},
+        {"question": "What topics are covered in Unit 3?", "answer": "Unit 3 covers Functions: Function declaration, definition, calling, recursion, storage classes, and scope rules.", "category": "topics"},
+        {"question": "What topics are covered in Unit 4?", "answer": "Unit 4 covers Pointers: Pointer basics, pointer arithmetic, pointers with arrays, pointers with functions, dynamic memory allocation.", "category": "topics"},
+        {"question": "What topics are covered in Unit 5?", "answer": "Unit 5 covers Structures and File Handling: Structures, Unions, Typedef, File operations, file pointers, reading and writing files.", "category": "topics"},
+        {"question": "How can I access the PPT materials?", "answer": "Type 'session [number] ppt' (e.g., 'session 3 ppt') to get the PPT link for that session.", "category": "topics"},
+        {"question": "What lab programs are available?", "answer": "There are 10 lab programs. Type 'week [number] lab' (e.g., 'week 3 lab') to see specific lab program details.", "category": "topics"},
+        
+        # General FAQs
+        {"question": "What is the course code?", "answer": "The course code for C Programming is 24UCS271 (PROG C).", "category": "general"},
+        {"question": "How to use this chatbot?", "answer": "You can ask about: faculty schedules (e.g., 'Sathish today'), department classes (e.g., 'CSE-A'), lab programs (e.g., 'week 3 lab'), or PPT materials (e.g., 'session 5 ppt'). Type 'help' for more commands.", "category": "general"},
+        {"question": "Who is absent today?", "answer": "Check the 'Absent Today' section in the dashboard to see which faculty members are absent today.", "category": "general"},
+    ]
+    
+    for faq_data in default_faqs:
+        faq = FAQ(
+            question=faq_data["question"],
+            answer=faq_data["answer"],
+            category=faq_data["category"]
+        )
+        db.add(faq)
+    db.commit()
+
+def _init_all_data(db):
+    """Initialize all data for a fresh database"""
+    # Add Departments with Room Numbers
+    departments = _get_expected_departments()
+    
+    for dept in departments:
+        db.add(Department(**dept))
+    
+    # Add Period Timings
+    period_timings = [
+        {"period": 1, "start_time": "08:00 AM", "end_time": "08:45 AM", "display_time": "08:00 AM - 08:45 AM"},
+        {"period": 2, "start_time": "08:45 AM", "end_time": "09:30 AM", "display_time": "08:45 AM - 09:30 AM"},
+        {"period": 3, "start_time": "09:45 AM", "end_time": "10:30 AM", "display_time": "09:45 AM - 10:30 AM"},
+        {"period": 4, "start_time": "10:30 AM", "end_time": "11:15 AM", "display_time": "10:30 AM - 11:15 AM"},
+        {"period": 5, "start_time": "11:15 AM", "end_time": "12:00 PM", "display_time": "11:15 AM - 12:00 PM"},
+        {"period": 6, "start_time": "01:00 PM", "end_time": "01:45 PM", "display_time": "01:00 PM - 01:45 PM"},
+        {"period": 7, "start_time": "01:45 PM", "end_time": "02:30 PM", "display_time": "01:45 PM - 02:30 PM"},
+        {"period": 8, "start_time": "02:30 PM", "end_time": "03:15 PM", "display_time": "02:30 PM - 03:15 PM"},
+    ]
+    
+    for timing in period_timings:
+        db.add(PeriodTiming(**timing))
+    
+    # Add C Programming Syllabus - Sessions with PPT URLs
+    syllabus_sessions = _get_expected_syllabus()
     
     for session in syllabus_sessions:
         db.add(Syllabus(**session))
